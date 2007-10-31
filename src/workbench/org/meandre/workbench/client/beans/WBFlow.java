@@ -54,14 +54,14 @@ public class WBFlow implements IsSerializable {
     /**
      * Set of executable component instances for this flow.
      *
-     * @gwt.typeArgs <org.seasr.client.beans.WBComponentInstance>
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponentInstance>
      */
     private Set setExecutableComponentInstances = null;
 
     /**
      * Instanctiated connections between instantiated components.
      *
-     * @gwt.typeArgs <org.seasr.client.beans.WBComponentConnection>
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponentConnection>
      */
     private Set setConnectorDescription = null;
 

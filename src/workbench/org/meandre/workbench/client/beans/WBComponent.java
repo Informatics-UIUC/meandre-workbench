@@ -74,13 +74,13 @@ public class WBComponent implements IsSerializable {
 
     /** The set of input data ports DataPortDescription
      *
-     * @gwt.typeArgs <org.seasr.client.beans.WBDataport>
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBDataport>
      * */
     private java.util.Set setInputs = null;
 
     /** The set of output data ports DataPortDescription
      *
-     * @gwt.typeArgs <org.seasr.client.beans.WBDataport>
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBDataport>
      * */
     private Set setOutputs = null;
 

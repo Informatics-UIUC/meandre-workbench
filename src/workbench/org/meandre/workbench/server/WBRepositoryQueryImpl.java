@@ -122,7 +122,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet /*implements
      * the search criteria.
      *
      * @param search String The search string for this query.
-     * @gwt.typeArgs <org.seasr.client.beans.WBComponent>
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
      * @return Set Returns set of active components matching search query.
      */
 //    public Set getActiveComponents(String search) {
@@ -150,7 +150,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet /*implements
     /**
      * Returns the set of active components in the repository.
      *
-     * @gwt.typeArgs <org.seasr.client.beans.WBComponent>
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
      * @return Set Returns set of active components.
      */
 //    public Set getActiveComponents() {
@@ -172,7 +172,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet /*implements
 
     /**
      *
-     * @gwt.typeArgs <org.seasr.client.beans.WBFlow>
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBFlow>
      */
 //    public Set getActiveFlows() {
 //

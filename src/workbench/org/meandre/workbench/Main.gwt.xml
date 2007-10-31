@@ -9,6 +9,6 @@
 	<!-- Specify the app entry point class.                   -->
         <!-- Gwm dependency -->
         <inherits name='org.gwm.GwtWindowManager'/>
-	<entry-point class='org.seasr.client.Main'/>
-        <servlet path='/WBRepositoryQuery' class='org.seasr.server.WBRepositoryQueryImpl'/>
+	<entry-point class='org.meandre.workbench.client.Main'/>
+        <servlet path='/WBRepositoryQuery' class='org.meandre.workbench.server.WBRepositoryQueryImpl'/>
 </module>
