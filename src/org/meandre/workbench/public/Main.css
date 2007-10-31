@@ -1,0 +1,176 @@
+
+.gwt-MenuBar {
+  background: #c3d9ff;
+  cursor: default;
+}
+
+.gwt-MenuItem {
+  font-size: 80%;
+  margin: 1px;
+  cursor: default;
+}
+
+.gwt-MenuItem-selected {
+  background: #e8eef7;
+}
+
+.gwt-HorizontalSplitPanel {
+  border-style: solid;
+  border-width: medium;
+  border-color: #c3d9ff;
+  margin: 1px;
+}
+
+.gwt-HorizontalSplitPanel .hsplitter {
+  cursor: e-resize;
+  background-color: #c3d9ff;
+}
+
+.gwt-VerticalSplitPanel .vsplitter  {
+  cursor: n-resize;
+  background-color: #c3d9ff;
+}
+
+.gwt-StackPanel {
+  background: #fff;
+}
+
+.gwt-Tree {
+  /*height: 100%;*/
+}
+
+.gwt-Tree .gwt-TreeItem {
+  cursor: pointer;
+  cursor: hand;
+  font-size: 70%;
+  font-weight: bold;
+  width: 100%;
+}
+
+.gwt-Tree .gwt-TreeItem-selected {
+  background: #ffffcc;
+}
+
+.comp-label{
+  font-size: 70%;
+  font-weight: bold;
+  cursor: text;
+}
+
+.comp-panel-image {
+  border-style: solid;
+  border-width: thin;
+  border-color: #000000;
+}
+
+.comp-panel-image-selected{
+  border-style: solid;
+  border-width: thin;
+  border-color: red;
+}
+
+.comp-ports {
+  cursor: pointer;
+  cursor: hand;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.port-popup {
+  background: #ffffcc;
+  font-size: 70%;
+  font-weight: bold;
+}
+
+.menu-panel {
+  border-style: solid;
+  border-width: medium;
+  border-color: #c3d9ff;
+  margin: 1px;
+}
+
+.menu-button {
+  margin: 5px;
+  cursor: pointer;
+  cursor: hand;
+  background-color: #ffffff;
+}
+
+.menu-button-text {
+  font-weight: bold;
+  text-align: center;
+  margin: 2px;
+  font-size: 80%;
+}
+
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+div#componentshow {
+  font-size: 80%;
+}
+
+.gwt-TabPanel {
+  margin-top: 4px;
+}
+
+.gwt-TabPanelBottom {
+   /*background-color: #E8EEF7;*/
+}
+
+.gwt-TabBar {
+  padding-top: 2px;
+  border-bottom: 4px solid #87B3FF;
+  background-color: #fff;
+}
+
+.gwt-TabBar .gwt-TabBarItem-selected {
+  padding: 4px;
+  font-weight: bold;
+  cursor: default;
+  background-color: #87b3ff;
+  border-bottom: 2px solid #87b3ff;
+  margin-right: 2px;
+  font-size: 70%;
+}
+
+
+.gwt-TabBar .gwt-TabBarItem {
+  padding: 4px;
+  cursor: pointer;
+  cursor: hand;
+
+  background-color: #e8eef7;
+  border-bottom: 2px solid white;
+  margin-right: 2px;
+ font-size: 70%;
+}
+
+
+.gwt-DialogBox .Caption {
+  background-color: #C3D9FF;
+  padding: 3px;
+  margin: 2px;
+  font-weight: bold;
+  cursor: default;
+}
+
+
+.gwt-DialogBox {
+  border: 2px outset;
+  background-color: white;
+}
+
+.dialog-button {
+  margin: 4px;
+}
+
+.tree-button {
+  margin: 4px;
+  font-weight: bold;
+  font-size: 70%;
+  background-color: #e8eef7;
+}
+
