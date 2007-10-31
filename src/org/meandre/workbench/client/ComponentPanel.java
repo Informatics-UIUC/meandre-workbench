@@ -1,4 +1,4 @@
-package org.seasr.client;
+package org.meandre.workbench.client;
 
 //==============
 // Java Imports
@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import org.seasr.client.beans.*;
+import org.meandre.workbench.client.beans.*;
 import com.google.gwt.user.client.ui.Widget;
 
 /**

@@ -1,4 +1,4 @@
-package org.seasr.client.beans;
+package org.meandre.workbench.client.beans;
 
 //==============
 // Java Imports

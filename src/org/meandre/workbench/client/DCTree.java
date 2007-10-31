@@ -1,4 +1,4 @@
-package org.seasr.client;
+package org.meandre.workbench.client;
 
 //==============
 // Java Imports
@@ -11,7 +11,7 @@ package org.seasr.client;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.Event;
-import org.seasr.client.beans.*;
+import org.meandre.workbench.client.beans.*;
 import com.google.gwt.user.client.ui.TreeListener;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.TreeImages;

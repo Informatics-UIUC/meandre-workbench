@@ -1,4 +1,4 @@
-package org.seasr.client;
+package org.meandre.workbench.client;
 
 /**
  * <p>Title: </p>

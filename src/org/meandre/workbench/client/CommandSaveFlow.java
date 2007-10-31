@@ -1,4 +1,4 @@
-package org.seasr.client;
+package org.meandre.workbench.client;
 
 //==============
 // Java Imports
@@ -8,10 +8,10 @@ package org.seasr.client;
 // Other Imports
 //===============
 
-import org.seasr.client.beans.WBFlow;
+import org.meandre.workbench.client.beans.WBFlow;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.Window;
-import org.seasr.client.beans.WBCallbackObject;
+import org.meandre.workbench.client.beans.WBCallbackObject;
 
 /**
  * <p>Title: Command Save Flow </p>

@@ -1,9 +1,9 @@
-package org.seasr.client;
+package org.meandre.workbench.client;
 
 import java.util.Set;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import org.seasr.client.beans.WBCallbackObject;
-import org.seasr.client.beans.WBFlow;
+import org.meandre.workbench.client.beans.WBCallbackObject;
+import org.meandre.workbench.client.beans.WBFlow;
 
 /**
  * <p>Title: </p>

@@ -1,8 +1,8 @@
-package org.seasr.client;
+package org.meandre.workbench.client;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import java.util.Set;
-import org.seasr.client.beans.*;
+import org.meandre.workbench.client.beans.*;
 
 
 /**

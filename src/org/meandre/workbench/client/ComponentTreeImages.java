@@ -1,4 +1,4 @@
-package org.seasr.client;
+package org.meandre.workbench.client;
 
 import com.google.gwt.user.client.ui.TreeImages;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;

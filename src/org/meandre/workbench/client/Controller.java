@@ -1,4 +1,4 @@
-package org.seasr.client;
+package org.meandre.workbench.client;
 
 //==============
 // Java Imports
@@ -24,11 +24,11 @@ import com.allen_sauer.gwt.dragdrop.client.drop.BoundaryDropController;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
-import org.seasr.client.beans.WBComponent;
-import org.seasr.client.beans.WBFlow;
-import org.seasr.client.beans.WBComponentInstance;
-import org.seasr.client.beans.WBProperties;
-import org.seasr.client.beans.WBComponentConnection;
+import org.meandre.workbench.client.beans.WBComponent;
+import org.meandre.workbench.client.beans.WBFlow;
+import org.meandre.workbench.client.beans.WBComponentInstance;
+import org.meandre.workbench.client.beans.WBProperties;
+import org.meandre.workbench.client.beans.WBComponentConnection;
 import org.gwtwidgets.client.wrap.JsGraphicsPanel;
 import com.allen_sauer.gwt.dragdrop.client.DragHandlerAdapter;
 import com.allen_sauer.gwt.dragdrop.client.DragEndEvent;
@@ -52,8 +52,8 @@ import com.google.gwt.user.client.ui.Image;
 import com.gwt.components.client.Effects;
 import com.gwt.components.client.Effects.EffectListenerAdapter;
 import com.gwt.components.client.Effects.Effect;
-import org.seasr.client.beans.WBPropertiesDefinition;
-import org.seasr.client.beans.WBDataport;
+import org.meandre.workbench.client.beans.WBPropertiesDefinition;
+import org.meandre.workbench.client.beans.WBDataport;
 
 /**
  * <p>Title: Controller</p>
@@ -1681,7 +1681,7 @@ public class Controller {
             String key = (String) itty.next();
             Object val = rootMap.get(key);
             WBTreeNode newND = new WBTreeNode();
-            if (val instanceof org.seasr.client.beans.WBComponent) {
+            if (val instanceof org.meandre.workbench.client.beans.WBComponent) {
                 WBTreeItem newItem = new WBTreeItem(key,
                         getCompTreeItemPopUpText((WBComponent) val));
                 newItem.setUserObject(val);

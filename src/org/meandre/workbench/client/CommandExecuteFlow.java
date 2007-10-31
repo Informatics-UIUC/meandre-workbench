@@ -1,4 +1,4 @@
-package org.seasr.client;
+package org.meandre.workbench.client;
 
 //==============
 // Java Imports
@@ -8,7 +8,7 @@ package org.seasr.client;
 // Other Imports
 //===============
 
-import org.seasr.client.beans.WBFlow;
+import org.meandre.workbench.client.beans.WBFlow;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ResponseTextHandler;

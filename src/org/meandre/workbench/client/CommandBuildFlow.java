@@ -1,4 +1,4 @@
-package org.seasr.client;
+package org.meandre.workbench.client;
 
 //==============
 // Java Imports
@@ -10,7 +10,7 @@ import java.util.Set;
 // Other Imports
 //===============
 
-import org.seasr.client.beans.WBFlow;
+import org.meandre.workbench.client.beans.WBFlow;
 
 /**
  * <p>Title: Command Build Flow</p>

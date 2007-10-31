@@ -1,9 +1,9 @@
-package org.seasr.client;
+package org.meandre.workbench.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
-import org.seasr.client.beans.*;
+import org.meandre.workbench.client.beans.*;
 
 /**
  * <p>Title: </p>

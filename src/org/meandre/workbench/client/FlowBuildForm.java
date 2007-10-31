@@ -1,4 +1,4 @@
-package org.seasr.client;
+package org.meandre.workbench.client;
 
 //==============
 // Java Imports
@@ -22,12 +22,12 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.TextArea;
-import org.seasr.client.beans.WBFlow;
-import org.seasr.client.beans.WBComponentInstance;
-import org.seasr.client.beans.WBTags;
-import org.seasr.client.beans.WBComponentConnection;
+import org.meandre.workbench.client.beans.WBFlow;
+import org.meandre.workbench.client.beans.WBComponentInstance;
+import org.meandre.workbench.client.beans.WBTags;
+import org.meandre.workbench.client.beans.WBComponentConnection;
 import com.google.gwt.user.client.Window;
-import org.seasr.client.beans.WBComponent;
+import org.meandre.workbench.client.beans.WBComponent;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 
 /**
