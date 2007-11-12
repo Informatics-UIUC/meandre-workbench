@@ -23,6 +23,11 @@ import org.meandre.workbench.server.proxy.beans.repository.RepositoryImpl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import java.io.DataOutputStream;
+import java.io.DataInputStream;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 /** Create a meandre autheticated proxy to access the web services
  *
@@ -450,4 +455,56 @@ public class MeandreProxy {
                         log.warning(e.toString());
                 }
         }
+
+        public String executePost(String sURL, Map<String, String> data){
+            StringBuffer sbuff = new StringBuffer();
+            try {
+                URL url = new URL(sBaseURL + sURL);
+                URLConnection urlConn;
+                DataOutputStream printout;
+                DataInputStream input;
+                // URL connection channel.
+                urlConn = url.openConnection();
+                // Let the run-time system (RTS) know that we want input.
+                urlConn.setRequestProperty("Authorization",
+                                           "Basic " + sUPEncoding);
+                urlConn.setDoInput(true);
+                // Let the RTS know that we want to do output.
+                urlConn.setDoOutput(true);
+                // No caching, we want the real thing.
+                urlConn.setUseCaches(false);
+                // Specify the content type.
+            urlConn.setRequestProperty
+                    ("Content-Type", "application/x-www-form-urlencoded");
+                // Send POST output.
+
+                String pdata = "";
+
+                for (String key : data.keySet()) {
+                    pdata += URLEncoder.encode(key, "UTF-8") + "=" +
+                            URLEncoder.encode(data.get(key), "UTF-8");
+                }
+
+                OutputStreamWriter wr = new OutputStreamWriter(urlConn.
+                        getOutputStream());
+                wr.write(pdata);
+                wr.flush();
+
+                // Get the response
+                BufferedReader rd = new BufferedReader(new InputStreamReader(
+                        urlConn.getInputStream()));
+                String line;
+                 while ((line = rd.readLine()) != null) {
+                    sbuff.append(line);
+                }
+                wr.close();
+                rd.close();
+
+            } catch (Exception e){
+                log.warning(e.getMessage());
+                return null;
+            }
+            return sbuff.toString();
+        }
+
 }

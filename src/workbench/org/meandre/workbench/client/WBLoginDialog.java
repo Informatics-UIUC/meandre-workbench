@@ -23,6 +23,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.meandre.workbench.client.beans.WBLoginBean;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.DOM;
 
 /**
  * <p>Title: Workbench Login Dialog</p>
@@ -48,7 +51,8 @@ public class WBLoginDialog extends DialogBox {
     private TextBox _tbox = null;
     private PasswordTextBox _pbox = null;
     private TextBox _ubox = null;
-    private Image _prog = null;
+    private TextBox _prtbox = null;
+    private Image _busy = null;
 
 
     public WBLoginDialog(Main main, Controller cont) {
@@ -58,6 +62,7 @@ public class WBLoginDialog extends DialogBox {
         setWidget(buildPanel());
         setText("Meandre Workbench Login");
         show();
+        _tbox.setFocus(true);
         setPopupPosition((Window.getClientWidth() / 2) -
                          (this.getOffsetWidth() / 2),
                          (Window.getClientHeight() / 2) -
@@ -67,12 +72,14 @@ public class WBLoginDialog extends DialogBox {
     private Panel buildPanel() {
         VerticalPanel vp = new VerticalPanel();
         Grid gp = new Grid(4, 2);
+
         _butt = new Button("Login");
         _butt.setEnabled(false);
 
-        HTML tLab = new HTML("<bold><right>User ID:</right></bold>");
-        HTML pLab = new HTML("<bold><right>Password:</right></bold>");
-        HTML uLab = new HTML("<bold><right>Location:</right></bold>");
+        HTML tLab = new HTML("<strong><right>User ID:</right></strong>");
+        HTML pLab = new HTML("<strong><right>Password:</right></strong>");
+        HTML uLab = new HTML("<strong><right>Domain:</right></strong>");
+        HTML prtLab = new HTML("<strong><right>Port:</right></strong>");
         _tbox = new TextBox();
         _tbox.addKeyboardListener(new KeyboardListenerAdapter() {
             public void onKeyPress(Widget sender, char keyCode, int modifiers) {
@@ -82,7 +89,8 @@ public class WBLoginDialog extends DialogBox {
                 }
                 if ((_tbox.getText().trim().length() > 0)
                     && (_tbox.getText().trim().length() > 0)
-                    && (_ubox.getText().trim().length() > 0)) {
+                    && (_ubox.getText().trim().length() > 0)
+                    && (_prtbox.getText().trim().length() > 0)) {
                     _butt.setEnabled(true);
                 } else {
                     _butt.setEnabled(false);
@@ -98,7 +106,8 @@ public class WBLoginDialog extends DialogBox {
                 }
                 if ((_tbox.getText().trim().length() > 0)
                     && (_tbox.getText().trim().length() > 0)
-                    && (_ubox.getText().trim().length() > 0)) {
+                    && (_ubox.getText().trim().length() > 0)
+                    && (_prtbox.getText().trim().length() > 0)) {
                     _butt.setEnabled(true);
                 } else {
                     _butt.setEnabled(false);
@@ -114,7 +123,30 @@ public class WBLoginDialog extends DialogBox {
                 }
                 if ((_tbox.getText().trim().length() > 0)
                     && (_tbox.getText().trim().length() > 0)
-                    && (_ubox.getText().trim().length() > 0)) {
+                    && (_ubox.getText().trim().length() > 0)
+                    && (_prtbox.getText().trim().length() > 0)) {
+                    _butt.setEnabled(true);
+                } else {
+                    _butt.setEnabled(false);
+                }
+           }
+        });
+
+        _prtbox = new TextBox();
+        _prtbox.addKeyboardListener(new KeyboardListenerAdapter() {
+            public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+                if (keyCode == '\r') {
+                    ((TextBox) sender).cancelKey();
+                    _butt.click();
+                }
+                if (!Character.isDigit(keyCode)){
+                    ((TextBox) sender).cancelKey();
+                    return;
+                }
+                if ((_tbox.getText().trim().length() > 0)
+                    && (_tbox.getText().trim().length() > 0)
+                    && (_ubox.getText().trim().length() > 0)
+                    && (_prtbox.getText().trim().length() > 0)) {
                     _butt.setEnabled(true);
                 } else {
                     _butt.setEnabled(false);
@@ -122,30 +154,32 @@ public class WBLoginDialog extends DialogBox {
             }
         });
 
-        gp.setWidget(0, 0, tLab);
-        gp.setWidget(0, 1, _tbox);
-        gp.setWidget(1, 0, pLab);
-        gp.setWidget(1, 1, _pbox);
-        gp.setWidget(2, 0, uLab);
-        gp.setWidget(2, 1, _ubox);
-
-        gp.setWidget(3, 1, _butt);
-
-        Image logo = new Image("images/meandre-logo.jpg");
-        _prog = new Image("images/wait-14x14.gif");
-        _prog.setVisible(false);
-        gp.setWidget(3, 0, _prog);
-
-        vp.add(logo);
-        vp.add(gp);
+        Button cancel = new Button("Cancel");
+        cancel.addClickListener(new ClickListener() {
+            public void onClick(Widget sender) {
+                clear();
+                hide();
+                _cont.getMain().closeApp();
+            }
+        });
 
         _butt.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
-                _prog.setVisible(true);
-                _cont.login(_tbox.getText(), _pbox.getText(), _ubox.getText(),
+
+                if (!_butt.isEnabled()){
+                    return;
+                }
+
+                _busy.setVisible(true);
+                String prt = "";
+                if (_prtbox.getText().trim().length() > 0){
+                    prt = ":" + _prtbox.getText().trim();
+                }
+                _cont.login(_tbox.getText(), _pbox.getText(), "http://"
+                            + _ubox.getText() + prt + "/",
                             new AsyncCallback() {
                     public void onSuccess(Object result) {
-                        _prog.setVisible(false);
+                        _busy.setVisible(false);
                         WBLoginBean lbean = (WBLoginBean)result;
                         if (lbean.getSuccess()){
                             _cont.loginSuccess(lbean.getUserName(), lbean.getSessionID());
@@ -155,13 +189,12 @@ public class WBLoginDialog extends DialogBox {
                             Window.alert(lbean.getFailureMessage());
                             _tbox.setText("");
                             _pbox.setText("");
-                            _ubox.setText("");
                             _butt.setEnabled(false);
                         }
                     }
 
                     public void onFailure(Throwable caught) {
-                        _prog.setVisible(false);
+                        _busy.setVisible(false);
                         // do some UI stuff to show failure
                         Window.alert(
                                 "AsyncCallBack Failure -- login():  " +
@@ -172,6 +205,35 @@ public class WBLoginDialog extends DialogBox {
 
             }
         });
+
+        gp.setWidget(0, 0, tLab);
+        gp.setWidget(0, 1, _tbox);
+        gp.setWidget(1, 0, pLab);
+        gp.setWidget(1, 1, _pbox);
+        gp.setWidget(2, 0, uLab);
+        _ubox.setText("localhost");
+        gp.setWidget(2, 1, _ubox);
+        gp.setWidget(3, 0, prtLab);
+        _prtbox.setText("1714");
+        gp.setWidget(3, 1, _prtbox);
+
+
+
+        Image logo = new Image("images/meandre-logo.jpg");
+        _busy = new Image("images/wait-14x14.gif");
+        _busy.setVisible(false);
+        HorizontalPanel hpan = new HorizontalPanel();
+        hpan.add(_busy);
+        hpan.add(cancel);
+        hpan.add(_butt);
+        hpan.setSpacing(15);
+        hpan.setHorizontalAlignment(hpan.ALIGN_RIGHT);
+
+        vp.add(logo);
+        vp.add(gp);
+        vp.add(hpan);
+
+        vp.setCellHorizontalAlignment(hpan,vp.ALIGN_RIGHT);
 
         return vp;
     }
