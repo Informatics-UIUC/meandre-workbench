@@ -54,6 +54,9 @@ import com.gwt.components.client.Effects.EffectListenerAdapter;
 import com.gwt.components.client.Effects.Effect;
 import org.meandre.workbench.client.beans.WBPropertiesDefinition;
 import org.meandre.workbench.client.beans.WBDataport;
+import com.google.gwt.user.client.Cookies;
+import org.meandre.workbench.client.beans.WBLoginBean;
+import java.util.Date;
 
 /**
  * <p>Title: Controller</p>
@@ -173,6 +176,14 @@ public class Controller {
     /* Tells is a flow is currently executing. */
     private boolean _flowExecuting = false;
 
+    /* session ID */
+    private String _sessionID = null;
+
+    /* user name */
+    private String _userName = "Default";
+
+    /* cookie property key for session id */
+    static public final String _sidKey = "SEASR.WB.SESSION.KEY";
 
     //================
     // Constructor(s)
@@ -204,6 +215,59 @@ public class Controller {
     //=================
     // Package Methods
     //=================
+
+    void login(){
+        //Do we have a cookie already?
+        String sessionID = Cookies.getCookie(_sidKey);
+        if ( sessionID != null ) {
+            checkSessionID(sessionID, new AsyncCallback() {
+                public void onSuccess(Object result) {
+                    WBLoginBean lbean = (WBLoginBean) result;
+                    if (lbean.getSuccess()){
+                        loginSuccess(lbean.getUserName(), lbean.getSessionID());
+                    } else {
+                        new WBLoginDialog(_main, Controller.this);
+                    }
+                }
+
+                public void onFailure(Throwable caught) {
+                        // do some UI stuff to show failure
+                        _userName = null;
+                        Window.alert("AsyncCallBack Failure -- getUser():  " + caught.getMessage());
+                        _main.closeApp();
+                    }
+                });
+        } else {
+            new WBLoginDialog(_main, this);
+        }
+    }
+
+    void loginSuccess(String uname, String sid){
+        setUserName(uname);
+        _sessionID = sid;
+
+        final long DURATION = 1000 * 60 * 60 * 24 * 14; //duration remembering login. 2 weeks in this example.
+        Date expires = new Date(System.currentTimeMillis() + DURATION);
+        Cookies.setCookie(this._sidKey, sid, expires, null, "/", false);
+        _main.onModuleLoadContinued();
+    }
+
+    /**
+     * Get the user name.
+     *
+     * @return String User name for current session.
+     */
+    String getUserName(){
+        return this._userName;
+    }
+
+    /**
+     * Set the user name.
+     * @param name String the user name.
+     */
+    void setUserName(String name){
+        _userName = name;
+    }
 
     /**
      * Get a handle to the Maion class.
@@ -252,6 +316,14 @@ public class Controller {
     // Interface Implementation: WBRepositoryQueryAsync
     //==================================================
 
+    void checkSessionID(String sessionID, AsyncCallback cb){
+        _repquery.checkSessionID(sessionID, cb);
+    }
+
+    void login(String user, String pass, String url, AsyncCallback cb){
+        _repquery.login(user, pass, url, cb);
+    }
+
     /**
      * Get the active components in the current user's repository.
      *
@@ -268,15 +340,6 @@ public class Controller {
      */
     void getActiveFlows(AsyncCallback cb) {
         _repquery.getActiveFlows(cb);
-    }
-
-    /**
-     * Get the user for this application session.
-     *
-     * @param cb AsyncCallback Callback object returned from the server.
-     */
-    void getUser(AsyncCallback cb) {
-        _repquery.getUser(cb);
     }
 
     /**
@@ -318,7 +381,7 @@ public class Controller {
          * Add user name to header.
          */
         HTML userlab = new HTML("<bold><font size=\"-1\">Welcome, "
-                                  + _main.getUserName() + "</font></bold>"
+                                  + getUserName() + "</font></bold>"
                                   , true);
         buttPan.add(userlab);
         buttPan.addStyleName("menu-panel");

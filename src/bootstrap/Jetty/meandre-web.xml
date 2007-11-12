@@ -288,7 +288,7 @@
 
 	<servlet-mapping>
 		<servlet-name>gwt</servlet-name>
-		<url-pattern>/workbench/WBRepositoryQuery</url-pattern>
+		<url-pattern>/WBRepositoryQuery</url-pattern>
 	</servlet-mapping>
 
 	<!-- ==================================================================== -->

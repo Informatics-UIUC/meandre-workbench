@@ -6,9 +6,8 @@
         <inherits name='org.gwtwidgets.WidgetLibrary'/>
         <!-- Inherit gwt-dnd support                            -->
         <inherits name='com.allen_sauer.gwt.dragdrop.DragAndDrop'/>
+        <inherits name='com.gwt.components.Effects'/>
 	<!-- Specify the app entry point class.                   -->
-        <!-- Gwm dependency -->
-        <inherits name='org.gwm.GwtWindowManager'/>
 	<entry-point class='org.meandre.workbench.client.Main'/>
         <servlet path='/WBRepositoryQuery' class='org.meandre.workbench.server.WBRepositoryQueryImpl'/>
 </module>

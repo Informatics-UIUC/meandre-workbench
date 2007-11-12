@@ -25,7 +25,6 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.WindowCloseListener;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Widget;
@@ -88,21 +87,9 @@ public class Main implements EntryPoint, WindowResizeListener,
     /* Scroll panel that wraps the lower detail window.*/
     private ScrollPanel _vscroll = new ScrollPanel();
 
-    /* user name */
-    private String _userName = null;
-
     //================
     // Public Methods
     //================
-
-    /**
-     * Get the user name.
-     *
-     * @return String User name for current session.
-     */
-    String getUserName(){
-        return this._userName;
-    }
 
     /**
      * This is the entry point method.
@@ -111,37 +98,7 @@ public class Main implements EntryPoint, WindowResizeListener,
         // First, create controller
         // Sets up all remote interfaces
         _controller = new Controller(this, _jsgPan);
-
-        //===================================================================
-
-        /**
-         * Get user or redirect.
-         */
-        AsyncCallback callback = new AsyncCallback() {
-            public void onSuccess(Object result) {
-                    _userName = (String) result;
-                    if (_userName == null){
-                        _controller.redirectOrClose("/index.jsp");
-                    } else {
-                        onModuleLoadContinued();
-                    }
-            }
-
-            public void onFailure(Throwable caught) {
-                // do some UI stuff to show failure
-                    _userName = null;
-                    Window.alert(
-                            "AsyncCallBack Failure -- getUser():  " +
-                            caught.getMessage());
-                    closeAppJS();
-            }
-        };
-
-        _controller.getUser(callback);
-
-
-        //===================================================================
-
+        _controller.login();
     }
 
     void onModuleLoadContinued(){

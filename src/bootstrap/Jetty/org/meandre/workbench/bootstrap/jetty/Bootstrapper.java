@@ -1,8 +1,5 @@
 package org.meandre.workbench.bootstrap.jetty;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -23,10 +20,10 @@ import org.mortbay.jetty.webapp.WebAppContext;
 public class Bootstrapper {
 
 	/** The version */
-	public final static String VERSION = "1.0vcli";
+	public final static String VERSION = "0.2 pre-alpha";
 
 	/** The base Meandre port */
-	public static final int BASE_PORT = 1714;
+	public static final int BASE_PORT = 1713;
 
 	/** The base directory for Jetty */
 	public static final String JETTY_HOME = ".";
@@ -42,12 +39,12 @@ public class Bootstrapper {
 		log = Logger.getLogger(Bootstrapper.class.getName());
 		log.setLevel(Level.FINEST);
 		try {
-			log.addHandler(handler = new FileHandler("meandre-log.xml"));
+			log.addHandler(handler = new FileHandler("meandre-workbench-log.xml"));
 		} catch (SecurityException e) {
-			System.err.println("Could not initialize meandre-log.xml");
+			System.err.println("Could not initialize meandre-workbench-log.xml");
 			System.exit(1);
 		} catch (IOException e) {
-			System.err.println("Could not initialize meandre-log.xml");
+			System.err.println("Could not initialize meandre-workbench-log.xml");
 			System.exit(1);
 		}
 
@@ -60,11 +57,9 @@ public class Bootstrapper {
 	 * @throws Exception Something went wrong, really wrong.
 	 */
 	public static void main(String[] args) throws Exception {
-		log.config("Bootstrapping Menadre Workflow Engine");
+		log.config("Bootstrapping Meandre Workbench");
 
-		// log.config("Running Hello World");
-		// runHelloWorld();
-		log.config("Installing MeandreSecurityManager");
+//		log.config("Installing MeandreSecurityManager");
 //		if( System.getSecurityManager() == null )
 //		{
 //		    System.setSecurityManager( new MeandreSecurityManager() );
