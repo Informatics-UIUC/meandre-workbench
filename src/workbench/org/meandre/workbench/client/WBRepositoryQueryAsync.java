@@ -48,33 +48,38 @@ public interface WBRepositoryQueryAsync {
          * Returns the set of active components in the repository via
          * callback parameters.
          *
+         * @param sid String session id
          * @param cb AsyncCallback Callback object returned from the server.
          */
-        public void getActiveComponents(AsyncCallback cb);
+        public void getActiveComponents(String sid, AsyncCallback cb);
 
         /**
          * Get the active components in the current user's repository that match
          * the search criteria.
          *
          * @param search String The search string for this query.
+         * @param sid String session id
          * @param cb AsyncCallback Callback object returned from the server.
          */
-        public void getActiveComponents(String search, AsyncCallback cb);
+        public void getActiveComponents(String search, String sid, AsyncCallback cb);
 
         /**
          * Saves the flow and returns the callback object.
          *
+         * @param flow WBFlow flow to save.
+         * @param sid String session id
          * @param cb AsyncCallback Callback object returned from the server.
          */
-        public void saveFlow(WBFlow flow, AsyncCallback cb);
+        public void saveFlow(WBFlow flow, String sid, AsyncCallback cb);
 
         /**
          * Returns the set of active flows in the repository via
          * callback parameters.
          *
+         * @param sid String session id
          * @param cb AsyncCallback Callback object returned from the server.
          */
-        public void getActiveFlows(AsyncCallback cb);
+        public void getActiveFlows(String sid, AsyncCallback cb);
 
 
 }

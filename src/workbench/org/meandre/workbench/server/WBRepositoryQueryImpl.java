@@ -8,10 +8,6 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Hashtable;
-import java.io.FileNotFoundException;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileReader;
 import java.util.Map;
 
 //===============
@@ -20,12 +16,10 @@ import java.util.Map;
 
 import com.google.gwt.user.server.rpc.*;
 import com.hp.hpl.jena.rdf.model.*;
-//import org.meandre.core.repository.*;
+import org.meandre.workbench.server.proxy.beans.repository.*;
 import org.meandre.workbench.client.*;
 import org.meandre.workbench.client.beans.*;
 import org.meandre.workbench.server.proxy.MeandreProxy;
-//import org.meandre.core.util.RepositoryFactory;
-//import org.meandre.core.security.User;
 
 
 /**
@@ -62,42 +56,6 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     // Private Methods
     //=================
 
-//    synchronized private QueryableRepository getRepository() {
-//        QueryableRepository qr = null;
-//        try {
-//            qr = ((RepositoryFactory) getThreadLocalRequest().
-//                                      getSession().getAttribute(
-//                    "repository-factory")).getRepository();
-//        } catch(CorruptedDescriptionException cde){
-//            cde.printStackTrace();
-//        }
-//        return qr;
-//    }
-//
-//    synchronized private QueryableRepository getWorkRepository() {
-//        QueryableRepository qr = null;
-//        String sPath = File.separator +
-//                       "resources" + File.separator +
-//                       "jetty" + File.separator +
-//                       "meandre-app" + File.separator +
-//                       "components" + File.separator +
-//                       "description" + File.separator;
-//        try {
-//            sPath = new File(".").getCanonicalPath() + sPath;
-//        } catch(Exception e){
-//            e.printStackTrace();
-//        }
-//            qr = ((RepositoryFactory) getThreadLocalRequest().
-//                                      getSession().getAttribute(
-//                    "repository-factory")).getComponentsInDirectory(sPath, ".rdf");
-//        return qr;
-//    }
-//
-//    synchronized private RepositoryFactory getWorkRepositoryFact() {
-//        RepositoryFactory qr = null;
-//            qr = (RepositoryFactory)getThreadLocalRequest().getSession().getAttribute("repository-factory");
-//        return qr;
-//    }
 
     //===================================
     // Interface Impl: WBRepositoryQuery
@@ -108,13 +66,13 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param sid String session id
      * @return LoginBean Bean containing login information.
      */
-    public WBLoginBean checkSessionID(String sid){
+    public WBLoginBean checkSessionID(String sid) {
         Object obj = _proxies.get(sid);
-        if (obj == null){
+        if (obj == null) {
             return new WBLoginBean("No longer valid session ID.");
         } else {
-            MeandreProxy proxy = (MeandreProxy)obj;
-            if (proxy.getRoles() != null){
+            MeandreProxy proxy = (MeandreProxy) obj;
+            if (proxy.getRoles() != null) {
                 return new WBLoginBean(proxy.getName(), sid);
             }
         }
@@ -122,27 +80,27 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     }
 
     /**
-      * Log the user into the application.
-      * @param userid String user's id
-      * @param password String user's password
-      * @param url String URL of server to connect with.
-      * @return LoginBean Bean containing login information.
-      */
-     public WBLoginBean login(String userid, String password, String url){
-         WBLoginBean wblb = null;
-         MeandreProxy proxy = new MeandreProxy(userid, password, url);
-         if (proxy.isReady()){
-             try {
-                 Thread.currentThread().sleep(5);
-             } catch (Exception e){}
-             String sid = "sid:" + System.currentTimeMillis();
-             wblb = new WBLoginBean(proxy.getName(), sid);
-             _proxies.put(sid, proxy);
-         } else {
-             wblb = new WBLoginBean("Login failed.");
-         }
-         return wblb;
-     }
+     * Log the user into the application.
+     * @param userid String user's id
+     * @param password String user's password
+     * @param url String URL of server to connect with.
+     * @return LoginBean Bean containing login information.
+     */
+    public WBLoginBean login(String userid, String password, String url) {
+        WBLoginBean wblb = null;
+        MeandreProxy proxy = new MeandreProxy(userid, password, url);
+        if (proxy.isReady()) {
+            try {
+                Thread.currentThread().sleep(5);
+            } catch (Exception e) {}
+            String sid = "sid:" + System.currentTimeMillis();
+            wblb = new WBLoginBean(proxy.getName(), sid);
+            _proxies.put(sid, proxy);
+        } else {
+            wblb = new WBLoginBean("Login failed.");
+        }
+        return wblb;
+    }
 
 
     /**
@@ -153,79 +111,96 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
      * @return Set Returns set of active components matching search query.
      */
-    public Set getActiveComponents(String search) {
-//            //acquire Repository object from current session
-//            QueryableRepository queryableRep = getWorkRepository();
-//            Set ret = new HashSet();
-//            Set comps = queryableRep.getAvailableExecutableComponents(search);
-//            for (Iterator itty = comps.iterator(); itty.hasNext(); ) {
-//                Resource res = (Resource) itty.next();
-//                ExecutableComponentDescription ecd = queryableRep.
-//                                                     getExecutableComponentDescription(
-//                        res);
-//                ret.add(MeandreToWBBeanConverter.convertComponent(ecd));
-//            }
-//
-//            comps = queryableRep.getAvailableFlows(search);
-//            for (Iterator itty = comps.iterator(); itty.hasNext(); ) {
-//                Resource res = (Resource) itty.next();
-//                FlowDescription flow = queryableRep.getFlowDescription(res);
-//                ret.add(MeandreToWBBeanConverter.convertFlow(flow, queryableRep));
-//            }
-//            return ret;
+    public Set getActiveComponents(String search, String sid) {
+        Object obj = _proxies.get(sid);
+        if (obj == null) {
             return null;
+        } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+
+            //acquire Repository object from current session
+            QueryableRepository queryableRep = proxy.getRepository();
+            Set ret = new HashSet();
+            Set comps = queryableRep.getAvailableExecutableComponents(search);
+            for (Iterator itty = comps.iterator(); itty.hasNext(); ) {
+                Resource res = (Resource) itty.next();
+                ExecutableComponentDescription ecd = queryableRep.
+                        getExecutableComponentDescription(
+                                res);
+                ret.add(MeandreToWBBeanConverter.convertComponent(ecd));
+            }
+
+            comps = queryableRep.getAvailableFlows(search);
+            for (Iterator itty = comps.iterator(); itty.hasNext(); ) {
+                Resource res = (Resource) itty.next();
+                FlowDescription flow = queryableRep.getFlowDescription(res);
+                ret.add(MeandreToWBBeanConverter.convertFlow(flow, queryableRep));
+            }
+            return ret;
+        }
     }
 
-    /**
-     * Returns the set of active components in the repository.
-     *
-     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
-     * @return Set Returns set of active components.
-     */
-    public Set getActiveComponents() {
+        /**
+         * Returns the set of active components in the repository.
+         *
+         * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
+         * @return Set Returns set of active components.
+         */
+        public Set getActiveComponents(String sid) {
+            Object obj = _proxies.get(sid);
+            if (obj == null) {
+                return null;
+            } else {
+                MeandreProxy proxy = (MeandreProxy) obj;
 
-//        //acquire Repository object from current session
-//        QueryableRepository queryableRep = getRepository();
-//        Set ret = new HashSet();
-//        Set comps = queryableRep.getAvailableExecutableComponents();
-//        for (Iterator itty = comps.iterator(); itty.hasNext(); ) {
-//            Resource res = (Resource) itty.next();
-//            ExecutableComponentDescription ecd = queryableRep.
-//                                                 getExecutableComponentDescription(
-//                    res);
-//            ret.add(MeandreToWBBeanConverter.convertComponent(ecd));
-//        }
-//
-//        return ret;
-            return null;
-    }
+                //acquire Repository object from current session
+                QueryableRepository queryableRep = proxy.getRepository();
 
-    /**
-     *
-     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBFlow>
-     */
-    public Set getActiveFlows() {
+                Set ret = new HashSet();
+                Set comps = queryableRep.getAvailableExecutableComponents();
+                for (Iterator itty = comps.iterator(); itty.hasNext(); ) {
+                    Resource res = (Resource) itty.next();
+                    ExecutableComponentDescription ecd = queryableRep.
+                            getExecutableComponentDescription(
+                                    res);
+                    ret.add(MeandreToWBBeanConverter.convertComponent(ecd));
+                }
 
-//        //acquire Repository object from current session
-//        QueryableRepository queryableRep = getWorkRepository();
-//        Set ret = new HashSet();
-//        Set flows = queryableRep.getAvailableFlows();
-//        for (Iterator itty = flows.iterator(); itty.hasNext(); ) {
-//            Resource res = (Resource) itty.next();
-//            FlowDescription flow = queryableRep.getFlowDescription(res);
-//            ret.add(MeandreToWBBeanConverter.convertFlow(flow, queryableRep));
-//        }
-//        return ret;
-            return null;
+                return ret;
+            }
+        }
 
-    }
+        /**
+         *
+         * @gwt.typeArgs <org.meandre.workbench.client.beans.WBFlow>
+         */
+        public Set getActiveFlows(String sid) {
+            Object obj = _proxies.get(sid);
+            if (obj == null) {
+                return null;
+            } else {
+                MeandreProxy proxy = (MeandreProxy) obj;
 
-    /**
-     * Saves the flow and returns the callback object.
-     *
-     * @return WBCallbackObject Returns callback object.
-     */
-    public WBCallbackObject saveFlow(WBFlow flow) {
+                //acquire Repository object from current session
+                QueryableRepository queryableRep = proxy.getRepository();
+                Set ret = new HashSet();
+                Set flows = queryableRep.getAvailableFlows();
+                for (Iterator itty = flows.iterator(); itty.hasNext(); ) {
+                    Resource res = (Resource) itty.next();
+                    FlowDescription flow = queryableRep.getFlowDescription(res);
+                    ret.add(MeandreToWBBeanConverter.convertFlow(flow,
+                            queryableRep));
+                }
+                return ret;
+            }
+        }
+
+        /**
+         * Saves the flow and returns the callback object.
+         *
+         * @return WBCallbackObject Returns callback object.
+         */
+        public WBCallbackObject saveFlow(WBFlow flow, String sid) {
 //        WBCallbackObject wbc = new WBCallbackObject();
 //        //acquire Repository object from current session
 //        RepositoryFactory queryableRep = getWorkRepositoryFact();
@@ -324,8 +299,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
 //        }
 //
 //        return wbc;
-        return null;
+            return null;
+        }
+
     }
-
-
-}

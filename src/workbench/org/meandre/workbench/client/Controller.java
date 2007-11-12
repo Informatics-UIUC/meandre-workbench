@@ -252,6 +252,10 @@ public class Controller {
         _main.onModuleLoadContinued();
     }
 
+    String getSessionID(){
+        return _sessionID;
+    }
+
     /**
      * Get the user name.
      *
@@ -330,7 +334,7 @@ public class Controller {
      * @param cb AsyncCallback Callback object returned from the server.
      */
     void getActiveComponents(AsyncCallback cb) {
-        _repquery.getActiveComponents(cb);
+        _repquery.getActiveComponents(getSessionID(), cb);
     }
 
     /**
@@ -339,7 +343,7 @@ public class Controller {
      * @param cb AsyncCallback Callback object returned from the server.
      */
     void getActiveFlows(AsyncCallback cb) {
-        _repquery.getActiveFlows(cb);
+        _repquery.getActiveFlows(getSessionID(), cb);
     }
 
     /**

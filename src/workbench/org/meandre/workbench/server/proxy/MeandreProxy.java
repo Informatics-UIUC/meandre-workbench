@@ -1,43 +1,45 @@
 package org.meandre.workbench.server.proxy;
 
-//==============
-// Java Imports
-//==============
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//===============
-// Other Imports
-//===============
+import javax.servlet.jsp.JspWriter;
 
-/**
- * <p>Title: Meandre Proxy</p>
+import org.meandre.workbench.bootstrap.jetty.Bootstrapper;
+import org.meandre.workbench.server.proxy.beans.location.LocationBean;
+import org.meandre.workbench.server.proxy.beans.repository.QueryableRepository;
+import org.meandre.workbench.server.proxy.beans.repository.RepositoryImpl;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
+/** Create a meandre autheticated proxy to access the web services
  *
- * <p>Description: Create a meandre autheticated proxy to access the web
- * services</p>
+ * @author Xavier Llor&agrave;
  *
- * <p>Copyright: Copyright (c) 2007</p>
- *
- * <p>Company: NCSA</p>
- *
- * @author Xavier Llor&agrave;, D. Searsmith
- * @version 1.0
  */
 public class MeandreProxy {
 
-        //==============
-        // Data Members
-        //==============
-
         /** The logger for the bootstrapper */
         protected static Logger log = null;
+
+        // Initializing the logger and its handlers
+        static {
+                log = Logger.getLogger(Bootstrapper.class.getName());
+                log.setLevel(Level.CONFIG);
+                log.addHandler(Bootstrapper.handler);
+        }
 
         /** The user name */
         private String sUserName;
@@ -52,29 +54,16 @@ public class MeandreProxy {
         private String sUPEncoding;
 
         /** Cached roles */
-        private HashMap mapRoles;
+        private HashMap<String, Boolean> mapRoles;
+
+        /** Cached repository */
+        private QueryableRepository qrCached;
 
         /** Is the proxy ready? */
         private boolean bIsReady;
 
         /** Did the last call succeed */
         private boolean bWasCallOK;
-
-        //=============
-        // Static Code
-        //=============
-
-        // Initializing the logger and its handlers
-        static {
-                log = Logger.getLogger(org.meandre.workbench.bootstrap.jetty.Bootstrapper.class.getName());
-                log.setLevel(Level.CONFIG);
-                log.addHandler(org.meandre.workbench.bootstrap.jetty.Bootstrapper.handler);
-        }
-
-
-        //==============
-        // Constructors
-        //==============
 
         /** Creates a Meandre Proxy
          *
@@ -92,6 +81,8 @@ public class MeandreProxy {
 
                 // Force a first authetication for role caching
                 this.bIsReady = null!=getRoles();
+                // Force the repository caching
+                this.qrCached = getRepository();
         }
 
         /** Returns true if the proxy was successfully initialized; false otherwise.
@@ -125,11 +116,19 @@ public class MeandreProxy {
                 mapRoles = null;
         }
 
+
+        /** Flushes the cached repository.
+         *
+         */
+        public void flushRepository () {
+                qrCached = null;
+        }
+
         /** Return the roles for the user of this proxy.
          *
          * @return The set of granted role for the proxy user
          */
-        public Map getRoles() {
+        public Map<String,Boolean> getRoles() {
                 if ( mapRoles==null ) {
                         String sRoles = executeGetRequest(sBaseURL+"services/about/user_roles.txt");
                         if ( sRoles==null )
@@ -137,26 +136,63 @@ public class MeandreProxy {
                         else {
                                 // Parse and generate the sets
                                 String [] sa = sRoles.split("\n");
-                                mapRoles = new HashMap();
-                                for (int i = 0, n = sa.length; i < n; i++){
-                                    String sRole = sa[i];
-                                    mapRoles.put(sRole, Boolean.TRUE);
-                                }
+                                mapRoles = new HashMap<String,Boolean>();
+                                for ( String sRole:sa )
+                                        mapRoles.put(sRole.trim(),true);
                         }
                 }
 
                 return mapRoles;
         }
 
+        /** Gets the current repository.
+         *
+         * @return The cached queryable repository
+         */
+        public QueryableRepository getRepository () {
+                if ( this.qrCached==null ) {
+                        // Caches the repository
+                        byte[] baResponse = executeGetRequestBytes(sBaseURL+"services/repository/dump.ttl");
+                        Model model = ModelFactory.createDefaultModel();
+                        model.read(new ByteArrayInputStream(baResponse),null,"TTL");
+                        this.qrCached = new RepositoryImpl(model);
+                }
+
+                return this.qrCached;
+        }
+
+
+        /** Gets the public repository.
+         *
+         * @return The public queryable repository
+         */
+        public QueryableRepository getPublicRepository () {
+                // The public repository
+                byte[] baResponse = executeGetRequestBytes(sBaseURL+"public/services/repository.ttl");
+                Model model = ModelFactory.createDefaultModel();
+                model.read(new ByteArrayInputStream(baResponse),null,"TTL");
+                return new RepositoryImpl(model);
+        }
+
+        /** Forces the repository to be recached.
+         *
+         * @return The recached repository
+         */
+        public QueryableRepository getRepositoryFlush () {
+                this.qrCached = null;
+                return getRepository();
+        }
+
         /** Return the list of locations for the user of this proxy.
          *
          * @return The array of location for this user
          */
-        public Map[] getLocations() {
+        @SuppressWarnings("unchecked")
+        public LocationBean[] getLocations() {
                 bWasCallOK = true;
-                Map[] mapaRes = null;
+                LocationBean[] loca = null;
 
-                if ( mapRoles==null ) {
+                if ( mapRoles!=null ) {
                         String sLocations = executeGetRequest(sBaseURL+"services/locations/list.txt");
                         if ( sLocations==null ) {
                                 bWasCallOK = false;
@@ -166,16 +202,173 @@ public class MeandreProxy {
                                 // Parse and generate the sets
                                 String [] sa = sLocations.split("\n");
                                 int iMax = sa.length/2;
-                                mapaRes = new Map[iMax];
+                                loca = new LocationBean[iMax];
                                 for ( int i=0 ; i<iMax ; i++ ) {
-                                        mapaRes[i] = new HashMap();
-                                        mapaRes[i].put("location", sa[i*2]);
-                                        mapaRes[i].put("description", sa[i*2+1]);
+                                        loca[i] = new LocationBean(sa[i*2].trim(), sa[i*2+1].trim());
                                 }
                         }
                 }
 
-                return mapaRes;
+                return loca;
+        }
+
+        /** Gets the result of attempting to regenerate the user repository.
+         *
+         * @return The result of the process
+         */
+        public String getRegenerate () {
+                bWasCallOK = true;
+                String sRes = null;
+
+                if ( mapRoles!=null ) {
+                        sRes = executeGetRequest(sBaseURL+"services/repository/regenerate.txt");
+                        if ( sRes==null )
+                                bWasCallOK = false;
+                        getRepositoryFlush();
+                }
+
+                return sRes;
+        }
+
+
+        /** Gets the result of attempting to add a new location to the user repository.
+         *
+         * @param sLocation The URL location
+         * @param sDescription The location description
+         * @return The result of the process. Returns the URL if everything when well,
+         *         null otherwise
+         */
+        public String getAddLocation (String sLocation, String sDescription ) {
+                bWasCallOK = true;
+                String sRes = null;
+
+                if ( mapRoles!=null ) {
+                        String sParams = "location="+sLocation+"&description="+sDescription;
+                        try {
+                                sParams = "location="+URLEncoder.encode(sLocation,"UTF-8")+"&description="+URLEncoder.encode(sDescription,"UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                                log.warning("Unknow encoding problem: "+e);
+                        }
+                        sRes= executeGetRequest(sBaseURL+"services/locations/add.txt?"+sParams);
+                        if ( sRes==null )
+                                bWasCallOK = false;
+                }
+
+                return sRes;
+        }
+
+        /** Gets the result of attempting to remove a location to the user repository.
+         *
+         * @param sLocation The URL location
+         * @return The result of the process. Returns the URL if everything when well,
+         *         empty otherwise
+         */
+        public String getRemoveLocation (String sLocation ) {
+                bWasCallOK = true;
+                String sRes = null;
+
+                if ( mapRoles!=null ) {
+                        String sParams = "location="+sLocation;
+                        try {
+                                sParams = "location="+URLEncoder.encode(sLocation,"UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                                log.warning("Unknow encoding problem: "+e);
+                        }
+                        sRes= executeGetRequest(sBaseURL+"services/locations/remove.txt?"+sParams);
+                        if ( sRes==null )
+                                bWasCallOK = false;
+                }
+
+                return sRes;
+        }
+
+        /** Runs a flow and streams the output.
+         *
+         * @param sURI The flow to execute
+         * @param sFormat The format of the output
+         * @param jw The writer to use
+         */
+        public void runFlowInteractively ( String sURI, String sFormat, JspWriter jw ) {
+                String sRequest = sBaseURL+"services/execute/flow."+sFormat+"?uri="+sURI;
+                executeSteamableGetRequest(sRequest,jw);
+        }
+
+        /** Gets the result of attempting to publish a URI from the user repository.
+         *
+         * @param sURI The URI to publish
+         * @return The result of the process. Returns the URL if everything when well,
+         *         empty otherwise
+         */
+        public String getPublish (String sURI ) {
+                bWasCallOK = true;
+                String sRes = null;
+
+                if ( mapRoles!=null ) {
+                        String sParams = "uri="+sURI;
+                        try {
+                                sParams = "uri="+URLEncoder.encode(sURI,"UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                                log.warning("Unknow encoding problem: "+e);
+                        }
+                        sRes = executeGetRequest(sBaseURL+"services/publish/publish.txt?"+sParams);
+                        if ( sRes==null )
+                                bWasCallOK = false;
+                }
+
+                return sRes;
+        }
+
+
+        /** Gets the result of attempting to unpublish a URI from the user repository.
+         *
+         * @param sURI The URI to publish
+         * @return The result of the process. Returns the URL if everything when well,
+         *         empty otherwise
+         */
+        public String getUnpublish (String sURI ) {
+                bWasCallOK = true;
+                String sRes = null;
+
+                if ( mapRoles!=null ) {
+                        String sParams = "uri="+sURI;
+                        try {
+                                sParams = "uri="+URLEncoder.encode(sURI,"UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                                log.warning("Unknow encoding problem: "+e);
+                        }
+                        sRes = executeGetRequest(sBaseURL+"services/publish/unpublish.txt?"+sParams);
+                        if ( sRes==null )
+                                bWasCallOK = false;
+                }
+
+                return sRes;
+        }
+
+        /** Gets the result of attempting to remove a URI from the user repository.
+         *
+         * @param sURI The URI to remove
+         * @return The result of the process. Returns the URL if everything when well,
+         *         empty otherwise
+         */
+        public String getRemove (String sURI ) {
+                bWasCallOK = true;
+                String sRes = null;
+
+                if ( mapRoles!=null ) {
+                        String sParams = "uri="+sURI;
+                        try {
+                                sParams = "uri="+URLEncoder.encode(sURI,"UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                                log.warning("Unknow encoding problem: "+e);
+                        }
+                        sRes = executeGetRequest(sBaseURL+"services/repository/remove.txt?"+sParams);
+                        if ( sRes==null )
+                                bWasCallOK = false;
+                        else
+                                flushRepository();
+                }
+
+                return sRes;
         }
 
         /** Does an authenticated get request against the provided URL. Returns null if the
@@ -186,7 +379,21 @@ public class MeandreProxy {
          */
         private String executeGetRequest ( String sURL ) {
                 try {
-                    log.warning(sURL);
+                        return new String(executeGetRequestBytes(sURL),"UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                        return null;
+                }
+
+        }
+
+        /** Does an authenticated get request against the provided URL. Returns null if the
+         * request failed
+         *
+         * @param sURL The URL
+         * @return The content bytes
+         */
+        private byte[] executeGetRequestBytes ( String sURL ) {
+                try {
                         // Create the URL
                         URL url = new URL(sURL);
 
@@ -196,12 +403,19 @@ public class MeandreProxy {
 
                         // Pull the stuff out of the Meandre server
                         InputStream is = (InputStream)uc.getInputStream();
-                        byte [] ba = new byte[is.available()];
-                        is.read(ba);
+                        ArrayList<Byte> lstBytes = new ArrayList<Byte>();
+                        int iTmp;
+                        while ( (iTmp=is.read())!=-1 )
+                                lstBytes.add((byte)iTmp);
+
                         is.close();
 
                         // Get the returned text
-                        return new String(ba,"UTF-8");
+                        byte [] ba = new byte[lstBytes.size()];
+                        int i=0;
+                        for ( byte b:lstBytes )
+                                ba[i++]=b;
+                        return ba;
                 }
                 catch ( IOException e ) {
                         log.warning(e.toString());
@@ -209,4 +423,31 @@ public class MeandreProxy {
                 }
         }
 
+        /** Does an authenticated get request against the provided URL and stream back
+         * the contents
+         *
+         * @param sURL The URL to request
+         * @param jw The outpt writter
+         */
+        private void executeSteamableGetRequest(String sURL, JspWriter jw) {
+                try {
+                        // Create the URL
+                        URL url = new URL(sURL);
+
+                        // Create and authenticated connection
+                        URLConnection uc = url.openConnection();
+                        uc.setRequestProperty ("Authorization", "Basic " + sUPEncoding);
+
+                        // Pull the stuff out of the Meandre server
+                        InputStream is = (InputStream)uc.getInputStream();
+                        int iTmp;
+                        while ( (iTmp=is.read())!=-1 )
+                                jw.write(iTmp);
+
+                        is.close();
+                }
+                catch ( IOException e ) {
+                        log.warning(e.toString());
+                }
+        }
 }

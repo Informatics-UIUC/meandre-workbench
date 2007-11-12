@@ -39,34 +39,38 @@ public interface WBRepositoryQuery extends RemoteService {
     /**
      * Returns the set of active components in the repository.
      *
+     * @param sid String session id
      * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
      * @return Set Returns set of active components.
      */
-    public Set getActiveComponents();
+    public Set getActiveComponents(String sid);
 
     /**
      * Get the active components in the current user's repository that match
      * the search criteria.
      *
      * @param search String The search string for this query.
+     * @param sid String session id
      * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
      * @return Set Returns set of active components matching search query.
      */
-    public Set getActiveComponents(String search);
+    public Set getActiveComponents(String search, String sid);
 
     /**
      * Saves the flow and returns the callback object.
      *
+     * @param sid String session id
      * @return WBCallbackObject Returns callback object.
      */
-    public WBCallbackObject saveFlow(WBFlow flow);
+    public WBCallbackObject saveFlow(WBFlow flow, String sid);
 
     /**
      * Returns the set of active flows in the repository.
      *
+     * @param sid String session id
      * @gwt.typeArgs <org.meandre.workbench.client.beans.WBFlow>
      * @return Set Returns set of active flows.
      */
-    public Set getActiveFlows();
+    public Set getActiveFlows(String sid);
 
 }

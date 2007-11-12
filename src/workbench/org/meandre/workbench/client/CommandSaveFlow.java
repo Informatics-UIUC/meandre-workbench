@@ -85,7 +85,7 @@ class CommandSaveFlow implements WBCommand {
                              caught.toString());
             }
         };
-        _repquery.saveFlow(_flow, callback);
+        _repquery.saveFlow(_flow, _cont.getSessionID(), callback);
 
     }
 
