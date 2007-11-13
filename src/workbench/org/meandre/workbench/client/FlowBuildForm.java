@@ -172,11 +172,11 @@ public class FlowBuildForm extends DialogBox {
                     _name.setText("");
                     return;
                 }
-                _flow.setName(_name.getText());
-                _flow.setDescription((_desc.getText() == null)? "" : _desc.getText());
-                _flow.setRights((_rights.getText() == null)? "" : _rights.getText());
+                _flow.setName(_name.getText().trim());
+                _flow.setDescription((_desc.getText() == null)? "" : _desc.getText().trim());
+                _flow.setRights((_rights.getText() == null)? "" : _rights.getText().trim());
 
-                _flow.setBaseURL(((_baseURL.getText() == null) || (_baseURL.getText().trim().length() == 0))? "" : _baseURL.getText());
+                _flow.setBaseURL(((_baseURL.getText() == null) || (_baseURL.getText().trim().length() == 0))? "" : _baseURL.getText().trim());
                 String burl = _flow.getBaseURL();
                 if ((burl.trim().length() > 0) && !burl.endsWith("/")
                     && !burl.endsWith("\\")){

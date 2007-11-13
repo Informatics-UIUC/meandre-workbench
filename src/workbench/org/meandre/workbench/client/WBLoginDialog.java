@@ -24,8 +24,6 @@ import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.meandre.workbench.client.beans.WBLoginBean;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.DOM;
 
 /**
  * <p>Title: Workbench Login Dialog</p>
@@ -75,94 +73,51 @@ public class WBLoginDialog extends DialogBox {
 
         _butt = new Button("Login");
         _butt.setEnabled(false);
+        Button cancel = new Button("Cancel");
 
-        HTML tLab = new HTML("<strong><right>User ID:</right></strong>");
-        HTML pLab = new HTML("<strong><right>Password:</right></strong>");
-        HTML uLab = new HTML("<strong><right>Domain:</right></strong>");
-        HTML prtLab = new HTML("<strong><right>Port:</right></strong>");
+        HTML tLab = new HTML("<strong>User ID:</strong>");
+        HTML pLab = new HTML("<strong>Password:</strong>");
+        HTML uLab = new HTML("<strong>Domain:</strong>");
+        HTML prtLab = new HTML("<strong>Port:</strong>");
         _tbox = new TextBox();
         _tbox.addKeyboardListener(new KeyboardListenerAdapter() {
             public void onKeyPress(Widget sender, char keyCode, int modifiers) {
-                if (keyCode == '\r') {
-                    ((TextBox) sender).cancelKey();
-                    _butt.click();
-                }
-                if ((_tbox.getText().trim().length() > 0)
-                    && (_tbox.getText().trim().length() > 0)
-                    && (_ubox.getText().trim().length() > 0)
-                    && (_prtbox.getText().trim().length() > 0)) {
-                    _butt.setEnabled(true);
-                } else {
-                    _butt.setEnabled(false);
-                }
-            }
+                ifKeycodeEnterSubmit(keyCode, sender);
+                checkEnableSubmit();            }
         });
         _pbox = new PasswordTextBox();
         _pbox.addKeyboardListener(new KeyboardListenerAdapter() {
             public void onKeyPress(Widget sender, char keyCode, int modifiers) {
-                if (keyCode == '\r') {
-                    ((TextBox) sender).cancelKey();
-                    _butt.click();
-                }
-                if ((_tbox.getText().trim().length() > 0)
-                    && (_tbox.getText().trim().length() > 0)
-                    && (_ubox.getText().trim().length() > 0)
-                    && (_prtbox.getText().trim().length() > 0)) {
-                    _butt.setEnabled(true);
-                } else {
-                    _butt.setEnabled(false);
-                }
-            }
+                ifKeycodeEnterSubmit(keyCode, sender);
+                checkEnableSubmit();            }
         });
         _ubox = new TextBox();
         _ubox.addKeyboardListener(new KeyboardListenerAdapter() {
             public void onKeyPress(Widget sender, char keyCode, int modifiers) {
-                if (keyCode == '\r') {
-                    ((TextBox) sender).cancelKey();
-                    _butt.click();
-                }
-                if ((_tbox.getText().trim().length() > 0)
-                    && (_tbox.getText().trim().length() > 0)
-                    && (_ubox.getText().trim().length() > 0)
-                    && (_prtbox.getText().trim().length() > 0)) {
-                    _butt.setEnabled(true);
-                } else {
-                    _butt.setEnabled(false);
-                }
-           }
+                ifKeycodeEnterSubmit(keyCode, sender);
+                checkEnableSubmit();           }
         });
 
         _prtbox = new TextBox();
         _prtbox.addKeyboardListener(new KeyboardListenerAdapter() {
             public void onKeyPress(Widget sender, char keyCode, int modifiers) {
-                if (keyCode == '\r') {
-                    ((TextBox) sender).cancelKey();
-                    _butt.click();
-                }
+                ifKeycodeEnterSubmit(keyCode, sender);
                 if (!Character.isDigit(keyCode)){
                     ((TextBox) sender).cancelKey();
                     return;
                 }
-                if ((_tbox.getText().trim().length() > 0)
-                    && (_tbox.getText().trim().length() > 0)
-                    && (_ubox.getText().trim().length() > 0)
-                    && (_prtbox.getText().trim().length() > 0)) {
-                    _butt.setEnabled(true);
-                } else {
-                    _butt.setEnabled(false);
-                }
-            }
+                checkEnableSubmit();            }
         });
 
-        Button cancel = new Button("Cancel");
+        /* Add click listener for cancel button.*/
         cancel.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
-                clear();
-                hide();
+                closeForm();
                 _cont.getMain().closeApp();
             }
         });
 
+        /* Add click listener for submit button.*/
         _butt.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
 
@@ -183,14 +138,10 @@ public class WBLoginDialog extends DialogBox {
                         WBLoginBean lbean = (WBLoginBean)result;
                         if (lbean.getSuccess()){
                             _cont.loginSuccess(lbean.getUserName(), lbean.getSessionID());
-                            clear();
-                            hide();
+                            closeForm();
                         } else {
                             Window.alert(lbean.getFailureMessage());
-                            _tbox.setText("");
-                            _pbox.setText("");
-                            _butt.setEnabled(false);
-                        }
+                            resetForm();                        }
                     }
 
                     public void onFailure(Throwable caught) {
@@ -199,8 +150,9 @@ public class WBLoginDialog extends DialogBox {
                         Window.alert(
                                 "AsyncCallBack Failure -- login():  " +
                                 caught.getMessage());
+                                    closeForm();
                                     _main.closeApp();
-                    }
+                   }
                 });
 
             }
@@ -226,7 +178,7 @@ public class WBLoginDialog extends DialogBox {
         hpan.add(_busy);
         hpan.add(cancel);
         hpan.add(_butt);
-        hpan.setSpacing(15);
+        hpan.setSpacing(20);
         hpan.setHorizontalAlignment(hpan.ALIGN_RIGHT);
 
         vp.add(logo);
@@ -238,5 +190,32 @@ public class WBLoginDialog extends DialogBox {
         return vp;
     }
 
+    private void closeForm(){
+        clear();
+        hide();
+    }
 
+    private void resetForm(){
+        _tbox.setText("");
+        _pbox.setText("");
+        _butt.setEnabled(false);
+    }
+
+    private void checkEnableSubmit(){
+        if ((_tbox.getText().trim().length() > 0)
+            && (_tbox.getText().trim().length() > 0)
+            && (_ubox.getText().trim().length() > 0)
+            && (_prtbox.getText().trim().length() > 0)) {
+            _butt.setEnabled(true);
+        } else {
+            _butt.setEnabled(false);
+        }
+    }
+
+    private void ifKeycodeEnterSubmit(Character keyCode, Widget sender){
+        if (keyCode == '\r') {
+            ((TextBox) sender).cancelKey();
+            _butt.click();
+        }
+    }
 }

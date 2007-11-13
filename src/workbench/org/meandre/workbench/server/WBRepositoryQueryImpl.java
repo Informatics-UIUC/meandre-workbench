@@ -21,6 +21,7 @@ import org.meandre.workbench.client.*;
 import org.meandre.workbench.client.beans.*;
 import org.meandre.workbench.server.proxy.MeandreProxy;
 import java.util.HashMap;
+import java.io.ByteArrayOutputStream;
 
 
 /**
@@ -218,7 +219,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
                 Resource resExecutableComponent = null;
                 if (flow.getBaseURL().trim().length() > 0) {
                     resExecutableComponent = model.createResource(flow.
-                            getBaseURL());
+                            getBaseURL().trim());
                 } else {
                     resExecutableComponent = model.createResource("file://");
                 }
@@ -228,17 +229,17 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
                     WBComponentInstance ci = (WBComponentInstance) itty.next();
                     model = ModelFactory.createDefaultModel();
                     Resource res1 = model.createResource(ci.
-                            getExecutableComponentInstance());
+                            getExecutableComponentInstance().trim());
                     model = ModelFactory.createDefaultModel();
                     Resource res2 = model.createResource(ci.
-                            getExecutableComponent().getID());
+                            getExecutableComponent().getID().trim());
                     PropertiesDescription pd = new PropertiesDescription(new
                             Hashtable(ci.getProperties().getValuesMap()));
                     ExecutableComponentInstanceDescription ecid = new
                             ExecutableComponentInstanceDescription(res1,
                             res2,
-                            ci.getName(),
-                            ci.getDescription(),
+                            ci.getName().trim(),
+                            ci.getDescription().trim(),
                             pd);
                     instances.add(ecid);
 
@@ -249,17 +250,17 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
                     WBComponentConnection cc = (WBComponentConnection) itty.
                                                next();
                     model = ModelFactory.createDefaultModel();
-                    Resource res1 = model.createResource(cc.getConnector());
+                    Resource res1 = model.createResource(cc.getConnector().trim());
                     model = ModelFactory.createDefaultModel();
-                    Resource res2 = model.createResource(cc.getSourceInstance());
+                    Resource res2 = model.createResource(cc.getSourceInstance().trim());
                     model = ModelFactory.createDefaultModel();
                     Resource res3 = model.createResource(cc.
-                            getSourceIntanceDataPort());
+                            getSourceIntanceDataPort().trim());
                     model = ModelFactory.createDefaultModel();
-                    Resource res4 = model.createResource(cc.getTargetInstance());
+                    Resource res4 = model.createResource(cc.getTargetInstance().trim());
                     model = ModelFactory.createDefaultModel();
                     Resource res5 = model.createResource(cc.
-                            getTargetIntanceDataPort());
+                            getTargetIntanceDataPort().trim());
                     ConnectorDescription cd = new ConnectorDescription(res1,
                             res2,
                             res3,
@@ -270,18 +271,27 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
                 }
                 FlowDescription flowdesc = new FlowDescription(
                         resExecutableComponent,
-                        flow.getName(),
-                        flow.getDescription(),
-                        flow.getRights(),
-                        flow.getCreator(),
+                        flow.getName().trim(),
+                        flow.getDescription().trim(),
+                        flow.getRights().trim(),
+                        flow.getCreator().trim(),
                         flow.getCreationDate(),
                         instances,
                         connections,
                         new TagsDescription(new HashSet(flow.getTags().getTags())));
 
                 Map params = new HashMap<String,String>();
-                params.put("repository", flowdesc.getModel().toString());
-                proxy.executePost("services/repository/add_flow_descriptosr.rdf", params);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                flowdesc.getModel().write(baos, "TTL");
+                try {
+                    baos.flush();
+                } catch (Exception e){}
+                //System.out.println(new String(baos.toByteArray()));
+                params.put("repository", new String(baos.toByteArray()));
+                try {
+                    baos.close();
+                } catch (Exception e){}
+                proxy.executePost("services/repository/add_flow_descriptors.ttl", params);
                 wbc.setMessage(flowdesc.getFlowComponent().getURI());
 
                 /* This is necessary for the web app. */
