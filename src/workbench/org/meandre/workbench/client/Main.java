@@ -28,6 +28,8 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.TabListener;
+import com.google.gwt.user.client.ui.SourcesTabEvents;
 
 
 /**
@@ -138,6 +140,21 @@ public class Main implements EntryPoint, WindowResizeListener,
                                               "Available"), "FLOWS");
         _tabPan.add(_controller.buildSearchPanel(), "SEARCH");
         _tabPan.selectTab(0);
+
+        _tabPan.addTabListener(new TabListener(){
+            public boolean onBeforeTabSelected(SourcesTabEvents sender,
+                                               int tabIndex){
+                return true;
+            }
+
+            public void	onTabSelected(SourcesTabEvents sender, int tabIndex){
+                if (tabIndex == 2){
+                    _controller.searchPanelTBSetFocus();
+                }
+            }
+
+        });
+
         _hsp.setLeftWidget(_tabPan);
 
         _vscroll = new ScrollPanel();

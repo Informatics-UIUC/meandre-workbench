@@ -1591,8 +1591,11 @@ public class Controller {
         vp.add(hp);
         vp.add(_compSearchResults);
         vp.add(_flowSearchResults);
-        _searchBox.setFocus(true);
         return vp;
+    }
+
+    void searchPanelTBSetFocus(){
+        _searchBox.setFocus(true);
     }
 
     /**
