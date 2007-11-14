@@ -57,6 +57,7 @@ import org.meandre.workbench.client.beans.WBDataport;
 import com.google.gwt.user.client.Cookies;
 import org.meandre.workbench.client.beans.WBLoginBean;
 import java.util.Date;
+import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
 
 /**
  * <p>Title: Controller</p>
@@ -81,6 +82,9 @@ public class Controller {
     static private String s_LeftKey = "wb_left_pix_pos";
     static private int s_TopVal = 20;
     static private int s_LeftVal = 20;
+
+    static Controller s_controller = null;
+    static final String s_baseURL = "http://test.org/";
 
     /* Sorts for the component trees*/
     public static final int s_COMP_TREE_SORT_ALPHA = 1;
@@ -158,6 +162,9 @@ public class Controller {
     /* A text box for the search panel.*/
     private TextBox _searchBox = null;
 
+    /* A submit button for the search panel.*/
+    private Button _searchButt = null;
+
     /* Component tree for the search panel. */
     private Tree _compSearchResults = null;
 
@@ -190,6 +197,7 @@ public class Controller {
     //================
 
     public Controller(Main main, JsGraphicsPanel dp) {
+        s_controller = this;
         _repquery = setupRepQuery();
         _main = main;
         _drawPan = dp;
@@ -1466,8 +1474,16 @@ public class Controller {
         HorizontalPanel hp = new HorizontalPanel();
         _searchBox = new TextBox();
         _searchBox.setVisibleLength(20);
-        hp.add(_searchBox);
-        Button searchButt = new Button("Search", new ClickListener() {
+        _searchBox.addKeyboardListener(new KeyboardListenerAdapter() {
+            public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+                if (keyCode == '\r') {
+                   ((TextBox) sender).cancelKey();
+                   _searchButt.click();
+               }
+            }
+        });
+        hp.add(CursorTextBox.wrapTextBox(_searchBox));
+        _searchButt = new Button("Search", new ClickListener() {
             public void onClick(Widget sender) {
                 if (isFlowExecuting()) {
                     return;
@@ -1559,7 +1575,7 @@ public class Controller {
                 }
             }
         });
-        hp.add(searchButt);
+        hp.add(_searchButt);
 
         _compSearchResults = new DCTree(this,
                                         (TreeImages) GWT.create(
@@ -1575,6 +1591,7 @@ public class Controller {
         vp.add(hp);
         vp.add(_compSearchResults);
         vp.add(_flowSearchResults);
+        _searchBox.setFocus(true);
         return vp;
     }
 

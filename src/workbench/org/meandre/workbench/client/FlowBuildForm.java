@@ -29,6 +29,8 @@ import org.meandre.workbench.client.beans.WBComponentConnection;
 import com.google.gwt.user.client.Window;
 import org.meandre.workbench.client.beans.WBComponent;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
+import com.google.gwt.user.client.ui.Image;
 
 /**
  * <p>Title: Flow Build Form</p>
@@ -59,9 +61,11 @@ public class FlowBuildForm extends DialogBox {
     private TextArea _rights = null;
     private TextBox _tags = null;
     private WBCommand _cmd = null;
+    private Button _ok = null;
 
     private Set _comps = null;
     private Set _conns = null;
+
 
     //==============
     // Constructors
@@ -84,6 +88,7 @@ public class FlowBuildForm extends DialogBox {
         buildPanel();
         setText("Flow Properties");
         show();
+        _name.setFocus(true);
         setPopupPosition((Window.getClientWidth() / 2) -
                          (this.getOffsetWidth() / 2),
                          (Window.getClientHeight() / 2) -
@@ -103,33 +108,45 @@ public class FlowBuildForm extends DialogBox {
         //name, description, creator, rights,
         Grid gp = new Grid(6, 2);
 
-        HTML lab = new HTML("<bold><right>Name:&nbsp;</right></bold>");
+        HTML lab = new HTML("<strong>Name:</strong>");
         gp.setWidget(0, 0, lab);
         _name = new TextBox();
+        _name.addKeyboardListener(new KeyboardListenerAdapter() {
+            public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+                ifKeycodeEnterSubmit(keyCode, sender);
+            }
+        });
         _name.setText("");
-        gp.setWidget(0, 1, _name);
+        gp.setWidget(0, 1, CursorTextBox.wrapTextBox(_name));
 
-        lab = new HTML("<bold><right>Desc:&nbsp;</right></bold>");
+        lab = new HTML("<strong>Desc:</strong>");
         gp.setWidget(1, 0, lab);
         _desc = new TextArea();
-        _desc.setCharacterWidth(40);
+         _desc.setCharacterWidth(40);
         _desc.setVisibleLines(4);
         String de = _flow.getDescription();
         if (de.length() > 0){
             _desc.setText(de);
         }
-        gp.setWidget(1, 1, _desc);
+        gp.setWidget(1, 1, CursorTextBox.wrapTextBox(_desc));
 
-        lab = new HTML("<bold><right>Creator:&nbsp;</right></bold>");
+        lab = new HTML("<strong>Creator:</strong>");
         gp.setWidget(2, 0, lab);
         _creator = new TextBox();
+        _creator.addKeyboardListener(new KeyboardListenerAdapter() {
+            public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+                ifKeycodeEnterSubmit(keyCode, sender);
+            }
+        });
         String cr = _flow.getCreator();
         if (cr.length() > 0){
             _creator.setText(cr);
+        } else {
+            _creator.setText(Controller.s_controller.getUserName());
         }
-        gp.setWidget(2, 1, _creator);
+        gp.setWidget(2, 1, CursorTextBox.wrapTextBox(_creator));
 
-        lab = new HTML("<bold><right>Rights:&nbsp;</right></bold>");
+        lab = new HTML("<strong>Rights:</strong>");
         gp.setWidget(3, 0, lab);
         _rights = new TextArea();
         _rights.setCharacterWidth(40);
@@ -138,31 +155,43 @@ public class FlowBuildForm extends DialogBox {
         if (ri.length() > 0){
             _rights.setText(ri);
         }
-        gp.setWidget(3, 1, _rights);
+        gp.setWidget(3, 1, CursorTextBox.wrapTextBox(_rights));
 
-        lab = new HTML("<bold><right>Base&nbsp;URL:&nbsp;</right></bold>");
+        lab = new HTML("<strong>Base URL:</strong>");
         gp.setWidget(4, 0, lab);
         _baseURL = new TextBox();
+        _baseURL.addKeyboardListener(new KeyboardListenerAdapter() {
+            public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+                ifKeycodeEnterSubmit(keyCode, sender);
+            }
+        });
         _baseURL.setVisibleLength(50);
         String bu = _flow.getBaseURL();
         if (bu.length() > 0){
             _baseURL.setText(bu);
+        } else {
+            _baseURL.setText(Controller.s_baseURL);
         }
-        gp.setWidget(4, 1, _baseURL);
+        gp.setWidget(4, 1, CursorTextBox.wrapTextBox(_baseURL));
 
-        lab = new HTML("<bold><right>Tags:&nbsp;</right></bold>");
+        lab = new HTML("<strong>Tags:</strong>");
         gp.setWidget(5, 0, lab);
         _tags = new TextBox();
         _tags.setVisibleLength(50);
+        _tags.addKeyboardListener(new KeyboardListenerAdapter() {
+            public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+                ifKeycodeEnterSubmit(keyCode, sender);
+            }
+        });
         String tgs = _flow.getTags().toString();
         if (tgs.length() > 0){
             _tags.setText(tgs);
         }
-        gp.setWidget(5, 1, _tags);
+        gp.setWidget(5, 1, CursorTextBox.wrapTextBox(_tags));
 
-        Button ok = new Button("Done");
-        ok.addStyleName("dialog-button");
-        ok.addClickListener(new ClickListener() {
+        _ok = new Button("Done");
+        _ok.addStyleName("dialog-button");
+        _ok.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
                 _flow.setCreationDate(new Date());
                 _flow.setCreator((_creator.getText() == null)? "" : _creator.getText().trim());
@@ -246,8 +275,7 @@ public class FlowBuildForm extends DialogBox {
         cancel.addStyleName("dialog-button");
         cancel.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
-                clear();
-                hide();
+                closeForm();
             }
         });
 
@@ -255,13 +283,25 @@ public class FlowBuildForm extends DialogBox {
 
         HorizontalPanel hp = new HorizontalPanel();
         hp.add(cancel);
-        hp.add(ok);
+        hp.add(_ok);
         hp.setHorizontalAlignment(HorizontalPanel.ALIGN_RIGHT);
 
         vp.add(hp);
         vp.setCellHorizontalAlignment(hp, vp.ALIGN_RIGHT);
-        vp.setWidth("100%");
+        //vp.setWidth("100%");
         setWidget(vp);
+    }
+
+    private void ifKeycodeEnterSubmit(char keyCode, Widget sender){
+        if (keyCode == '\r') {
+            ((TextBox) sender).cancelKey();
+            _ok.click();
+        }
+    }
+
+    private void closeForm(){
+        clear();
+        hide();
     }
 
 }

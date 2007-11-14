@@ -61,8 +61,7 @@ class CommandSaveFlow implements WBCommand {
                 // do some UI stuff to show success
                 WBCallbackObject cbo = (WBCallbackObject) result;
                 if (cbo.getSuccess()) {
-                    Window.alert("Flow saved successfully.");
-                    _cont.buildFlowTree(_cont.getFlowTreeHandle(),
+                     _cont.buildFlowTree(_cont.getFlowTreeHandle(),
                                         _cont.getFlowTreeRoot(),
                                         "Available");
                     _main.getTabPanel().selectTab(1);

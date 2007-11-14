@@ -75,7 +75,7 @@ public class WBTags implements IsSerializable {
     public String toString(){
         String ret = "";
         for (Iterator itty = _setTags.iterator(); itty.hasNext();){
-            ret += (String)itty.next();
+            ret += (String)itty.next() + " ";
         }
         return ret.trim();
     }
