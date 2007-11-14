@@ -22,17 +22,10 @@ import org.meandre.workbench.server.proxy.beans.repository.QueryableRepository;
 import org.meandre.workbench.server.proxy.beans.repository.RepositoryImpl;
 
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import java.io.DataOutputStream;
-import java.io.DataInputStream;
-import java.io.OutputStreamWriter;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 /** Create a meandre autheticated proxy to access the web services
  *
@@ -496,7 +489,7 @@ public class MeandreProxy {
             post.addRequestHeader("Authorization",
                               "Basic " + sUPEncoding);
             for (String key : data.keySet()) {
-                post.addParameter(URLEncoder.encode(key.trim(), "UTF-8"), URLEncoder.encode(new String(data.get(key).trim().getBytes(),"UTF-8"), "UTF-8"));
+                post.addParameter(key, new String(data.get(key).trim().getBytes(),"UTF-8"));
             }
 
             // execute the post

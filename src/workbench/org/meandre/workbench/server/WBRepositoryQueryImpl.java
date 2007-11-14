@@ -219,9 +219,12 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
                 Resource resExecutableComponent = null;
                 if (flow.getBaseURL().trim().length() > 0) {
                     resExecutableComponent = model.createResource(flow.
-                            getBaseURL().trim());
+                            getBaseURL() + "flow/"
+                            + flow.getName().toLowerCase().replaceAll(" ", "-"));
                 } else {
-                    resExecutableComponent = model.createResource("file://");
+                    resExecutableComponent = model.createResource("http://test.org/flow/"
+                            + System.currentTimeMillis()
+                            + flow.getName().toLowerCase().replaceAll(" ", "-"));
                 }
                 Set instances = new HashSet();
                 for (Iterator itty = flow.getExecutableComponentInstances().
@@ -271,10 +274,10 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
                 }
                 FlowDescription flowdesc = new FlowDescription(
                         resExecutableComponent,
-                        flow.getName().trim(),
-                        flow.getDescription().trim(),
-                        flow.getRights().trim(),
-                        flow.getCreator().trim(),
+                        flow.getName(),
+                        flow.getDescription(),
+                        flow.getRights(),
+                        flow.getCreator(),
                         flow.getCreationDate(),
                         instances,
                         connections,

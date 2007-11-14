@@ -1239,7 +1239,8 @@ public class Controller {
         //change param to component obj
 
         WBComponentInstance ci = new WBComponentInstance(comp.getID() + "/" +
-                comp.getName(), comp, comp.getName(), comp.getDescription(),
+                comp.getName().toLowerCase().trim().replaceAll(" ", "-"),
+                comp, comp.getName(), comp.getDescription(),
                 new WBProperties(new java.util.HashMap(comp.getProperties().
                 getValuesMap())));
 

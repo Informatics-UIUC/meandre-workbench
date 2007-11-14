@@ -165,7 +165,7 @@ public class FlowBuildForm extends DialogBox {
         ok.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
                 _flow.setCreationDate(new Date());
-                _flow.setCreator((_creator.getText() == null)? "" : _creator.getText());
+                _flow.setCreator((_creator.getText() == null)? "" : _creator.getText().trim());
                 String name = _name.getText();
                 if ((name == null) || (name.trim().length() == 0)){
                     Window.alert("Must enter a valid name!");
@@ -207,19 +207,22 @@ public class FlowBuildForm extends DialogBox {
                             itty.next()).
                                              getComponent();
                     WBComponent comp = ci.getExecutableComponent();
-                    ci.setExecutableComponentInstance(comp.getID() + "/" +  ci.getName() + "/" + _flow.getName());
+                    ci.setExecutableComponentInstance(comp.getID() + "/"
+                                                      +  ci.getName().toLowerCase().replaceAll(" ", "-") + "/"
+                                                      + _flow.getName().toLowerCase().replaceAll(" ", "-"));
                     _flow.addExecutableComponentInstance(ci);
                 }
 
                 int connNum = 0;
                 burl = _flow.getBaseURL();
                 if (burl.trim().length() == 0){
-                    burl = "file://";
+                    burl = "http://test.org/flow/" + System.currentTimeMillis()
+                                             + _flow.getName().toLowerCase().replaceAll(" ", "-");
                 }
                 for (Iterator itty = _conns.iterator(); itty.hasNext(); ) {
                     PortConn conn = (PortConn) itty.next();
                     WBComponentConnection cc = new WBComponentConnection(
-                            burl + _flow.getName() +
+                            burl + _flow.getName().toLowerCase().replaceAll(" ", "-") +
                             "/connector/data/" +
                             connNum,
                             conn.getFrom().getParentComponent().getComponent().

@@ -28,7 +28,8 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 /**
  * <p>Title: Workbench Login Dialog</p>
  *
- * <p>Description: Dialog used for acquiring login information for the meandre workbench. </p>
+ * <p>Description: Dialog used for acquiring login information for the
+ * meandre workbench. </p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
@@ -212,7 +213,7 @@ public class WBLoginDialog extends DialogBox {
         }
     }
 
-    private void ifKeycodeEnterSubmit(Character keyCode, Widget sender){
+    private void ifKeycodeEnterSubmit(char keyCode, Widget sender){
         if (keyCode == '\r') {
             ((TextBox) sender).cancelKey();
             _butt.click();
