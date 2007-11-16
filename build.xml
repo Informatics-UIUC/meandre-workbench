@@ -19,10 +19,7 @@
    <property name="WORKBENCH_CLIENT_SERVER_TEST" value="./src-test" />
 
    <!-- USER SETTABLE -->
-   <property name="JAVA_2" value="c:/Progra~1/Java/jdk1.5.0_12/bin"/>
-   <property name="JAVA_1.4" value="c:/Borland/JBuilder2005/jdk1.4/bin"/>
    <property name="BOOT_CLASS" value="org.meandre.workbench.bootstrap.jetty.Bootstrapper"/>
-   <property name="USER_DIR" value="c:/algsource/SEASR/TestEngine_002/Meandre-Workbench"/>
    <property name="WORKBENCH_BOOTSTRAP_SRC" value="./src/bootstrap/Jetty" />
 
     <path id="gwt_compile.classpath">
@@ -50,7 +47,7 @@
    </target>
 
     <target name="gwt_compile">
-        <java jvm="${JAVA_1.4}/java" classname="com.google.gwt.dev.GWTCompiler" fork="yes" maxmemory="512m">
+        <java classname="com.google.gwt.dev.GWTCompiler" fork="yes" maxmemory="512m">
             <classpath refid="gwt_compile.classpath"/>
             <arg value="-out"/>
             <arg value="./www"/>
@@ -144,14 +141,25 @@
 
     <target name="run" depends="clean,gwt_compile,bootstrap_compile,server_compile,build">
         <java
-          jvm="${JAVA_2}/java"
           classname="${BOOT_CLASS}"
           fork="yes"
           maxmemory="1024m">
             <classpath refid="run.classpath"/>
-            <jvmarg value="-Duser.dir=${USER_DIR}"/>
+            <jvmarg value="-Duser.dir=.."/>
         </java>
     </target>
 
+
+    <target name="gwt_shell" depends="clean, bootstrap_compile, server_compile">
+        <java classname="com.google.gwt.dev.GWTShell" fork="yes" maxmemory="512m">
+            <classpath refid="gwt_compile.classpath"/>
+            <arg value="-out"/>
+            <arg value="./www"/>
+            <arg value="%*"/>
+            <arg value="org.meandre.workbench.Main/Main.html"/>
+            <arg value="-port"/>
+            <arg value="8989"/>
+        </java>
+    </target>
 
 </project>
