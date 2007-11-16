@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.jsp.JspWriter;
 
-import org.meandre.workbench.bootstrap.jetty.Bootstrapper;
+//import org.meandre.workbench.bootstrap.jetty.Bootstrapper;
 import org.meandre.workbench.server.proxy.beans.location.LocationBean;
 import org.meandre.workbench.server.proxy.beans.repository.QueryableRepository;
 import org.meandre.workbench.server.proxy.beans.repository.RepositoryImpl;
@@ -38,11 +38,11 @@ public class MeandreProxy {
     protected static Logger log = null;
 
     // Initializing the logger and its handlers
-    static {
-        log = Logger.getLogger(Bootstrapper.class.getName());
-        log.setLevel(Level.CONFIG);
-        log.addHandler(Bootstrapper.handler);
-    }
+//    static {
+//        log = Logger.getLogger(Bootstrapper.class.getName());
+//        log.setLevel(Level.CONFIG);
+//        log.addHandler(Bootstrapper.handler);
+//    }
 
     /** The user name */
     private String sUserName;
@@ -261,7 +261,7 @@ public class MeandreProxy {
                           "&description=" +
                           URLEncoder.encode(sDescription, "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                log.warning("Unknow encoding problem: " + e);
+                System.out.println("Unknow encoding problem: " + e);
             }
             sRes = executeGetRequest(sBaseURL + "services/locations/add.txt?" +
                                      sParams);
@@ -288,7 +288,7 @@ public class MeandreProxy {
             try {
                 sParams = "location=" + URLEncoder.encode(sLocation, "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                log.warning("Unknow encoding problem: " + e);
+                System.out.println("Unknow encoding problem: " + e);
             }
             sRes = executeGetRequest(sBaseURL +
                                      "services/locations/remove.txt?" + sParams);
@@ -327,7 +327,7 @@ public class MeandreProxy {
             try {
                 sParams = "uri=" + URLEncoder.encode(sURI, "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                log.warning("Unknow encoding problem: " + e);
+                System.out.println("Unknow encoding problem: " + e);
             }
             sRes = executeGetRequest(sBaseURL + "services/publish/publish.txt?" +
                                      sParams);
@@ -355,7 +355,7 @@ public class MeandreProxy {
             try {
                 sParams = "uri=" + URLEncoder.encode(sURI, "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                log.warning("Unknow encoding problem: " + e);
+                System.out.println("Unknow encoding problem: " + e);
             }
             sRes = executeGetRequest(sBaseURL +
                                      "services/publish/unpublish.txt?" +
@@ -383,7 +383,7 @@ public class MeandreProxy {
             try {
                 sParams = "uri=" + URLEncoder.encode(sURI, "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                log.warning("Unknow encoding problem: " + e);
+                System.out.println("Unknow encoding problem: " + e);
             }
             sRes = executeGetRequest(sBaseURL +
                                      "services/repository/remove.txt?" +
@@ -446,7 +446,7 @@ public class MeandreProxy {
             }
             return ba;
         } catch (IOException e) {
-            log.warning(e.toString());
+            System.out.println(e.toString());
             return null;
         }
     }
@@ -475,7 +475,7 @@ public class MeandreProxy {
 
             is.close();
         } catch (IOException e) {
-            log.warning(e.toString());
+            System.out.println(e.toString());
         }
     }
 
@@ -500,7 +500,7 @@ public class MeandreProxy {
                 sbuff = post.getResponseBodyAsString();
             }
         } catch (Exception e){
-            log.warning(e.getMessage());
+            System.out.println(e.getMessage());
         } finally {
             // release any connection resources used by the method
             post.releaseConnection();

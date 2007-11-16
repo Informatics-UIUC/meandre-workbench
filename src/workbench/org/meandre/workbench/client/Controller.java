@@ -38,7 +38,6 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
@@ -58,6 +57,7 @@ import com.google.gwt.user.client.Cookies;
 import org.meandre.workbench.client.beans.WBLoginBean;
 import java.util.Date;
 import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 /**
  * <p>Title: Controller</p>
@@ -396,7 +396,7 @@ public class Controller {
                                   + getUserName() + "</font></bold>"
                                   , true);
         buttPan.add(userlab);
-        buttPan.addStyleName("menu-panel");
+        //buttPan.addStyleName("menu-panel");
         buttPan.setCellVerticalAlignment(logo, HorizontalPanel.ALIGN_MIDDLE);
         buttPan.setCellVerticalAlignment(userlab, HorizontalPanel.ALIGN_TOP);
 
@@ -1470,7 +1470,8 @@ public class Controller {
      * @return Panel The constructed search panel.
      */
     Panel buildSearchPanel() {
-        VerticalPanel vp = new VerticalPanel();
+        FlowPanel fp = new FlowPanel();
+
         HorizontalPanel hp = new HorizontalPanel();
         _searchBox = new TextBox();
         _searchBox.setVisibleLength(20);
@@ -1576,7 +1577,6 @@ public class Controller {
             }
         });
         hp.add(_searchButt);
-
         _compSearchResults = new DCTree(this,
                                         (TreeImages) GWT.create(
                                                 ComponentTreeImages.class));
@@ -1588,10 +1588,11 @@ public class Controller {
         _flowSearchResultsRoot = new WBTreeItem("Flows", null);
         _flowSearchResults.addItem(_flowSearchResultsRoot);
 
-        vp.add(hp);
-        vp.add(_compSearchResults);
-        vp.add(_flowSearchResults);
-        return vp;
+        fp.add(hp);
+        fp.add( _compSearchResults);
+        fp.add( _flowSearchResults);
+
+        return fp;
     }
 
     void searchPanelTBSetFocus(){

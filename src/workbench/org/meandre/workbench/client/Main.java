@@ -30,6 +30,8 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.SourcesTabEvents;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 
 /**
@@ -99,17 +101,22 @@ public class Main implements EntryPoint, WindowResizeListener,
     public void onModuleLoad() {
         // First, create controller
         // Sets up all remote interfaces
+        DOM.setStyleAttribute(RootPanel.get().getBodyElement(), "background",
+                              "black");
         _controller = new Controller(this, _jsgPan);
         _controller.login();
     }
 
-    void onModuleLoadContinued(){
+    void onModuleLoadContinued() {
+
+        DOM.setStyleAttribute(RootPanel.get().getBodyElement(), "background",
+                              "white");
 
         // Make sure we catch unexpected exceptions in web mode, especially in other browsers
         GWT.setUncaughtExceptionHandler(new MyUncaughtExceptionHandler());
 
         //Get the component Tree
-        VerticalPanel ctvp = new VerticalPanel();
+        FlowPanel ctvp = new FlowPanel();
         HorizontalPanel cthp = new HorizontalPanel();
         Button expand = new Button("+");
         Button collapse = new Button("-");
@@ -129,11 +136,10 @@ public class Main implements EntryPoint, WindowResizeListener,
         });
         ctvp.add(cthp);
         ctvp.add(_controller.buildCompTree(_controller.getCompTreeHandle(),
-                                              _controller.getCompTreeRoot(),
-                                              "Available",
-                                              Controller.s_COMP_TREE_SORT_TYPE));
+                                           _controller.getCompTreeRoot(),
+                                           "Available",
+                                           Controller.s_COMP_TREE_SORT_TYPE));
         _tabPan.add(ctvp, "COMPONENTS");
-
 
         _tabPan.add(_controller.buildFlowTree(_controller.getFlowTreeHandle(),
                                               _controller.getFlowTreeRoot(),
@@ -141,14 +147,14 @@ public class Main implements EntryPoint, WindowResizeListener,
         _tabPan.add(_controller.buildSearchPanel(), "SEARCH");
         _tabPan.selectTab(0);
 
-        _tabPan.addTabListener(new TabListener(){
+        _tabPan.addTabListener(new TabListener() {
             public boolean onBeforeTabSelected(SourcesTabEvents sender,
-                                               int tabIndex){
+                                               int tabIndex) {
                 return true;
             }
 
-            public void	onTabSelected(SourcesTabEvents sender, int tabIndex){
-                if (tabIndex == 2){
+            public void onTabSelected(SourcesTabEvents sender, int tabIndex) {
+                if (tabIndex == 2) {
                     _controller.searchPanelTBSetFocus();
                 }
             }
@@ -170,12 +176,10 @@ public class Main implements EntryPoint, WindowResizeListener,
         Window.addWindowCloseListener(this);
         RootPanel.get().add(_dockPan);
 
-
         //MenuBar _mb = _controller.buildMenu();
         _buttPan = _controller.buildButtPan();
         _dockPan.add(_buttPan);
         _dockPan.add(_hsp);
-
 
         _dockPan.setSize("100%", "100%");
         _hsp.setWidth("99%");
@@ -335,9 +339,10 @@ public class Main implements EntryPoint, WindowResizeListener,
     /**
      * Javascript call to close the application window.
      */
-    private native void closeAppJS() /*-{
-                    $wnd.close();
-                 }-*/
-            ;
+    private void closeAppJS() {
+        RootPanel.get().clear();
+        DOM.setStyleAttribute(RootPanel.get().getBodyElement(), "background",
+                              "black");
+    }
 
 }

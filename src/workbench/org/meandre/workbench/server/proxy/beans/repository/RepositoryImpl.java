@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.workbench.bootstrap.jetty.Bootstrapper;
+//import org.meandre.workbench.bootstrap.jetty.Bootstrapper;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.query.Query;
@@ -51,9 +51,9 @@ public class RepositoryImpl implements QueryableRepository {
 		//
 		// Initializing the logger and its handlers
 		//
-		log = Logger.getLogger(Bootstrapper.class.getName());
-		log.setLevel(Level.CONFIG);
-		log.addHandler(Bootstrapper.handler);
+//		log = Logger.getLogger(Bootstrapper.class.getName());
+//		log.setLevel(Level.CONFIG);
+//		log.addHandler(Bootstrapper.handler);
 
 		//
 		// Initialize the sets
@@ -301,7 +301,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 */
 	public RepositoryImpl ( Model mod ) {
 		// Initializing the repository
-		log.info("Initializing the repository");
+		System.out.println("Initializing the repository");
 
 		this.model = mod;
 
@@ -323,7 +323,7 @@ public class RepositoryImpl implements QueryableRepository {
 	 */
 	public void refreshCache () {
 		// Flushing the cache
-		log.info("Flushing the cached descriptions");
+		System.out.println("Flushing the cached descriptions");
 		htComDescMap.clear();
 		setComRes.clear();
 		htFlowDescMap.clear();
@@ -332,7 +332,7 @@ public class RepositoryImpl implements QueryableRepository {
 		htFlowTags.clear();
 		LARQ.removeDefaultIndex();
 
-		log.info("Refreshing cached descriptions");
+		System.out.println("Refreshing cached descriptions");
 		// Query all the components
 		setComRes = getAvailableExecutableComponentsFromModel();
 		for ( Resource res:setComRes ) {
@@ -350,7 +350,7 @@ public class RepositoryImpl implements QueryableRepository {
 					set.add(ecd);
 				}
 			} catch (CorruptedDescriptionException e) {
-				log.warning("Corrupted component found "+res.toString()+"\n"+e.toString());
+				System.out.println("Corrupted component found "+res.toString()+"\n"+e.toString());
 			}
 		}
 		// Query all the flows
@@ -370,7 +370,7 @@ public class RepositoryImpl implements QueryableRepository {
 					set.add(fd);
 				}
 			} catch (CorruptedDescriptionException e) {
-				log.warning("Corrupted flow found "+res.toString()+"\n"+e.toString());
+				System.out.println("Corrupted flow found "+res.toString()+"\n"+e.toString());
 			}
 		}
 
@@ -545,7 +545,7 @@ public class RepositoryImpl implements QueryableRepository {
 			ResultSet resultsFiring = execFiring.execSelect();
 
 			if ( !resultsFiring.hasNext() )
-				log.info("Component "+res.toString()+" has not firing policy, assuming all" );
+				System.out.println("Component "+res.toString()+" has not firing policy, assuming all" );
 			else {
 				QuerySolution qsFP = resultsFiring.nextSolution();
 				if ( resultsFiring.getRowNumber()!=1 )

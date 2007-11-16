@@ -174,3 +174,8 @@ div#componentshow {
   background-color: #e8eef7;
 }
 
+.no-vert-padding {
+  padding-top: 0cm;
+  padding-bottom: 0cm;
+}
+
