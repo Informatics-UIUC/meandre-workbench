@@ -64,6 +64,8 @@ public class PropertiesDialog extends DialogBox {
     private TreeItemPopUp _ppp = null;
     /* Map used to find property description for each label.*/
     private Map _descs = new java.util.HashMap();
+    /* Name textbox used to set focus.*/
+    private TextBox _name = null;
 
     //==============
     // Constructors
@@ -84,6 +86,7 @@ public class PropertiesDialog extends DialogBox {
         setText("Properties: " + _cp.getComponent().getName());
         buildPanel();
         show();
+        _name.setFocus(true);
 //        setPopupPosition((Window.getClientWidth() / 2) -
 //                         (this.getOffsetWidth() / 2),
 //                         (Window.getClientHeight() / 2) -
@@ -156,7 +159,10 @@ public class PropertiesDialog extends DialogBox {
                 val = ival;
             }
             tb.setText(val);
-            gp.setWidget(x, 1, tb);
+            gp.setWidget(x, 1, CursorTextBox.wrapTextBox(tb));
+            if (x == 0){
+                _name = tb;
+            }
             _tboxes[x] = tb;
             _keys[x] = key;
         }
