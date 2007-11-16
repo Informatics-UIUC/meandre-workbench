@@ -17,6 +17,7 @@ import java.util.Map;
 import org.meandre.workbench.client.beans.*;
 import org.meandre.workbench.server.proxy.beans.repository.*;
 import com.hp.hpl.jena.rdf.model.Resource;
+import org.meandre.workbench.client.Controller;
 
 
 /**
@@ -74,15 +75,15 @@ public class MeandreToWBBeanConverter {
 
         WBFlow f = new WBFlow(_id, sName, sDescription, sRights, sCreator,
                               dateCreation, setInstances, setConns, tagDesc);
-   //        try {
-   //            f.setBaseURL(new File(".").toURI().toString());
-   //            if (f.getBaseURL().endsWith("./")){
-   //                f.setBaseURL(f.getBaseURL().substring(0, f.getBaseURL().length()-2));
-   //            }
-   //        } catch (Exception e){
-   //            f.setBaseURL("");
-   //        }
-        f.setBaseURL("http://mydomain.org/components/");
+        int pos = flow.getFlowComponent().getURI().toLowerCase().lastIndexOf("flow");
+        if (pos == -1){
+            pos = flow.getFlowComponent().getURI().toLowerCase().lastIndexOf("/");
+        }
+        if (pos == -1) {
+            f.setBaseURL(Controller.s_baseURL);
+        } else {
+            f.setBaseURL(flow.getFlowComponent().getURI().substring(0, pos));
+        }
         return f;
     }
 

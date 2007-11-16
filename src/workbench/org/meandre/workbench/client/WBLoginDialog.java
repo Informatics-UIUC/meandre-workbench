@@ -215,7 +215,11 @@ public class WBLoginDialog extends DialogBox {
 
     private void ifKeycodeEnterSubmit(char keyCode, Widget sender){
         if (keyCode == '\r') {
-            ((TextBox) sender).cancelKey();
+            if (sender instanceof TextBox){
+                ((TextBox) sender).cancelKey();
+            } else {
+                ((PasswordTextBox) sender).cancelKey();
+            }
             _butt.click();
         }
     }

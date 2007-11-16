@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.HTML;
 
 /**
  * <p>Title: Workbench Tree Item</p>
@@ -36,7 +37,7 @@ public class WBTreeItem extends TreeItem {
 
     /* Tree item popup panel object for this tree node.*/
     private TreeItemPopUp _ppp = null;
-    private Label _lab = null;
+    private HTML _lab = null;
 
 
     //==============
@@ -60,7 +61,7 @@ public class WBTreeItem extends TreeItem {
             _ppp = new TreeItemPopUp(puString);
             _ppp.addStyleName("port-popup");
         }
-        _lab = new Label(txt) {
+        _lab = new HTML(txt) {
             public void onBrowserEvent(Event event) {
                 switch (DOM.eventGetType(event)) {
                 case Event.ONMOUSEOVER:

@@ -30,7 +30,6 @@ import com.google.gwt.user.client.Window;
 import org.meandre.workbench.client.beans.WBComponent;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
-import com.google.gwt.user.client.ui.Image;
 
 /**
  * <p>Title: Flow Build Form</p>
@@ -66,6 +65,8 @@ public class FlowBuildForm extends DialogBox {
     private Set _comps = null;
     private Set _conns = null;
 
+    private boolean _saveas = true;
+
 
     //==============
     // Constructors
@@ -88,7 +89,11 @@ public class FlowBuildForm extends DialogBox {
         buildPanel();
         setText("Flow Properties");
         show();
-        _name.setFocus(true);
+        if (_saveas) {
+            _name.setFocus(true);
+        } else {
+            _desc.setFocus(true);
+        }
         setPopupPosition((Window.getClientWidth() / 2) -
                          (this.getOffsetWidth() / 2),
                          (Window.getClientHeight() / 2) -
@@ -103,6 +108,11 @@ public class FlowBuildForm extends DialogBox {
      * Build this dialog panel.
      */
     private void buildPanel() {
+        if (_flow.getFlowID().trim().length() > 0){
+            _saveas = false;
+        } else {
+            _saveas = true;
+        }
         VerticalPanel vp = new VerticalPanel();
 
         //name, description, creator, rights,
@@ -116,8 +126,15 @@ public class FlowBuildForm extends DialogBox {
                 ifKeycodeEnterSubmit(keyCode, sender);
             }
         });
-        _name.setText("");
+        _name.setText("untitled");
+        String nm = _flow.getName();
+        if (nm.length() > 0){
+            _name.setText(nm);
+        }
         gp.setWidget(0, 1, CursorTextBox.wrapTextBox(_name));
+        if (!_saveas){
+            _name.setEnabled(false);
+        }
 
         lab = new HTML("<strong>Desc:</strong>");
         gp.setWidget(1, 0, lab);
@@ -158,6 +175,10 @@ public class FlowBuildForm extends DialogBox {
         gp.setWidget(3, 1, CursorTextBox.wrapTextBox(_rights));
 
         lab = new HTML("<strong>Base URL:</strong>");
+        if (!_saveas){
+            lab = new HTML("<strong>URI:</strong>");
+        }
+
         gp.setWidget(4, 0, lab);
         _baseURL = new TextBox();
         _baseURL.addKeyboardListener(new KeyboardListenerAdapter() {
@@ -173,6 +194,10 @@ public class FlowBuildForm extends DialogBox {
             _baseURL.setText(Controller.s_baseURL);
         }
         gp.setWidget(4, 1, CursorTextBox.wrapTextBox(_baseURL));
+        if (!_saveas){
+            _baseURL.setText(_flow.getFlowID());
+            _baseURL.setEnabled(false);
+        }
 
         lab = new HTML("<strong>Tags:</strong>");
         gp.setWidget(5, 0, lab);
@@ -193,24 +218,37 @@ public class FlowBuildForm extends DialogBox {
         _ok.addStyleName("dialog-button");
         _ok.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
+                String burl = "";
                 _flow.setCreationDate(new Date());
                 _flow.setCreator((_creator.getText() == null)? "" : _creator.getText().trim());
-                String name = _name.getText();
-                if ((name == null) || (name.trim().length() == 0)){
-                    Window.alert("Must enter a valid name!");
-                    _name.setText("");
-                    return;
+                if (_saveas){
+                    String name = _name.getText();
+                    if ((name == null) || (name.trim().length() == 0)) {
+                        Window.alert("Must enter a valid name!");
+                        _name.setText("");
+                        return;
+                    }
+                    _flow.setBaseURL(((_baseURL.getText() == null) ||
+                                      (_baseURL.getText().trim().length() == 0)) ?
+                                     "" : _baseURL.getText().trim());
+                    burl = _flow.getBaseURL();
+                    if ((burl.trim().length() > 0) && !burl.endsWith("/")
+                        && !burl.endsWith("\\")) {
+                        _flow.setBaseURL(burl + "/");
+                    }
+                    if (Controller.s_controller.flowByNameBaseExists(name,
+                            _flow.getBaseURL())) {
+                        if (!Window.confirm("Overwrite pre-exisiting flow?")) {
+                            return;
+                        }
+                    }
+
+                    _flow.setName(_name.getText().trim());
                 }
-                _flow.setName(_name.getText().trim());
+
                 _flow.setDescription((_desc.getText() == null)? "" : _desc.getText().trim());
                 _flow.setRights((_rights.getText() == null)? "" : _rights.getText().trim());
 
-                _flow.setBaseURL(((_baseURL.getText() == null) || (_baseURL.getText().trim().length() == 0))? "" : _baseURL.getText().trim());
-                String burl = _flow.getBaseURL();
-                if ((burl.trim().length() > 0) && !burl.endsWith("/")
-                    && !burl.endsWith("\\")){
-                    _flow.setBaseURL(burl + "/");
-                }
 
                 if ((_tags.getText() == null) || (_tags.getText().trim().length() == 0)){
                     _flow.getTags().clear();
@@ -243,10 +281,14 @@ public class FlowBuildForm extends DialogBox {
                 }
 
                 int connNum = 0;
-                burl = _flow.getBaseURL();
-                if (burl.trim().length() == 0){
-                    burl = "http://test.org/flow/" + System.currentTimeMillis()
-                                             + _flow.getName().toLowerCase().replaceAll(" ", "-");
+                if (_saveas){
+                    burl = _flow.getBaseURL();
+                    if (burl.trim().length() == 0) {
+                        burl = "http://test.org/flow/" +
+                               System.currentTimeMillis()
+                               +
+                               _flow.getName().toLowerCase().replaceAll(" ", "-");
+                    }
                 }
                 for (Iterator itty = _conns.iterator(); itty.hasNext(); ) {
                     PortConn conn = (PortConn) itty.next();

@@ -204,6 +204,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
          */
         public WBCallbackObject saveFlow(WBFlow flow, String sid) {
             Object obj = _proxies.get(sid);
+            boolean saveas = false;
             WBCallbackObject wbc = new WBCallbackObject();
             if (obj == null) {
                 wbc.setSuccess(false);
@@ -217,14 +218,19 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
 
                 Model model = ModelFactory.createDefaultModel();
                 Resource resExecutableComponent = null;
-                if (flow.getBaseURL().trim().length() > 0) {
-                    resExecutableComponent = model.createResource(flow.
-                            getBaseURL() + "flow/"
-                            + flow.getName().toLowerCase().replaceAll(" ", "-"));
+                if (flow.getFlowID().trim().length() > 0){
+                    resExecutableComponent = model.createResource(flow.getFlowID());
                 } else {
-                    resExecutableComponent = model.createResource("http://test.org/flow/"
-                            + System.currentTimeMillis()
-                            + flow.getName().toLowerCase().replaceAll(" ", "-"));
+                    saveas = true;
+                    if (flow.getBaseURL().trim().length() > 0) {
+                        resExecutableComponent = model.createResource(flow.
+                                getBaseURL() + "flow/"
+                                + flow.getName().toLowerCase().replaceAll(" ", "-"));
+                    } else {
+                        resExecutableComponent = model.createResource("http://test.org/flow/"
+                                + System.currentTimeMillis()
+                                + flow.getName().toLowerCase().replaceAll(" ", "-"));
+                    }
                 }
                 Set instances = new HashSet();
                 for (Iterator itty = flow.getExecutableComponentInstances().
@@ -294,6 +300,16 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
                 try {
                     baos.close();
                 } catch (Exception e){}
+
+                if (!saveas){
+                    String uri = proxy.getRemove(flow.getFlowID());
+                    if ((uri == null) || (!uri.trim().equals(flow.getFlowID().trim()))){
+                        wbc.setSuccess(false);
+                        wbc.setMessage("Unable to delete old flow.  " + uri + " "  + flow.getFlowID());
+                        return wbc;
+                    }
+                }
+
                 proxy.executePost("services/repository/add_flow_descriptors.ttl", params);
                 wbc.setMessage(flowdesc.getFlowComponent().getURI());
 

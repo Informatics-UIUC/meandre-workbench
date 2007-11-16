@@ -84,7 +84,7 @@ public class Controller {
     static private int s_LeftVal = 20;
 
     static Controller s_controller = null;
-    static final String s_baseURL = "http://test.org/";
+    public static final String s_baseURL = "http://test.org/";
 
     /* Sorts for the component trees*/
     public static final int s_COMP_TREE_SORT_ALPHA = 1;
@@ -191,6 +191,9 @@ public class Controller {
 
     /* cookie property key for session id */
     static public final String _sidKey = "SEASR.WB.SESSION.KEY";
+
+    /* hash of flows by name */
+    private HashMap _flowsByName = new HashMap();
 
     //================
     // Constructor(s)
@@ -400,31 +403,31 @@ public class Controller {
         buttPan.setCellVerticalAlignment(logo, HorizontalPanel.ALIGN_MIDDLE);
         buttPan.setCellVerticalAlignment(userlab, HorizontalPanel.ALIGN_TOP);
 
-        Button button = new Button("<IMG SRC='images/gnome-load-32.png'>",
+        Button button = new Button("<IMG SRC='images/gnome-save-32.png'>",
                                    new ClickListener() {
             public void onClick(Widget sender) {
-                Window.alert("Not implermented yet.");
+                saveFlow(false);
             }
         });
         button.setHeight("40px");
         button.setWidth("40px");
         button.addStyleName("menu-button");
         gPan.setWidget(0, 0, button);
-        Label lab = new Label("Load");
+        Label lab = new Label("Save");
         lab.addStyleName("menu-button-text");
         gPan.setWidget(1, 0, lab);
 
         button = new Button("<IMG SRC='images/gnome-save-32.png'>",
                             new ClickListener() {
             public void onClick(Widget sender) {
-                saveFlow();
+                saveFlow(true);
             }
         });
         button.setHeight("40px");
         button.setWidth("40px");
         button.addStyleName("menu-button");
         gPan.setWidget(0, 1, button);
-        lab = new Label("Save");
+        lab = new Label("Save As");
         lab.addStyleName("menu-button-text");
         gPan.setWidget(1, 1, lab);
 
@@ -465,10 +468,10 @@ public class Controller {
         button.setHeight("40px");
         button.setWidth("40px");
         button.addStyleName("menu-button");
-        gPan.setWidget(0, 4, button);
+        //gPan.setWidget(0, 4, button);
         lab = new Label("Run");
         lab.addStyleName("menu-button-text");
-        gPan.setWidget(1, 4, lab);
+        //gPan.setWidget(1, 4, lab);
 
         button = new Button("<IMG SRC='images/gnome-format-32.png'>",
                             new ClickListener() {
@@ -493,10 +496,10 @@ public class Controller {
         button.setHeight("40px");
         button.setWidth("40px");
         button.addStyleName("menu-button");
-        gPan.setWidget(0, 6, button);
+        //gPan.setWidget(0, 6, button);
         lab = new Label("Props");
         lab.addStyleName("menu-button-text");
-        gPan.setWidget(1, 6, lab);
+        //gPan.setWidget(1, 6, lab);
 
         button = new Button("<IMG SRC='images/gnome-quit-32.png'>",
                             new ClickListener() {
@@ -871,7 +874,8 @@ public class Controller {
         /**
          * @todo insert code here to query for saving working flow.
          */
-        for (Iterator itty = _canvasComps.iterator(); itty.hasNext(); ) {
+        Set samp = new HashSet(_canvasComps);
+        for (Iterator itty = samp.iterator(); itty.hasNext(); ) {
             ComponentPanel conn = (ComponentPanel) itty.next();
             removeComponent(conn);
         }
@@ -903,32 +907,29 @@ public class Controller {
     void removeComponent(ComponentPanel cp) {
         _tempremoveComponentCP = cp;
 
-        Set removes = new HashSet();
+        Set samp = new HashSet(_connections);
         for (Iterator iter = cp.getInputs().iterator();
                              iter.hasNext(); ) {
             PortComp pc = (PortComp) iter.next();
-            for (Iterator itty = _connections.iterator(); itty.hasNext(); ) {
+            for (Iterator itty = samp.iterator(); itty.hasNext(); ) {
                 PortConn conn = (PortConn) itty.next();
                 if (pc == conn.getTo()) {
                     removeConnection(conn);
-                    removes.add(conn);
                 }
             }
         }
-        this._connections.removeAll(removes);
-        removes.clear();
+        samp.clear();
+        samp.addAll(_connections);
         for (Iterator iter = cp.getOutputs().iterator();
                              iter.hasNext(); ) {
             PortComp pc = (PortComp) iter.next();
-            for (Iterator itty = _connections.iterator(); itty.hasNext(); ) {
+            for (Iterator itty = samp.iterator(); itty.hasNext(); ) {
                 PortConn conn = (PortConn) itty.next();
                 if (pc == conn.getFrom()) {
                     removeConnection(conn);
-                    removes.add(conn);
                 }
             }
         }
-        this._connections.removeAll(removes);
 
         this._canvasComps.remove(cp);
         this.removeComponentNameFromLookup(cp.getComponent().getName());
@@ -969,14 +970,25 @@ public class Controller {
     /**
      * Save the current flow to the repository.
      */
-    void saveFlow() {
+    void saveFlow(boolean saveas) {
         WBFlow flow = new WBFlow(); ;
-        if (this.hasActiveFlow()) {
+        if (saveas || !hasActiveFlow()){
+            if (this.hasActiveFlow()) {
+                flow.setDescription(this._workingFlow.getDescription());
+                flow.setCreator(this._workingFlow.getCreator());
+                flow.setRights(this._workingFlow.getRights());
+                flow.setBaseURL(this._workingFlow.getBaseURL());
+                flow.setTags(this._workingFlow.getTags());
+                flow.setName(this._workingFlow.getName());
+            }
+        } else {
             flow.setDescription(this._workingFlow.getDescription());
             flow.setCreator(this._workingFlow.getCreator());
             flow.setRights(this._workingFlow.getRights());
             flow.setBaseURL(this._workingFlow.getBaseURL());
             flow.setTags(this._workingFlow.getTags());
+            flow.setName(this._workingFlow.getName());
+            flow.setFlowID(this._workingFlow.getFlowID());
         }
         _workingFlow = flow;
         new CommandBuildFlow(_canvasComps, _connections,
@@ -1023,6 +1035,7 @@ public class Controller {
                 flow.setRights(this._workingFlow.getRights());
                 flow.setBaseURL(this._workingFlow.getBaseURL());
                 flow.setTags(this._workingFlow.getTags());
+                flow.setName(this._workingFlow.getName());
             }
             _workingFlow = flow;
             new CommandBuildFlow(_canvasComps, _connections,
@@ -1189,6 +1202,7 @@ public class Controller {
         flownew.setTags(flow.getTags());
         flownew.setFlowID(flow.getFlowID());
         flownew.setBaseURL(flow.getBaseURL());
+        flownew.setName(flow.getName());
         _workingFlow = flownew;
         _dirty = false;
 
@@ -1216,7 +1230,7 @@ public class Controller {
      * Indicates whether there have been edits to the current flow that have
      * ot been saved.
      *
-     * @return boolean INdictaes if there are editsa to the current flow that
+     * @return boolean Indictaes if there are editsa to the current flow that
      * have not benn saved.
      */
     boolean isDirty() {
@@ -1855,6 +1869,8 @@ public class Controller {
 
         _flowRootTemp = flowTreeRoot;
 
+        _flowsByName.clear();
+
         AsyncCallback callback = new AsyncCallback() {
             public void onSuccess(Object result) {
                 // do some UI stuff to show success
@@ -1865,7 +1881,7 @@ public class Controller {
                     WBFlow f = (WBFlow) itty.next();
                     String putxt = "Name:&nbsp;" + f.getName() + "<br>" +
                                    "<font color=\"#0000ff\">" +
-                                   "&nbsp;Base&nbsp;URL:&nbsp;" +
+                                   "&nbsp;ID:&nbsp;" +
                                    f.getFlowID() +
                                    "<br>" +
                                    "&nbsp;Description:&nbsp;" +
@@ -1875,8 +1891,17 @@ public class Controller {
                                    /*"&nbsp;Rights:&nbsp;" + f.getRights() +
                                    "<br>" +*/
                                    "</font>";
-                    WBTreeItem ti = new WBTreeItem(f.getName(), putxt);
+                    WBTreeItem ti = new WBTreeItem(f.getName()
+                            + "<br><font color=\"#0000ff\" size=\"-4\">[" + f.getFlowID() + "]</font>", putxt);
                     ti.setUserObject(f);
+                    //add to flows by name
+                    Object obj = _flowsByName.get(f.getName());
+                    if (obj == null){
+                        obj = new ArrayList();
+                    }
+                    ((ArrayList)obj).add(f);
+                    _flowsByName.put(f.getName(), obj);
+
                     root.addChild(new WBTreeNode(ti));
                 }
                 itty = root.getChildren().iterator();
@@ -1899,6 +1924,20 @@ public class Controller {
         getActiveFlows(callback);
 
         return flowTree;
+    }
+
+    boolean flowByNameBaseExists(String name, String base){
+        Object obj = _flowsByName.get(name);
+         if (obj != null){
+             ArrayList al = (ArrayList)obj;
+             for (int i = 0, n = al.size(); i < n; i++){
+                 WBFlow comp = (WBFlow)al.get(i);
+                 if (comp.getBaseURL().equals(base)){
+                     return true;
+                 }
+             }
+         }
+         return false;
     }
 
     //=================
