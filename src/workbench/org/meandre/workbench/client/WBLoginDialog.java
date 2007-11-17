@@ -180,6 +180,7 @@ public class WBLoginDialog extends DialogBox {
         hpan.add(cancel);
         hpan.add(_butt);
         hpan.setSpacing(20);
+        hpan.setCellWidth(_busy, "20px");
         hpan.setHorizontalAlignment(hpan.ALIGN_RIGHT);
 
         vp.add(logo);
@@ -187,6 +188,7 @@ public class WBLoginDialog extends DialogBox {
         vp.add(hpan);
 
         vp.setCellHorizontalAlignment(hpan,vp.ALIGN_RIGHT);
+        vp.setCellHorizontalAlignment(logo,vp.ALIGN_CENTER);
 
         return vp;
     }
