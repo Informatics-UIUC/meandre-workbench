@@ -176,9 +176,13 @@ public class Main implements EntryPoint, WindowResizeListener,
         Window.addWindowCloseListener(this);
         RootPanel.get().add(_dockPan);
 
-        //MenuBar _mb = _controller.buildMenu();
+        FlowPanel fp = new FlowPanel();
+        MenuBar _mb = _controller.buildMenu();
         _buttPan = _controller.buildButtPan();
-        _dockPan.add(_buttPan);
+        fp.add(_mb);
+        fp.add(_buttPan);
+
+        _dockPan.add(fp);
         _dockPan.add(_hsp);
 
         _dockPan.setSize("100%", "100%");

@@ -20,6 +20,25 @@ import org.meandre.workbench.client.beans.*;
 public interface WBRepositoryQuery extends RemoteService {
 
     /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param execid String execution ID.
+     * @param flowid String flow uri.
+     * @return WBExecBean Bean that contains execution information.
+     */
+    public WBExecBean startInteractiveExecution(String sid,
+                                                String execid,
+                                                String flowid);
+
+    /**
+     * Updates status of execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param execid String execution ID.
+     * @return WBExecBean
+     */
+    public WBExecBean updateInteractiveExecution(String sid, String execid);
+
+    /**
      * Log the user into the application.
      * @param sid String session id
      * @return LoginBean Bean containing login information.

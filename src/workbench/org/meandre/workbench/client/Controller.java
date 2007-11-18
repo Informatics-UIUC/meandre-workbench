@@ -263,6 +263,10 @@ public class Controller {
         _main.onModuleLoadContinued();
     }
 
+    void logout(){
+        Cookies.removeCookie(this._sidKey);
+    }
+
     String getSessionID(){
         return _sessionID;
     }
@@ -331,10 +335,48 @@ public class Controller {
     // Interface Implementation: WBRepositoryQueryAsync
     //==================================================
 
+    /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param execid String execution ID.
+     * @param flowid String flow uri.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void startInteractiveExecution(String sid,
+                                          String execid,
+                                          String flowid,
+                                          AsyncCallback cb){
+        _repquery.startInteractiveExecution(sid, execid, flowid, cb);
+    }
+
+    /**
+     * Updates status of execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param execid String execution ID.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void updateInteractiveExecution(String sid,
+                                           String execid,
+                                           AsyncCallback cb){
+        _repquery.updateInteractiveExecution(sid, execid, cb);
+    }
+
+    /**
+     * Log the user into the application.
+     * @param sid String session id
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
     void checkSessionID(String sessionID, AsyncCallback cb){
         _repquery.checkSessionID(sessionID, cb);
     }
 
+    /**
+      * Log the user into the application.
+      * @param userid String user's id
+      * @param password String user's password
+      * @param url String URL of server to connect with.
+      * @param cb AsyncCallback Callback object returned from the server.
+      */
     void login(String user, String pass, String url, AsyncCallback cb){
         _repquery.login(user, pass, url, cb);
     }
@@ -468,10 +510,10 @@ public class Controller {
         button.setHeight("40px");
         button.setWidth("40px");
         button.addStyleName("menu-button");
-        //gPan.setWidget(0, 4, button);
+        gPan.setWidget(0, 4, button);
         lab = new Label("Run");
         lab.addStyleName("menu-button-text");
-        //gPan.setWidget(1, 4, lab);
+        gPan.setWidget(1, 4, lab);
 
         button = new Button("<IMG SRC='images/gnome-format-32.png'>",
                             new ClickListener() {
@@ -530,26 +572,114 @@ public class Controller {
      *
      * @return MenuBar The top level menu bar object.
      */
-    private MenuBar buildMenu() {
+    MenuBar buildMenu() {
         Command cmd = new Command() {
             public void execute() {
                 Window.alert("You selected a menu item!");
             }
         };
 
+        Command saveCmd = new Command() {
+            public void execute() {
+                saveFlow(false);
+            }
+        };
+        Command saveAsCmd = new Command() {
+            public void execute() {
+                saveFlow(true);
+            }
+        };
+        Command newFlowCmd = new Command() {
+            public void execute() {
+                clearCanvas();
+            }
+        };
+        Command removeCompCmd = new Command() {
+            public void execute() {
+                removeSelectedComponent();
+            }
+        };
+        Command layoutFlowCmd = new Command() {
+            public void execute() {
+                Controller.this.formatFlow();
+            }
+        };
+        Command exitAppCmd = new Command() {
+            public void execute() {
+                Controller.this.getMain().closeApp();
+            }
+        };
+        Command exitAndLogoutAppCmd = new Command() {
+            public void execute() {
+                Controller.this.logout();
+                Controller.this.getMain().closeApp();
+            }
+        };
+        Command executeInteractiveCmd = new Command() {
+            public void execute() {
+                Controller.this.saveFlowAndExecute();
+            }
+        };
+
         // Make some sub-menus that we will cascade from the top menu.
-        MenuBar fooMenu = new MenuBar(true);
-        fooMenu.addItem("New Itinerary", cmd);
-        fooMenu.addItem("Save", cmd);
-        fooMenu.addItem("Run", cmd);
-        fooMenu.addItem("Exit", cmd);
+
+
+        //app commands
+        MenuBar appMenu = new MenuBar(true);
+        appMenu.addItem("Exit (Logout)", exitAndLogoutAppCmd);
+        appMenu.addItem("Exit", exitAppCmd);
+
+
+        //flow commands
+        MenuBar flowMenu = new MenuBar(true);
+        flowMenu.addItem("Save", saveCmd);
+        flowMenu.addItem("Save As ...", saveAsCmd);
+        flowMenu.addItem("New", newFlowCmd);
+        flowMenu.addItem("Layout", layoutFlowCmd);
+        flowMenu.addItem("Publish", cmd);
+        flowMenu.addItem("Unpublish", cmd);
+        flowMenu.addItem("Remove Component", removeCompCmd);
+        flowMenu.addItem("Delete", cmd);
+
+        //component commands
+        MenuBar compMenu = new MenuBar(true);
+        compMenu.addItem("Create", cmd);
+        compMenu.addItem("Publish", cmd);
+        compMenu.addItem("Unpublish", cmd);
+        compMenu.addItem("Properties", cmd);
+        compMenu.addItem("Delete", cmd);
+
+        //exec commands
+        MenuBar execMenu = new MenuBar(true);
+        execMenu.addItem("Run Interactive", executeInteractiveCmd);
+
+        //Repository
+        MenuBar repoMenu = new MenuBar(true);
+        repoMenu.addItem("Regenerate", cmd);
+        repoMenu.addItem("Upload", cmd);
+        repoMenu.addItem("Add Location", cmd);
+        repoMenu.addItem("Remove Location", cmd);
+
+        //help
+        MenuBar helpMenu = new MenuBar(true);
+        helpMenu.addItem("About", cmd);
 
         // Make a new menu bar, adding a few cascading menus to it.
         MenuBar menu = new MenuBar();
-        menu.addItem("File", fooMenu);
+        menu.addItem("Application", appMenu);
+        menu.addItem("Flow", flowMenu);
+        menu.addItem("Component", compMenu);
+        menu.addItem("Execute", execMenu);
+        menu.addItem("Repository", repoMenu);
+        menu.addItem("Help", helpMenu);
 
         menu.setStyleName("gwt-MenuBar");
-        fooMenu.setStyleName("gwt-MenuBar");
+        appMenu.setStyleName("gwt-MenuBar");
+        helpMenu.setStyleName("gwt-MenuBar");
+        flowMenu.setStyleName("gwt-MenuBar");
+        repoMenu.setStyleName("gwt-MenuBar");
+        compMenu.setStyleName("gwt-MenuBar");
+        execMenu.setStyleName("gwt-MenuBar");
         return menu;
     }
 
@@ -1036,6 +1166,7 @@ public class Controller {
                 flow.setBaseURL(this._workingFlow.getBaseURL());
                 flow.setTags(this._workingFlow.getTags());
                 flow.setName(this._workingFlow.getName());
+                flow.setFlowID(this._workingFlow.getFlowID());
             }
             _workingFlow = flow;
             new CommandBuildFlow(_canvasComps, _connections,

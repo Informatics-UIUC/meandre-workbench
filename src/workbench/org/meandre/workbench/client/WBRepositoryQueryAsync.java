@@ -12,6 +12,7 @@ import java.util.Set;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.meandre.workbench.client.beans.WBFlow;
+import org.meandre.workbench.client.beans.WBExecBean;
 
 /**
  * <p>Title: Workbench Repository Query Asynchronous</p>
@@ -26,6 +27,28 @@ import org.meandre.workbench.client.beans.WBFlow;
  * @version 1.0
  */
 public interface WBRepositoryQueryAsync {
+
+        /**
+         * Starts execution of a flow in interactive mode.
+         * @param sid String session ID.
+         * @param execid String execution ID.
+         * @param flowid String flow uri.
+         * @param cb AsyncCallback Callback object returned from the server.
+         */
+        public void startInteractiveExecution(String sid,
+                                              String execid,
+                                              String flowid,
+                                              AsyncCallback cb);
+
+        /**
+         * Updates status of execution of a flow in interactive mode.
+         * @param sid String session ID.
+         * @param execid String execution ID.
+         * @param cb AsyncCallback Callback object returned from the server.
+         */
+        public void updateInteractiveExecution(String sid,
+                                               String execid,
+                                               AsyncCallback cb);
 
         /**
          * Log the user into the application.

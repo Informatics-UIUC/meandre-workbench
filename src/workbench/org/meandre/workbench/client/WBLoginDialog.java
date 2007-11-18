@@ -170,6 +170,10 @@ public class WBLoginDialog extends DialogBox {
         _prtbox.setText("1714");
         gp.setWidget(3, 1, _prtbox);
 
+        // FOR DEV ONLY
+        _tbox.setText("admin");
+        _pbox.setText("admin");
+
 
 
         Image logo = new Image("images/meandre-logo.jpg");

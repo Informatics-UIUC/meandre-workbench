@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.HashMap;
+import java.io.ByteArrayOutputStream;
+import java.util.Vector;
 
 //===============
 // Other Imports
@@ -20,8 +23,6 @@ import org.meandre.workbench.server.proxy.beans.repository.*;
 import org.meandre.workbench.client.*;
 import org.meandre.workbench.client.beans.*;
 import org.meandre.workbench.server.proxy.MeandreProxy;
-import java.util.HashMap;
-import java.io.ByteArrayOutputStream;
 
 
 /**
@@ -44,14 +45,24 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     // Data Members
     //==============
 
-    private Map _proxies = new Hashtable();
+    private static Map _proxies = new Hashtable();
+    private static Map _runOutput = new Hashtable();
+    static private WBRepositoryQueryImpl s_instance = null;
 
     //================
     // Constructor(s)
     //================
 
     public WBRepositoryQueryImpl() {
+        s_instance = this;
+    }
 
+    //================
+    // Static Methods
+    //================
+
+    public static MeandreProxy getProxy(String sid){
+        return (MeandreProxy)_proxies.get(sid);
     }
 
     //=================
@@ -62,6 +73,90 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     //===================================
     // Interface Impl: WBRepositoryQuery
     //===================================
+
+    /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param execid String execution ID.
+     * @param flowid String flow uri.
+     * @return WBExecBean Bean that contains execution information.
+     */
+    public WBExecBean startInteractiveExecution(String sid,
+                                                String execid,
+                                                String flowid){
+        Object obj = _proxies.get(sid);
+        if (obj == null) {
+            return new WBExecBean("No longer valid session ID.");
+        } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+            Vector v = new Vector();
+            _runOutput.put(execid, v);
+
+            new Thread(new InteractiveExecutionRunner(flowid, "txt", v, proxy)).start();
+
+            try {
+                Thread.currentThread().sleep(500);
+            } catch (Exception e){}
+
+            StringBuffer buff = new StringBuffer("");
+            while(!v.isEmpty()){
+                char[] iarr = (char[])v.remove(0);
+                if ((iarr.length == 1) && (iarr[0] == '`')){
+                    _runOutput.remove(v);
+                    return new WBExecBean(buff.toString(), execid, true);
+                }
+                buff.append(iarr);
+            }
+            return new WBExecBean(buff.toString(), execid, false);
+        }
+    }
+
+    private class InteractiveExecutionRunner implements Runnable {
+
+        private String _flowid = null;
+        private String _fmt = null;
+        private Vector _v = null;
+        private MeandreProxy _proxy = null;
+
+        public InteractiveExecutionRunner(String flowid, String fmt, Vector v, MeandreProxy proxy){
+            _flowid = flowid;
+            _fmt = fmt;
+            _v = v;
+            _proxy = proxy;
+        }
+
+        public void run(){
+            _proxy.runWBFlowInteractively(_flowid, _fmt, _v);
+        }
+    }
+
+    /**
+     * Updates status of execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param execid String execution ID.
+     * @return WBExecBean
+     */
+    public WBExecBean updateInteractiveExecution(String sid, String execid){
+        Object obj = _proxies.get(sid);
+        if (obj == null) {
+            return new WBExecBean("No longer valid session ID.");
+        } else {
+            WBExecBean eb = null;
+            MeandreProxy proxy = (MeandreProxy) obj;
+            Vector v = (Vector)_runOutput.get(execid);
+
+            StringBuffer buff = new StringBuffer("");
+            while(!v.isEmpty()){
+                char[] iarr = (char[])v.remove(0);
+                if ((iarr.length == 1) && (iarr[0] == '`')){
+                    _runOutput.remove(v);
+                    return new WBExecBean(buff.toString(), execid, true);
+                }
+                buff.append(iarr);
+            }
+            return new WBExecBean(buff.toString(), execid, false);
+        }
+    }
 
     /**
      * Log the user into the application.

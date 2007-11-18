@@ -2,11 +2,16 @@
 .gwt-MenuBar {
   background: #c3d9ff;
   cursor: default;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .gwt-MenuItem {
-  font-size: 80%;
-  margin: 1px;
+  font-size: 90%;
+  font-weight: bold;
+  margin: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
   cursor: default;
 }
 

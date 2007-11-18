@@ -26,11 +26,12 @@ import org.apache.commons.httpclient.methods.PostMethod;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import java.util.Vector;
 
 /** Create a meandre autheticated proxy to access the web services
  *
  * @author Xavier Llor&agrave;
- *
+ * @author D. Searsmith
  */
 public class MeandreProxy {
 
@@ -506,6 +507,60 @@ public class MeandreProxy {
             post.releaseConnection();
         }
         return sbuff;
+    }
+
+    /** Runs a flow and streams the output.
+     *
+     * @param sURI The flow to execute
+     * @param sFormat The format of the output
+     * @param jw The writer to use
+     */
+    public void runWBFlowInteractively(String sURI, String sFormat, Vector v) {
+        String sRequest = sBaseURL + "services/execute/flow." + sFormat +
+                          "?uri=" + sURI;
+        executeWBSteamableGetRequest(sRequest, v);
+    }
+
+    /** Does an authenticated get request against the provided URL and stream back
+     * the contents
+     *
+     * @param sURL The URL to request
+     * @param jw The outpt writter
+     */
+    private void executeWBSteamableGetRequest(String sURL, Vector v) {
+        try {
+            // Create the URL
+            URL url = new URL(sURL);
+
+            // Create and authenticated connection
+            URLConnection uc = url.openConnection();
+            uc.setRequestProperty("Authorization", "Basic " + sUPEncoding);
+
+            // Pull the stuff out of the Meandre server
+            InputStream is = (InputStream) uc.getInputStream();
+            int iTmp;
+            char[] iarr = new char[40];
+            int cnt = 0;
+            while ((iTmp = is.read()) != -1) {
+                iarr[cnt++] = (char)iTmp;
+                if (cnt == 40){
+                    v.add(iarr);
+                    iarr = new char[40];
+                    cnt = 0;
+                }
+            }
+            if (cnt > 0){
+                char[] ifin = new char[cnt];
+                System.arraycopy(iarr, 0, ifin, 0, cnt);
+                v.add(ifin);
+            }
+            char[] end = new char[1];
+            end[0] = '`';
+            v.add(end);
+            is.close();
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
     }
 
 }
