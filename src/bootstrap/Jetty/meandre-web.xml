@@ -291,6 +291,20 @@
 		<url-pattern>/WBRepositoryQuery</url-pattern>
 	</servlet-mapping>
 
+	<!-- PLUGIN Servlets are here
+	<servlet>
+		<servlet-name>proxy</servlet-name>
+		<servlet-class>org.seasr.server.plugins.proxy.HttpProxyServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>proxy</servlet-name>
+		<url-pattern>/proxy/*</url-pattern>
+	</servlet-mapping>
+
+        -->
+
 	<!-- ==================================================================== -->
 	<!-- Dynamic Servlet Invoker.                                             -->
 	<!-- This servlet invokes anonymous servlets that have not been defined   -->
