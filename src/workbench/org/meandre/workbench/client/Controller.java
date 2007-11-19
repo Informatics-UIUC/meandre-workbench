@@ -431,7 +431,7 @@ public class Controller {
          * Add logo to header.
          */
         Image logo = new Image("images/meandre-logo.jpg");
-        Grid gPan = new Grid(2, 8);
+        Grid gPan = new Grid(2, 1);
         buttPan.add(gPan);
         buttPan.add(logo);
         /**
@@ -444,106 +444,10 @@ public class Controller {
         //buttPan.addStyleName("menu-panel");
         buttPan.setCellVerticalAlignment(logo, HorizontalPanel.ALIGN_MIDDLE);
         buttPan.setCellVerticalAlignment(userlab, HorizontalPanel.ALIGN_TOP);
+        buttPan.setCellHorizontalAlignment(userlab, HorizontalPanel.ALIGN_RIGHT);
+        buttPan.setCellHorizontalAlignment(logo, HorizontalPanel.ALIGN_RIGHT);
 
-        Button button = new Button("<IMG SRC='images/gnome-save-32.png'>",
-                                   new ClickListener() {
-            public void onClick(Widget sender) {
-                saveFlow(false);
-            }
-        });
-        button.setHeight("40px");
-        button.setWidth("40px");
-        button.addStyleName("menu-button");
-        gPan.setWidget(0, 0, button);
-        Label lab = new Label("Save");
-        lab.addStyleName("menu-button-text");
-        gPan.setWidget(1, 0, lab);
-
-        button = new Button("<IMG SRC='images/gnome-save-32.png'>",
-                            new ClickListener() {
-            public void onClick(Widget sender) {
-                saveFlow(true);
-            }
-        });
-        button.setHeight("40px");
-        button.setWidth("40px");
-        button.addStyleName("menu-button");
-        gPan.setWidget(0, 1, button);
-        lab = new Label("Save As");
-        lab.addStyleName("menu-button-text");
-        gPan.setWidget(1, 1, lab);
-
-        button = new Button("<IMG SRC='images/gnome-quit-32.png'>",
-                            new ClickListener() {
-            public void onClick(Widget sender) {
-                removeSelectedComponent();
-            }
-        });
-        button.setHeight("40px");
-        button.setWidth("40px");
-        button.addStyleName("menu-button");
-        gPan.setWidget(0, 2, button);
-        lab = new Label("Delete");
-        lab.addStyleName("menu-button-text");
-        gPan.setWidget(1, 2, lab);
-
-        button = new Button("<IMG SRC='images/gnome-clear-32.png'>",
-                            new ClickListener() {
-            public void onClick(Widget sender) {
-                clearCanvas();
-            }
-        });
-        button.setHeight("40px");
-        button.setWidth("40px");
-        button.addStyleName("menu-button");
-        gPan.setWidget(0, 3, button);
-        lab = new Label("Clear");
-        lab.addStyleName("menu-button-text");
-        gPan.setWidget(1, 3, lab);
-
-        button = new Button("<IMG SRC='images/gnome-reboot-32.png'>",
-                            new ClickListener() {
-            public void onClick(Widget sender) {
-                saveFlowAndExecute();
-            }
-        });
-        button.setHeight("40px");
-        button.setWidth("40px");
-        button.addStyleName("menu-button");
-        gPan.setWidget(0, 4, button);
-        lab = new Label("Run");
-        lab.addStyleName("menu-button-text");
-        gPan.setWidget(1, 4, lab);
-
-        button = new Button("<IMG SRC='images/gnome-format-32.png'>",
-                            new ClickListener() {
-            public void onClick(Widget sender) {
-                formatFlow();
-            }
-        });
-        button.setHeight("40px");
-        button.setWidth("40px");
-        button.addStyleName("menu-button");
-        gPan.setWidget(0, 5, button);
-        lab = new Label("Layout");
-        lab.addStyleName("menu-button-text");
-        gPan.setWidget(1, 5, lab);
-
-        button = new Button("<IMG SRC='images/gnome-properties-32.png'>",
-                            new ClickListener() {
-            public void onClick(Widget sender) {
-                Window.alert("Not implermented yet.");
-            }
-        });
-        button.setHeight("40px");
-        button.setWidth("40px");
-        button.addStyleName("menu-button");
-        //gPan.setWidget(0, 6, button);
-        lab = new Label("Props");
-        lab.addStyleName("menu-button-text");
-        //gPan.setWidget(1, 6, lab);
-
-        button = new Button("<IMG SRC='images/gnome-quit-32.png'>",
+        Button button = new Button("<IMG SRC='images/gnome-quit-32.png'>",
                             new ClickListener() {
             public void onClick(Widget sender) {
                 if (canvasHasComps() && isDirty()) {
@@ -559,10 +463,124 @@ public class Controller {
         button.setHeight("40px");
         button.setWidth("40px");
         button.addStyleName("menu-button");
-        gPan.setWidget(0, 7, button);
-        lab = new Label("Exit");
+        gPan.setWidget(0, 0, button);
+        Label lab = new Label("Exit");
         lab.addStyleName("menu-button-text");
-        gPan.setWidget(1, 7, lab);
+        gPan.setWidget(1, 0, lab);
+
+        return buttPan;
+    }
+
+    /**
+     * Builds the button panel that appears at the top of the work bench
+     * application.
+     *
+     * @return VerticalPanel The vertical panel containing the buttons.
+     */
+    HorizontalPanel buildCanvasButtPan() {
+        HorizontalPanel buttPan = new HorizontalPanel();
+        Grid gPan = new Grid(2, 7);
+        buttPan.add(gPan);
+        buttPan.addStyleName("menu-panel");
+
+        Button button = new Button("<IMG SRC='images/gnome-save-22.png'>",
+                                   new ClickListener() {
+            public void onClick(Widget sender) {
+                saveFlow(false);
+            }
+        });
+        button.setHeight("30px");
+        button.setWidth("30px");
+        button.addStyleName("menu-button");
+        gPan.setWidget(0, 0, button);
+        Label lab = new Label("Save");
+        lab.addStyleName("menu-button-text");
+        gPan.setWidget(1, 0, lab);
+
+        button = new Button("<IMG SRC='images/gnome-save-22.png'>",
+                            new ClickListener() {
+            public void onClick(Widget sender) {
+                saveFlow(true);
+            }
+        });
+        button.setHeight("30px");
+        button.setWidth("30px");
+        button.addStyleName("menu-button");
+        gPan.setWidget(0, 1, button);
+        lab = new Label("Save As");
+        lab.addStyleName("menu-button-text");
+        gPan.setWidget(1, 1, lab);
+
+        button = new Button("<IMG SRC='images/gnome-quit-22.png'>",
+                            new ClickListener() {
+            public void onClick(Widget sender) {
+                removeSelectedComponent();
+            }
+        });
+        button.setHeight("30px");
+        button.setWidth("30px");
+        button.addStyleName("menu-button");
+        gPan.setWidget(0, 2, button);
+        lab = new Label("Delete");
+        lab.addStyleName("menu-button-text");
+        gPan.setWidget(1, 2, lab);
+
+        button = new Button("<IMG SRC='images/gnome-clear-22.png'>",
+                            new ClickListener() {
+            public void onClick(Widget sender) {
+                clearCanvas();
+            }
+        });
+        button.setHeight("30px");
+        button.setWidth("30px");
+        button.addStyleName("menu-button");
+        gPan.setWidget(0, 3, button);
+        lab = new Label("Clear");
+        lab.addStyleName("menu-button-text");
+        gPan.setWidget(1, 3, lab);
+
+        button = new Button("<IMG SRC='images/gnome-reboot-22.png'>",
+                            new ClickListener() {
+            public void onClick(Widget sender) {
+                saveFlowAndExecute();
+            }
+        });
+        button.setHeight("30px");
+        button.setWidth("30px");
+        button.addStyleName("menu-button");
+        gPan.setWidget(0, 4, button);
+        lab = new Label("Run");
+        lab.addStyleName("menu-button-text");
+        gPan.setWidget(1, 4, lab);
+
+        button = new Button("<IMG SRC='images/gnome-format-22.png'>",
+                            new ClickListener() {
+            public void onClick(Widget sender) {
+                formatFlow();
+            }
+        });
+        button.setHeight("30px");
+        button.setWidth("30px");
+        button.addStyleName("menu-button");
+        gPan.setWidget(0, 5, button);
+        lab = new Label("Layout");
+        lab.addStyleName("menu-button-text");
+        gPan.setWidget(1, 5, lab);
+
+        button = new Button("<IMG SRC='images/gnome-properties-22.png'>",
+                            new ClickListener() {
+            public void onClick(Widget sender) {
+                Window.alert("Not implermented yet.");
+            }
+        });
+        button.setHeight("30px");
+        button.setWidth("30px");
+        button.addStyleName("menu-button");
+        //gPan.setWidget(0, 6, button);
+        lab = new Label("Props");
+        lab.addStyleName("menu-button-text");
+        //gPan.setWidget(1, 6, lab);
+
 
         return buttPan;
     }

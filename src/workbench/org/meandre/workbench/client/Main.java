@@ -32,6 +32,7 @@ import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.SourcesTabEvents;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.DockPanel;
 
 
 /**
@@ -82,6 +83,10 @@ public class Main implements EntryPoint, WindowResizeListener,
      * appear at the top of the workbench application.
      */
     private HorizontalPanel _buttPan = null;
+
+    private FlowPanel _canvasPan = null;
+
+    private HorizontalPanel _canvasButtPan = null;
 
     /** The vertical split panel that partitions the canvas from the
      * lower detail window.
@@ -166,7 +171,14 @@ public class Main implements EntryPoint, WindowResizeListener,
         _vscroll = new ScrollPanel();
         _boundPan.add(_absPan);
         _absPan.add(_jsgPan);
-        _vsp.setTopWidget(_boundPan);
+
+        _canvasPan = new FlowPanel();
+
+        _canvasButtPan = _controller.buildCanvasButtPan();
+        _canvasPan.add(_canvasButtPan);
+        _canvasPan.add(_boundPan);
+
+        _vsp.setTopWidget(_canvasPan);
         _vsp.setBottomWidget(_vscroll);
 
         _hsp.setRightWidget(_vsp);
@@ -199,6 +211,9 @@ public class Main implements EntryPoint, WindowResizeListener,
         _controller.getCompTreeHandle().setWidth("100%");
         _controller.getFlowTreeHandle().setHeight("100%");
         _controller.getFlowTreeHandle().setWidth("100%");
+        _canvasPan.setWidth("100%");
+        _canvasPan.setHeight("100%");
+        _canvasButtPan.setWidth("100%");
         _boundPan.setWidth("100%");
         _boundPan.setHeight("100%");
         _vscroll.setWidth("100%");
@@ -245,7 +260,10 @@ public class Main implements EntryPoint, WindowResizeListener,
         _vsp.setHeight("100%");
         _controller.getCompTreeHandle().setHeight("100%");
         _controller.getCompTreeHandle().setWidth("100%");
+        _canvasPan.setWidth("100%");
+        _canvasPan.setHeight("100%");
         _boundPan.setWidth("100%");
+        _canvasButtPan.setWidth("100%");
         _boundPan.setHeight("100%");
         _vscroll.setWidth("100%");
         _vscroll.setHeight("100%");

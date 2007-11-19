@@ -91,11 +91,12 @@
   border-style: solid;
   border-width: medium;
   border-color: #c3d9ff;
-  margin: 1px;
+  /*margin: 1px;*/
+  background: #c3d9ff
 }
 
 .menu-button {
-  margin: 5px;
+  margin: 3px;
   cursor: pointer;
   cursor: hand;
   background-color: #ffffff;
@@ -104,8 +105,8 @@
 .menu-button-text {
   font-weight: bold;
   text-align: center;
-  margin: 2px;
-  font-size: 80%;
+  margin: 1px;
+  font-size: 70%;
 }
 
 
