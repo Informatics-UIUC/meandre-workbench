@@ -96,17 +96,39 @@
 }
 
 .menu-button {
-  margin: 3px;
   cursor: pointer;
   cursor: hand;
   background-color: #ffffff;
-}
+  margin-left: auto;
+  margin-right: auto;
+  }
 
 .menu-button-text {
   font-weight: bold;
   text-align: center;
-  margin: 1px;
   font-size: 70%;
+}
+
+.top-menu-panel {
+  border-style: solid;
+  border-width: medium;
+  border-color: #c3d9ff;
+  /*margin: 1px;*/
+  background: #c3d9ff
+}
+
+.top-menu-button {
+  cursor: pointer;
+  cursor: hand;
+  background-color: #ffffff;
+  margin-left: auto;
+  margin-right: auto;
+  }
+
+.top-menu-button-text {
+  font-weight: bold;
+  text-align: center;
+  font-size: 80%;
 }
 
 

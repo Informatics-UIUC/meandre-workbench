@@ -58,6 +58,7 @@ import org.meandre.workbench.client.beans.WBLoginBean;
 import java.util.Date;
 import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
 /**
  * <p>Title: Controller</p>
@@ -462,10 +463,10 @@ public class Controller {
         });
         button.setHeight("40px");
         button.setWidth("40px");
-        button.addStyleName("menu-button");
+        button.addStyleName("top-menu-button");
         gPan.setWidget(0, 0, button);
         Label lab = new Label("Exit");
-        lab.addStyleName("menu-button-text");
+        lab.addStyleName("top-menu-button-text");
         gPan.setWidget(1, 0, lab);
 
         return buttPan;
@@ -479,7 +480,22 @@ public class Controller {
      */
     HorizontalPanel buildCanvasButtPan() {
         HorizontalPanel buttPan = new HorizontalPanel();
-        Grid gPan = new Grid(2, 7);
+
+        Grid gPan = new Grid(2, 6);
+        gPan.getColumnFormatter().setWidth(0, "50px");
+        gPan.getColumnFormatter().setWidth(1, "50px");
+        gPan.getColumnFormatter().setWidth(2, "50px");
+        gPan.getColumnFormatter().setWidth(3, "50px");
+        gPan.getColumnFormatter().setWidth(4, "50px");
+        gPan.getColumnFormatter().setWidth(5, "50px");
+
+        gPan.getCellFormatter().setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_CENTER);
+        gPan.getCellFormatter().setHorizontalAlignment(0, 1, HasHorizontalAlignment.ALIGN_CENTER);
+        gPan.getCellFormatter().setHorizontalAlignment(0, 2, HasHorizontalAlignment.ALIGN_CENTER);
+        gPan.getCellFormatter().setHorizontalAlignment(0, 3, HasHorizontalAlignment.ALIGN_CENTER);
+        gPan.getCellFormatter().setHorizontalAlignment(0, 4, HasHorizontalAlignment.ALIGN_CENTER);
+        gPan.getCellFormatter().setHorizontalAlignment(0, 5, HasHorizontalAlignment.ALIGN_CENTER);
+
         buttPan.add(gPan);
         buttPan.addStyleName("menu-panel");
 
@@ -489,13 +505,14 @@ public class Controller {
                 saveFlow(false);
             }
         });
-        button.setHeight("30px");
-        button.setWidth("30px");
+        button.setHeight("32px");
+        button.setWidth("32px");
         button.addStyleName("menu-button");
         gPan.setWidget(0, 0, button);
         Label lab = new Label("Save");
         lab.addStyleName("menu-button-text");
         gPan.setWidget(1, 0, lab);
+
 
         button = new Button("<IMG SRC='images/gnome-save-22.png'>",
                             new ClickListener() {
@@ -503,8 +520,8 @@ public class Controller {
                 saveFlow(true);
             }
         });
-        button.setHeight("30px");
-        button.setWidth("30px");
+        button.setHeight("32px");
+        button.setWidth("32px");
         button.addStyleName("menu-button");
         gPan.setWidget(0, 1, button);
         lab = new Label("Save As");
@@ -517,8 +534,8 @@ public class Controller {
                 removeSelectedComponent();
             }
         });
-        button.setHeight("30px");
-        button.setWidth("30px");
+        button.setHeight("32px");
+        button.setWidth("32px");
         button.addStyleName("menu-button");
         gPan.setWidget(0, 2, button);
         lab = new Label("Delete");
@@ -531,8 +548,8 @@ public class Controller {
                 clearCanvas();
             }
         });
-        button.setHeight("30px");
-        button.setWidth("30px");
+        button.setHeight("32px");
+        button.setWidth("32px");
         button.addStyleName("menu-button");
         gPan.setWidget(0, 3, button);
         lab = new Label("Clear");
@@ -545,8 +562,8 @@ public class Controller {
                 saveFlowAndExecute();
             }
         });
-        button.setHeight("30px");
-        button.setWidth("30px");
+        button.setHeight("32px");
+        button.setWidth("32px");
         button.addStyleName("menu-button");
         gPan.setWidget(0, 4, button);
         lab = new Label("Run");
@@ -559,8 +576,8 @@ public class Controller {
                 formatFlow();
             }
         });
-        button.setHeight("30px");
-        button.setWidth("30px");
+        button.setHeight("32px");
+        button.setWidth("32px");
         button.addStyleName("menu-button");
         gPan.setWidget(0, 5, button);
         lab = new Label("Layout");
@@ -573,13 +590,14 @@ public class Controller {
                 Window.alert("Not implermented yet.");
             }
         });
-        button.setHeight("30px");
-        button.setWidth("30px");
+        button.setHeight("32px");
+        button.setWidth("32px");
         button.addStyleName("menu-button");
         //gPan.setWidget(0, 6, button);
         lab = new Label("Props");
         lab.addStyleName("menu-button-text");
         //gPan.setWidget(1, 6, lab);
+
 
 
         return buttPan;
