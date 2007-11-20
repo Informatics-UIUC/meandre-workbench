@@ -482,12 +482,12 @@ public class Controller {
         HorizontalPanel buttPan = new HorizontalPanel();
 
         Grid gPan = new Grid(2, 6);
-        gPan.getColumnFormatter().setWidth(0, "50px");
-        gPan.getColumnFormatter().setWidth(1, "50px");
-        gPan.getColumnFormatter().setWidth(2, "50px");
-        gPan.getColumnFormatter().setWidth(3, "50px");
-        gPan.getColumnFormatter().setWidth(4, "50px");
-        gPan.getColumnFormatter().setWidth(5, "50px");
+        gPan.getColumnFormatter().setWidth(0, "52px");
+        gPan.getColumnFormatter().setWidth(1, "52px");
+        gPan.getColumnFormatter().setWidth(2, "52px");
+        gPan.getColumnFormatter().setWidth(3, "52px");
+        gPan.getColumnFormatter().setWidth(4, "52px");
+        gPan.getColumnFormatter().setWidth(5, "52px");
 
         gPan.getCellFormatter().setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_CENTER);
         gPan.getCellFormatter().setHorizontalAlignment(0, 1, HasHorizontalAlignment.ALIGN_CENTER);
@@ -538,7 +538,7 @@ public class Controller {
         button.setWidth("32px");
         button.addStyleName("menu-button");
         gPan.setWidget(0, 2, button);
-        lab = new Label("Delete");
+        lab = new Label("Remove");
         lab.addStyleName("menu-button-text");
         gPan.setWidget(1, 2, lab);
 
@@ -668,14 +668,17 @@ public class Controller {
 
         //flow commands
         MenuBar flowMenu = new MenuBar(true);
-        flowMenu.addItem("Save", saveCmd);
-        flowMenu.addItem("Save As ...", saveAsCmd);
-        flowMenu.addItem("New", newFlowCmd);
-        flowMenu.addItem("Layout", layoutFlowCmd);
         flowMenu.addItem("Publish", cmd);
         flowMenu.addItem("Unpublish", cmd);
-        flowMenu.addItem("Remove Component", removeCompCmd);
         flowMenu.addItem("Delete", cmd);
+
+        //canvas commands
+        MenuBar canvasMenu = new MenuBar(true);
+        canvasMenu.addItem("Save", saveCmd);
+        canvasMenu.addItem("Save As ...", saveAsCmd);
+        canvasMenu.addItem("New", newFlowCmd);
+        canvasMenu.addItem("Layout", layoutFlowCmd);
+        canvasMenu.addItem("Remove Component", removeCompCmd);
 
         //component commands
         MenuBar compMenu = new MenuBar(true);
@@ -703,6 +706,7 @@ public class Controller {
         // Make a new menu bar, adding a few cascading menus to it.
         MenuBar menu = new MenuBar();
         menu.addItem("Application", appMenu);
+        menu.addItem("Canvas", canvasMenu);
         menu.addItem("Flow", flowMenu);
         menu.addItem("Component", compMenu);
         menu.addItem("Execute", execMenu);
@@ -716,6 +720,7 @@ public class Controller {
         repoMenu.setStyleName("gwt-MenuBar");
         compMenu.setStyleName("gwt-MenuBar");
         execMenu.setStyleName("gwt-MenuBar");
+        canvasMenu.setStyleName("gwt-MenuBar");
         return menu;
     }
 
@@ -1998,7 +2003,7 @@ public class Controller {
     private String getCompTreeItemPopUpText(WBComponent ecd) {
         String putxt = "Name:&nbsp;" + ecd.getName() + "<br>" +
                        "<font color=\"#0000ff\">" +
-                       "&nbsp;Base&nbsp;URL:&nbsp;" + ecd.getID() +
+                       "&nbsp;ID:&nbsp;" + ecd.getID() +
                        "<br>" +
                        "&nbsp;Description:&nbsp;" +
                        ecd.getDescription() + "<br>" +
