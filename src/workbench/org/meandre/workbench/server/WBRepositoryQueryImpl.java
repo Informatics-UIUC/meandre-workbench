@@ -227,7 +227,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
         } else {
             MeandreProxy proxy = (MeandreProxy) obj;
             if (proxy.getRoles() != null) {
-                return new WBLoginBean(proxy.getName(), sid);
+                return new WBLoginBean(proxy.getName(), sid, proxy.getBaseURL());
             }
         }
         return new WBLoginBean("No longer valid session ID.");
@@ -248,7 +248,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
                 Thread.currentThread().sleep(5);
             } catch (Exception e) {}
             String sid = "sid:" + System.currentTimeMillis();
-            wblb = new WBLoginBean(proxy.getName(), sid);
+            wblb = new WBLoginBean(proxy.getName(), sid, url);
             _proxies.put(sid, proxy);
         } else {
             wblb = new WBLoginBean("Login failed.");

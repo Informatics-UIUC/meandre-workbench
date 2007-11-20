@@ -91,8 +91,18 @@
   border-style: solid;
   border-width: medium;
   border-color: #c3d9ff;
-  /*margin: 1px;*/
+  margin: 1px;
   background: #c3d9ff
+}
+
+.status-bar {
+  border-style: solid;
+  border-width: medium;
+  border-color: #c3d9ff;
+  margin: 1px;
+  background: #c3d9ff
+  font-weight: bold;
+  font-size: 80%;
 }
 
 .menu-button {

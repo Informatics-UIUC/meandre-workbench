@@ -139,7 +139,9 @@ public class WBLoginDialog extends DialogBox {
                         _busy.setVisible(false);
                         WBLoginBean lbean = (WBLoginBean)result;
                         if (lbean.getSuccess()){
-                            _cont.loginSuccess(lbean.getUserName(), lbean.getSessionID());
+                            _cont.loginSuccess(lbean.getUserName(),
+                                               lbean.getSessionID(),
+                                               lbean.getBaseURL());
                             closeForm();
                         } else {
                             Window.alert(lbean.getFailureMessage());

@@ -98,6 +98,10 @@ public class MeandreProxy {
         return bIsReady;
     }
 
+    public String getBaseURL(){
+        return this.sBaseURL;
+    }
+
     /** Returns true if the last call was completed successfully.
      *
      * @return True if everything when well. False otherwise

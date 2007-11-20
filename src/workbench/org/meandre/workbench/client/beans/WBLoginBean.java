@@ -34,6 +34,9 @@ public class WBLoginBean implements IsSerializable{
     /* Session ID */
     private String _sid = null;
 
+    /* Session ID */
+    private String _baseURL = null;
+
     /* Indicates success of login attempt */
     private boolean _success = false;
 
@@ -47,9 +50,10 @@ public class WBLoginBean implements IsSerializable{
     public WBLoginBean() {
     }
 
-    public WBLoginBean(String uname, String sid){
+    public WBLoginBean(String uname, String sid, String base){
         _sid = sid;
         _user = uname;
+        _baseURL = base;
         _success = true;
     }
 
@@ -75,6 +79,10 @@ public class WBLoginBean implements IsSerializable{
 
     public String getSessionID(){
         return _sid;
+    }
+
+    public String getBaseURL(){
+        return this._baseURL;
     }
 
     public void setSuccess(boolean b){

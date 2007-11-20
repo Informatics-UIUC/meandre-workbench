@@ -96,6 +96,9 @@ public class Controller {
 
     private WBFlow _workingFlow = null;
 
+    /* GUI status bar*/
+    private Label _statusBar = null;
+
     /* Repository remote interface */
     private WBRepositoryQueryAsync _repquery = null;
 
@@ -197,6 +200,9 @@ public class Controller {
     /* hash of flows by name */
     private HashMap _flowsByName = new HashMap();
 
+    /* Active Domain */
+    String _activeDomain = "";
+
     //================
     // Constructor(s)
     //================
@@ -237,7 +243,8 @@ public class Controller {
                 public void onSuccess(Object result) {
                     WBLoginBean lbean = (WBLoginBean) result;
                     if (lbean.getSuccess()) {
-                        loginSuccess(lbean.getUserName(), lbean.getSessionID());
+                        loginSuccess(lbean.getUserName(), lbean.getSessionID()
+                                     , lbean.getBaseURL());
                     } else {
                         new WBLoginDialog(_main, Controller.this);
                     }
@@ -256,9 +263,14 @@ public class Controller {
         }
     }
 
-    void loginSuccess(String uname, String sid) {
+    public String getActiveDomain(){
+        return _activeDomain;
+    }
+
+    void loginSuccess(String uname, String sid, String dom) {
         setUserName(uname);
         _sessionID = sid;
+        _activeDomain = dom;
 
         final long DURATION = 1000 * 60 * 60 * 24 * 14; //duration remembering login. 2 weeks in this example.
         Date expires = new Date(System.currentTimeMillis() + DURATION);
@@ -485,6 +497,25 @@ public class Controller {
         gPan.setWidget(1, 0, lab);
 
         return buttPan;
+    }
+
+    Label buildStatusBar(){
+        _statusBar = new Label();
+        _statusBar.setWidth("100%");
+        _statusBar.setStyleName("status-bar");
+        return _statusBar;
+    }
+
+    Label getStatusBar(){
+        return _statusBar;
+    }
+
+    void setStatusMessage(String s){
+        _statusBar.setText(s);
+    }
+
+    void clearStatusMessage(){
+        _statusBar.setText("");
     }
 
     /**

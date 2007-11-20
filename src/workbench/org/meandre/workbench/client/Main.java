@@ -33,6 +33,9 @@ import com.google.gwt.user.client.ui.SourcesTabEvents;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.DockPanel;
+import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Label;
 
 
 /**
@@ -196,30 +199,17 @@ public class Main implements EntryPoint, WindowResizeListener,
 
         _dockPan.add(fp);
         _dockPan.add(_hsp);
+        _dockPan.add(_controller.buildStatusBar());
 
-        _dockPan.setSize("100%", "100%");
-        _hsp.setWidth("99%");
-        _hsp.setHeight("99%");
-        _buttPan.setWidth("100%");
-        _tabPan.setHeight("99%");
-        _tabPan.setWidth("99%");
+        resizeApp();
+
         _hsp.setSplitPosition("220px");
-        _vsp.setWidth("100%");
-        _vsp.setHeight("100%");
         _vsp.setSplitPosition("80%");
-        _controller.getCompTreeHandle().setHeight("100%");
-        _controller.getCompTreeHandle().setWidth("100%");
-        _controller.getFlowTreeHandle().setHeight("100%");
-        _controller.getFlowTreeHandle().setWidth("100%");
-        _canvasPan.setWidth("100%");
-        _canvasPan.setHeight("100%");
-        _canvasButtPan.setWidth("100%");
-        _boundPan.setWidth("100%");
-        _boundPan.setHeight("100%");
-        _vscroll.setWidth("100%");
-        _vscroll.setHeight("100%");
-        _absPan.setSize("100%", "100%");
-        _jsgPan.setSize("100%", "100%");
+
+        _controller.setStatusMessage("User " +
+                                     _controller.getUserName() +
+                                     " logged in to " +
+                                     _controller.getActiveDomain() + ".");
 
         // Call the window resized handler to get the initial sizes setup. Doing
         // this in a deferred command causes it to occur after all widgets' sizes
@@ -246,13 +236,17 @@ public class Main implements EntryPoint, WindowResizeListener,
      * @param height int The height of the work bench application window.
      */
     public void onWindowResized(int width, int height) {
+        resizeApp();
+    }
 
+    private void resizeApp(){
         _dockPan.setSize("100%", "100%");
         _dockPan.setCellWidth(_buttPan, "100%");
         _dockPan.setCellWidth(_hsp, "100%");
         _dockPan.setCellHeight(_hsp, "100%");
         _hsp.setWidth("99%");
         _hsp.setHeight("99%");
+        _controller.getStatusBar().setWidth("100%");
         _buttPan.setWidth("100%");
         _tabPan.setHeight("99%");
         _tabPan.setWidth("99%");
@@ -260,6 +254,8 @@ public class Main implements EntryPoint, WindowResizeListener,
         _vsp.setHeight("100%");
         _controller.getCompTreeHandle().setHeight("100%");
         _controller.getCompTreeHandle().setWidth("100%");
+        _controller.getFlowTreeHandle().setHeight("100%");
+        _controller.getFlowTreeHandle().setWidth("100%");
         _canvasPan.setWidth("100%");
         _canvasPan.setHeight("100%");
         _boundPan.setWidth("100%");
@@ -269,8 +265,7 @@ public class Main implements EntryPoint, WindowResizeListener,
         _vscroll.setHeight("100%");
         _absPan.setSize("100%", "100%");
         _jsgPan.setSize("100%", "100%");
-        _controller.getFlowTreeHandle().setHeight("100%");
-        _controller.getFlowTreeHandle().setWidth("100%");
+
     }
 
     //===============================================
