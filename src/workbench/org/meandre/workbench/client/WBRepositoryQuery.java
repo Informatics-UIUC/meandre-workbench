@@ -22,6 +22,14 @@ public interface WBRepositoryQuery extends RemoteService {
     /**
      * Starts execution of a flow in interactive mode.
      * @param sid String session ID.
+     * @param flowid String flow uri.
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject deleteFlowFromRepository(String sid, String flowid);
+
+    /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
      * @param execid String execution ID.
      * @param flowid String flow uri.
      * @return WBExecBean Bean that contains execution information.

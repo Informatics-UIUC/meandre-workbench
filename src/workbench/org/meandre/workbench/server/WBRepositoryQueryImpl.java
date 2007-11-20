@@ -77,6 +77,35 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     /**
      * Starts execution of a flow in interactive mode.
      * @param sid String session ID.
+     * @param flowid String flow uri.
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject deleteFlowFromRepository(String sid, String flowid){
+        Object obj = _proxies.get(sid);
+         boolean saveas = false;
+         WBCallbackObject wbc = new WBCallbackObject();
+         if (obj == null) {
+             wbc.setSuccess(false);
+             wbc.setMessage("Session ID no longer valid.");
+          } else {
+             MeandreProxy proxy = (MeandreProxy) obj;
+             String uri = proxy.getRemove(flowid);
+             if ((uri == null) || (!uri.trim().equals(flowid.trim()))) {
+                 wbc.setSuccess(false);
+                 wbc.setMessage("Unable to delete old flow.  " + uri + " " +
+                                flowid);
+             } else {
+                 wbc.setSuccess(true);
+                 wbc.setMessage(uri);
+             }
+         }
+         return wbc;
+    }
+
+
+    /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
      * @param execid String execution ID.
      * @param flowid String flow uri.
      * @return WBExecBean Bean that contains execution information.

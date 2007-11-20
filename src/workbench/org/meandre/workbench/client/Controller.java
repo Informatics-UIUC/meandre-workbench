@@ -59,6 +59,7 @@ import java.util.Date;
 import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.TabPanel;
 
 /**
  * <p>Title: Controller</p>
@@ -228,14 +229,14 @@ public class Controller {
     // Package Methods
     //=================
 
-    void login(){
+    void login() {
         //Do we have a cookie already?
         String sessionID = Cookies.getCookie(_sidKey);
-        if ( sessionID != null ) {
+        if (sessionID != null) {
             checkSessionID(sessionID, new AsyncCallback() {
                 public void onSuccess(Object result) {
                     WBLoginBean lbean = (WBLoginBean) result;
-                    if (lbean.getSuccess()){
+                    if (lbean.getSuccess()) {
                         loginSuccess(lbean.getUserName(), lbean.getSessionID());
                     } else {
                         new WBLoginDialog(_main, Controller.this);
@@ -243,18 +244,19 @@ public class Controller {
                 }
 
                 public void onFailure(Throwable caught) {
-                        // do some UI stuff to show failure
-                        _userName = null;
-                        Window.alert("AsyncCallBack Failure -- getUser():  " + caught.getMessage());
-                        _main.closeApp();
-                    }
-                });
+                    // do some UI stuff to show failure
+                    _userName = null;
+                    Window.alert("AsyncCallBack Failure -- getUser():  " +
+                                 caught.getMessage());
+                    _main.closeApp();
+                }
+            });
         } else {
             new WBLoginDialog(_main, this);
         }
     }
 
-    void loginSuccess(String uname, String sid){
+    void loginSuccess(String uname, String sid) {
         setUserName(uname);
         _sessionID = sid;
 
@@ -264,11 +266,11 @@ public class Controller {
         _main.onModuleLoadContinued();
     }
 
-    void logout(){
+    void logout() {
         Cookies.removeCookie(this._sidKey);
     }
 
-    String getSessionID(){
+    String getSessionID() {
         return _sessionID;
     }
 
@@ -277,7 +279,7 @@ public class Controller {
      *
      * @return String User name for current session.
      */
-    String getUserName(){
+    String getUserName() {
         return this._userName;
     }
 
@@ -285,7 +287,7 @@ public class Controller {
      * Set the user name.
      * @param name String the user name.
      */
-    void setUserName(String name){
+    void setUserName(String name) {
         _userName = name;
     }
 
@@ -324,17 +326,30 @@ public class Controller {
     }
 
     //redirect the browser to the given url
-    public static native void redirectOrClose(String url)/*-{
-      if ($wnd.opener && !$wnd.opener.closed){
-          $wnd.close();
-      } else {
-        $wnd.location = url;
-      }
-    }-*/;
+    public static native void redirectOrClose(String url) /*-{
+                   if ($wnd.opener && !$wnd.opener.closed){
+                       $wnd.close();
+                   } else {
+                     $wnd.location = url;
+                   }
+                 }-*/
+            ;
 
     //==================================================
     // Interface Implementation: WBRepositoryQueryAsync
     //==================================================
+
+    /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param flowid String flow uri.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void deleteFlowFromRepository(String sid,
+                                         String flowid,
+                                         AsyncCallback cb) {
+        _repquery.deleteFlowFromRepository(sid, flowid, cb);
+    }
 
     /**
      * Starts execution of a flow in interactive mode.
@@ -346,7 +361,7 @@ public class Controller {
     public void startInteractiveExecution(String sid,
                                           String execid,
                                           String flowid,
-                                          AsyncCallback cb){
+                                          AsyncCallback cb) {
         _repquery.startInteractiveExecution(sid, execid, flowid, cb);
     }
 
@@ -358,7 +373,7 @@ public class Controller {
      */
     public void updateInteractiveExecution(String sid,
                                            String execid,
-                                           AsyncCallback cb){
+                                           AsyncCallback cb) {
         _repquery.updateInteractiveExecution(sid, execid, cb);
     }
 
@@ -367,18 +382,18 @@ public class Controller {
      * @param sid String session id
      * @param cb AsyncCallback Callback object returned from the server.
      */
-    void checkSessionID(String sessionID, AsyncCallback cb){
+    void checkSessionID(String sessionID, AsyncCallback cb) {
         _repquery.checkSessionID(sessionID, cb);
     }
 
     /**
-      * Log the user into the application.
-      * @param userid String user's id
-      * @param password String user's password
-      * @param url String URL of server to connect with.
-      * @param cb AsyncCallback Callback object returned from the server.
-      */
-    void login(String user, String pass, String url, AsyncCallback cb){
+     * Log the user into the application.
+     * @param userid String user's id
+     * @param password String user's password
+     * @param url String URL of server to connect with.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    void login(String user, String pass, String url, AsyncCallback cb) {
         _repquery.login(user, pass, url, cb);
     }
 
@@ -439,8 +454,8 @@ public class Controller {
          * Add user name to header.
          */
         HTML userlab = new HTML("<bold><font size=\"-1\">Welcome, "
-                                  + getUserName() + "</font></bold>"
-                                  , true);
+                                + getUserName() + "</font></bold>"
+                                , true);
         buttPan.add(userlab);
         //buttPan.addStyleName("menu-panel");
         buttPan.setCellVerticalAlignment(logo, HorizontalPanel.ALIGN_MIDDLE);
@@ -449,7 +464,7 @@ public class Controller {
         buttPan.setCellHorizontalAlignment(logo, HorizontalPanel.ALIGN_RIGHT);
 
         Button button = new Button("<IMG SRC='images/gnome-quit-32.png'>",
-                            new ClickListener() {
+                                   new ClickListener() {
             public void onClick(Widget sender) {
                 if (canvasHasComps() && isDirty()) {
                     if (Window.confirm(
@@ -489,12 +504,18 @@ public class Controller {
         gPan.getColumnFormatter().setWidth(4, "52px");
         gPan.getColumnFormatter().setWidth(5, "52px");
 
-        gPan.getCellFormatter().setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_CENTER);
-        gPan.getCellFormatter().setHorizontalAlignment(0, 1, HasHorizontalAlignment.ALIGN_CENTER);
-        gPan.getCellFormatter().setHorizontalAlignment(0, 2, HasHorizontalAlignment.ALIGN_CENTER);
-        gPan.getCellFormatter().setHorizontalAlignment(0, 3, HasHorizontalAlignment.ALIGN_CENTER);
-        gPan.getCellFormatter().setHorizontalAlignment(0, 4, HasHorizontalAlignment.ALIGN_CENTER);
-        gPan.getCellFormatter().setHorizontalAlignment(0, 5, HasHorizontalAlignment.ALIGN_CENTER);
+        gPan.getCellFormatter().setHorizontalAlignment(0, 0,
+                HasHorizontalAlignment.ALIGN_CENTER);
+        gPan.getCellFormatter().setHorizontalAlignment(0, 1,
+                HasHorizontalAlignment.ALIGN_CENTER);
+        gPan.getCellFormatter().setHorizontalAlignment(0, 2,
+                HasHorizontalAlignment.ALIGN_CENTER);
+        gPan.getCellFormatter().setHorizontalAlignment(0, 3,
+                HasHorizontalAlignment.ALIGN_CENTER);
+        gPan.getCellFormatter().setHorizontalAlignment(0, 4,
+                HasHorizontalAlignment.ALIGN_CENTER);
+        gPan.getCellFormatter().setHorizontalAlignment(0, 5,
+                HasHorizontalAlignment.ALIGN_CENTER);
 
         buttPan.add(gPan);
         buttPan.addStyleName("menu-panel");
@@ -512,7 +533,6 @@ public class Controller {
         Label lab = new Label("Save");
         lab.addStyleName("menu-button-text");
         gPan.setWidget(1, 0, lab);
-
 
         button = new Button("<IMG SRC='images/gnome-save-22.png'>",
                             new ClickListener() {
@@ -656,6 +676,11 @@ public class Controller {
                 Controller.this.saveFlowAndExecute();
             }
         };
+        Command deleteFlowCmd = new Command() {
+            public void execute() {
+                Controller.this.deleteFlow();
+            }
+        };
 
         // Make some sub-menus that we will cascade from the top menu.
 
@@ -665,12 +690,11 @@ public class Controller {
         appMenu.addItem("Exit (Logout)", exitAndLogoutAppCmd);
         appMenu.addItem("Exit", exitAppCmd);
 
-
         //flow commands
         MenuBar flowMenu = new MenuBar(true);
         flowMenu.addItem("Publish", cmd);
         flowMenu.addItem("Unpublish", cmd);
-        flowMenu.addItem("Delete", cmd);
+        flowMenu.addItem("Delete", deleteFlowCmd);
 
         //canvas commands
         MenuBar canvasMenu = new MenuBar(true);
@@ -830,11 +854,11 @@ public class Controller {
                 "</td></tr>" +
                 "<tr><td><em>Description:</em></td><td>" + ecd.getDescription() +
                 "</td></tr>";
-                if (incRights){
-                    s += "<tr><td><em>Rights:</em></td><td>" + ecd.getRights() +
-                            "</td></tr>";
-                }
-                s += "<tr><td><em>Creator:</em></td><td>" + ecd.getCreator() +
+        if (incRights) {
+            s += "<tr><td><em>Rights:</em></td><td>" + ecd.getRights() +
+                    "</td></tr>";
+        }
+        s += "<tr><td><em>Creator:</em></td><td>" + ecd.getCreator() +
                 "</td></tr>" +
                 "<tr><td><em>Date:</em></td><td>" + ecd.getCreationDate() +
                 "</td></tr>" +
@@ -944,7 +968,7 @@ public class Controller {
                    "</td></tr>" +
                    "<tr><td><em>Description:</em></td><td>" +
                    flow.getDescription() + "</td></tr>";
-        if (incRights){
+        if (incRights) {
             s += "<tr><td><em>Rights:</em></td><td>" + flow.getRights() +
                     "</td></tr>";
         }
@@ -1054,6 +1078,35 @@ public class Controller {
     }
 
     /**
+     * Delete a selected flow from the flow tree.
+     */
+    void deleteFlow() {
+        TabPanel tp = _main.getTabPanel();
+        if (tp.getTabBar().getSelectedTab() != 1) {
+            Window.alert("Please select a flow first!");
+        } else {
+            Tree tree = this.getFlowTreeHandle();
+            TreeItem ti = tree.getSelectedItem();
+            if (ti == null) {
+                Window.alert("Please select a flow first!");
+            } else {
+                WBFlow flow = (WBFlow) ti.getUserObject();
+                if (Window.confirm(
+                        "Are you certain that you want to delete this flow from the repository?")) {
+                    if ((this._workingFlow != null) &&
+                        (this._workingFlow.
+                         getFlowID().trim().equals(flow.getFlowID().trim()))) {
+                        this.clearCanvas();
+                        _main.getCompDescScrollPanel().clear();
+                    }
+                    new CommandDeleteFlow(this._repquery, this,
+                                          null).execute(flow);
+                }
+            }
+        }
+    }
+
+    /**
      * If a component is currently marked as selected then remove it.
      */
     void removeSelectedComponent() {
@@ -1143,7 +1196,7 @@ public class Controller {
      */
     void saveFlow(boolean saveas) {
         WBFlow flow = new WBFlow(); ;
-        if (saveas || !hasActiveFlow()){
+        if (saveas || !hasActiveFlow()) {
             if (this.hasActiveFlow()) {
                 flow.setDescription(this._workingFlow.getDescription());
                 flow.setCreator(this._workingFlow.getCreator());
@@ -1664,9 +1717,9 @@ public class Controller {
         _searchBox.addKeyboardListener(new KeyboardListenerAdapter() {
             public void onKeyPress(Widget sender, char keyCode, int modifiers) {
                 if (keyCode == '\r') {
-                   ((TextBox) sender).cancelKey();
-                   _searchButt.click();
-               }
+                    ((TextBox) sender).cancelKey();
+                    _searchButt.click();
+                }
             }
         });
         hp.add(CursorTextBox.wrapTextBox(_searchBox));
@@ -1716,7 +1769,7 @@ public class Controller {
                                                 "<br>" +
                                                 /*"&nbsp;Rights:&nbsp;" + f.getRights() +
                                                 "<br>" +*/
-                                                "</font>";
+                                                 "</font>";
                                         WBTreeItem ti = new WBTreeItem(f.
                                                 getName(), putxt);
                                         ti.setUserObject(f);
@@ -1775,13 +1828,13 @@ public class Controller {
         _flowSearchResults.addItem(_flowSearchResultsRoot);
 
         fp.add(hp);
-        fp.add( _compSearchResults);
-        fp.add( _flowSearchResults);
+        fp.add(_compSearchResults);
+        fp.add(_flowSearchResults);
 
         return fp;
     }
 
-    void searchPanelTBSetFocus(){
+    void searchPanelTBSetFocus() {
         _searchBox.setFocus(true);
     }
 
@@ -1790,9 +1843,9 @@ public class Controller {
      *
      * @param t Tree Tree for which all items will be expanded.
      */
-    void expandAllTreeItems(Tree t){
-        for (Iterator itty = t.treeItemIterator(); itty.hasNext();){
-            ((TreeItem)itty.next()).setState(true);
+    void expandAllTreeItems(Tree t) {
+        for (Iterator itty = t.treeItemIterator(); itty.hasNext(); ) {
+            ((TreeItem) itty.next()).setState(true);
         }
     }
 
@@ -1801,9 +1854,9 @@ public class Controller {
      *
      * @param t Tree Tree for which all items will be collapsed.
      */
-    void collapseAllTreeItems(Tree t){
-        for (Iterator itty = t.treeItemIterator(); itty.hasNext();){
-            ((TreeItem)itty.next()).setState(false);
+    void collapseAllTreeItems(Tree t) {
+        for (Iterator itty = t.treeItemIterator(); itty.hasNext(); ) {
+            ((TreeItem) itty.next()).setState(false);
         }
     }
 
@@ -2010,7 +2063,7 @@ public class Controller {
                        "&nbsp;Creator:&nbsp;" + ecd.getCreator() +
                        "<br>" + /*
                        "&nbsp;Rights:&nbsp;" + ecd.getRights() +
-                          "<br>" + */
+                                                 "<br>" + */
                        "</font>";
         return putxt;
     }
@@ -2064,14 +2117,15 @@ public class Controller {
                                    "<br>" +*/
                                    "</font>";
                     WBTreeItem ti = new WBTreeItem(f.getName()
-                            + "<br><font color=\"#0000ff\" size=\"-4\">[" + f.getFlowID() + "]</font>", putxt);
+                            + "<br><font color=\"#0000ff\" size=\"-4\">[" +
+                            f.getFlowID() + "]</font>", putxt);
                     ti.setUserObject(f);
                     //add to flows by name
                     Object obj = _flowsByName.get(f.getName());
-                    if (obj == null){
+                    if (obj == null) {
                         obj = new ArrayList();
                     }
-                    ((ArrayList)obj).add(f);
+                    ((ArrayList) obj).add(f);
                     _flowsByName.put(f.getName(), obj);
 
                     root.addChild(new WBTreeNode(ti));
@@ -2098,18 +2152,18 @@ public class Controller {
         return flowTree;
     }
 
-    boolean flowByNameBaseExists(String name, String base){
+    boolean flowByNameBaseExists(String name, String base) {
         Object obj = _flowsByName.get(name);
-         if (obj != null){
-             ArrayList al = (ArrayList)obj;
-             for (int i = 0, n = al.size(); i < n; i++){
-                 WBFlow comp = (WBFlow)al.get(i);
-                 if (comp.getBaseURL().equals(base)){
-                     return true;
-                 }
-             }
-         }
-         return false;
+        if (obj != null) {
+            ArrayList al = (ArrayList) obj;
+            for (int i = 0, n = al.size(); i < n; i++) {
+                WBFlow comp = (WBFlow) al.get(i);
+                if (comp.getBaseURL().equals(base)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     //=================

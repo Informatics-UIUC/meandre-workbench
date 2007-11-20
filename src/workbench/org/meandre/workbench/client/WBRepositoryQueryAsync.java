@@ -27,6 +27,13 @@ import org.meandre.workbench.client.beans.WBExecBean;
  * @version 1.0
  */
 public interface WBRepositoryQueryAsync {
+        /**
+         * Starts execution of a flow in interactive mode.
+         * @param sid String session ID.
+         * @param flowid String flow uri.
+         * @param cb AsyncCallback Callback object returned from the server.
+         */
+        public void deleteFlowFromRepository(String sid, String flowid, AsyncCallback cb);
 
         /**
          * Starts execution of a flow in interactive mode.
