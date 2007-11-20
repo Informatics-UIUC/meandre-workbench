@@ -20,6 +20,14 @@ import org.meandre.workbench.client.beans.*;
 public interface WBRepositoryQuery extends RemoteService {
 
     /**
+     * Regenerate the repository from all of its locations.  NOTE: this
+     * command will delete all unpublished components and flows.
+     * @param sid String session id
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject regenerateRepository(String sid);
+
+    /**
      * Starts execution of a flow in interactive mode.
      * @param sid String session ID.
      * @param flowid String flow uri.

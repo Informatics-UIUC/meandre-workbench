@@ -27,6 +27,16 @@ import org.meandre.workbench.client.beans.WBExecBean;
  * @version 1.0
  */
 public interface WBRepositoryQueryAsync {
+
+        /**
+         * Regenerate the repository from all of its locations.  NOTE: this
+         * command will delete all unpublished components and flows.
+         * @param sid String session id
+         * @param cb AsyncCallback Callback object returned from the server.
+         */
+        public void regenerateRepository(String sid, AsyncCallback cb);
+
+
         /**
          * Starts execution of a flow in interactive mode.
          * @param sid String session ID.

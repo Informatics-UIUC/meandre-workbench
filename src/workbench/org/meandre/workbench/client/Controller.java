@@ -681,6 +681,11 @@ public class Controller {
                 Controller.this.deleteFlow();
             }
         };
+        Command regenerateRepositoryCmd = new Command() {
+            public void execute() {
+                Controller.this.regenerateRepository();
+            }
+        };
 
         // Make some sub-menus that we will cascade from the top menu.
 
@@ -718,7 +723,7 @@ public class Controller {
 
         //Repository
         MenuBar repoMenu = new MenuBar(true);
-        repoMenu.addItem("Regenerate", cmd);
+        repoMenu.addItem("Regenerate", regenerateRepositoryCmd);
         repoMenu.addItem("Upload", cmd);
         repoMenu.addItem("Add Location", cmd);
         repoMenu.addItem("Remove Location", cmd);
@@ -1075,6 +1080,33 @@ public class Controller {
             removeComponent(conn);
         }
         newCanvas();
+    }
+
+    void regenerateRepository(){
+        if (Window.confirm(
+                "All unpublished components and flows will be deleted.  Are you certain that you want to regenerate the repository?")) {
+            if (_dirty){
+                Window.alert("Save or clear the working flow first.");
+            } else {
+                this.clearCanvas();
+                _main.getCompDescScrollPanel().clear();
+                regenerateTabbedPanel();
+            }
+        }
+    }
+
+    void regenerateTabbedPanel(){
+        buildCompTree(getCompTreeHandle(),
+                      getCompTreeRoot(),
+                      "Available",
+                      Controller.s_COMP_TREE_SORT_TYPE);
+        buildFlowTree(getFlowTreeHandle(),
+                           getFlowTreeRoot(),
+                           "Available");
+             ((Panel)_main.getTabPanel().getWidget(2)).clear();
+             _main.getTabPanel().remove(2);
+             _main.getTabPanel().add(buildSearchPanel(), "SEARCH");
+             _main.getTabPanel().selectTab(0);
     }
 
     /**

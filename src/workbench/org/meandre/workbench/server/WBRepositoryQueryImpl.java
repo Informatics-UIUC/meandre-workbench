@@ -75,6 +75,34 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     //===================================
 
     /**
+     * Regenerate the repository from all of its locations.  NOTE: this
+     * command will delete all unpublished components and flows.
+     * @param sid String session id
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject regenerateRepository(String sid){
+        Object obj = _proxies.get(sid);
+        boolean saveas = false;
+        WBCallbackObject wbc = new WBCallbackObject();
+        if (obj == null) {
+            wbc.setSuccess(false);
+            wbc.setMessage("Session ID no longer valid.");
+         } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+            String msg = proxy.getRegenerate();
+            if ((msg == null) || (msg.indexOf("successfully regenerated") == -1)) {
+                wbc.setSuccess(false);
+                wbc.setMessage("Unable to delete old flow.  " + msg);
+            } else {
+                wbc.setSuccess(true);
+                wbc.setMessage(msg);
+            }
+        }
+        return wbc;
+    }
+
+
+    /**
      * Starts execution of a flow in interactive mode.
      * @param sid String session ID.
      * @param flowid String flow uri.
