@@ -435,7 +435,7 @@ public class Controller {
      * @param cb AsyncCallback Callback object returned from the server.
      */
     void getActiveComponents(String search, AsyncCallback cb) {
-        _repquery.getActiveComponents(search, cb);
+        _repquery.getActiveComponents(search, getSessionID(), cb);
     }
 
     //===================================================
@@ -1796,6 +1796,12 @@ public class Controller {
                     AsyncCallback callback = new AsyncCallback() {
                         public void onSuccess(Object result) {
                             // do some UI stuff to show success
+
+                            if (result == null){
+                                Window.alert("Session ID no longer valid.");
+                                return;
+                            }
+
                             _compSearchResultsRoot.removeItems();
                             _flowSearchResultsRoot.removeItems();
                             Set items = (Set) result;
@@ -1819,19 +1825,21 @@ public class Controller {
                                         comproot.addChild(new WBTreeNode(ti));
                                     } else if (obj instanceof WBFlow) {
                                         WBFlow f = (WBFlow) obj;
+                                        String fname = (f.getName() != null)?f.getName():"";
+                                        String flowid = (f.getFlowID() != null)?f.getFlowID():"";
+                                        String flowdesc = (f.getDescription() != null)?f.getDescription():"";
+                                        String flowrts = (f.getRights() != null)?f.getRights():"";
                                         String putxt = "Name:&nbsp;" +
-                                                f.getName() + "<br>" +
+                                                fname + "<br>" +
                                                 "<font color=\"#0000ff\">" +
                                                 "&nbsp;Base&nbsp;URL:&nbsp;" +
-                                                f.getFlowID() +
+                                                flowid +
                                                 "<br>" +
                                                 "&nbsp;Description:&nbsp;" +
-                                                f.getDescription() + "<br>" +
+                                                flowdesc + "<br>" +
                                                 "&nbsp;Creator:&nbsp;" +
-                                                f.getCreator() +
+                                                flowrts +
                                                 "<br>" +
-                                                /*"&nbsp;Rights:&nbsp;" + f.getRights() +
-                                                "<br>" +*/
                                                  "</font>";
                                         WBTreeItem ti = new WBTreeItem(f.
                                                 getName(), putxt);
