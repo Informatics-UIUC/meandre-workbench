@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
     AbstractImagePrototype treeClosed();
 
     /**
-     * @gwt.resource flow-tree-leaf.png
+     * @gwt.resource loc-tree-leaf.png
      */
     AbstractImagePrototype treeLeaf();
 
