@@ -28,98 +28,108 @@ import org.meandre.workbench.client.beans.WBExecBean;
  */
 public interface WBRepositoryQueryAsync {
 
-        /**
-         * Regenerate the repository from all of its locations.  NOTE: this
-         * command will delete all unpublished components and flows.
-         * @param sid String session id
-         * @param cb AsyncCallback Callback object returned from the server.
-         */
-        public void regenerateRepository(String sid, AsyncCallback cb);
+    /**
+     * Returns the set of active locations in the repository.
+     *
+     * @param sid String session id
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void getLocations(String sid, AsyncCallback cb);
+
+    /**
+     * Regenerate the repository from all of its locations.  NOTE: this
+     * command will delete all unpublished components and flows.
+     * @param sid String session id
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void regenerateRepository(String sid, AsyncCallback cb);
 
 
-        /**
-         * Starts execution of a flow in interactive mode.
-         * @param sid String session ID.
-         * @param flowid String flow uri.
-         * @param cb AsyncCallback Callback object returned from the server.
-         */
-        public void deleteFlowFromRepository(String sid, String flowid, AsyncCallback cb);
+    /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param flowid String flow uri.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void deleteFlowFromRepository(String sid, String flowid,
+                                         AsyncCallback cb);
 
-        /**
-         * Starts execution of a flow in interactive mode.
-         * @param sid String session ID.
-         * @param execid String execution ID.
-         * @param flowid String flow uri.
-         * @param cb AsyncCallback Callback object returned from the server.
-         */
-        public void startInteractiveExecution(String sid,
-                                              String execid,
-                                              String flowid,
-                                              AsyncCallback cb);
+    /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param execid String execution ID.
+     * @param flowid String flow uri.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void startInteractiveExecution(String sid,
+                                          String execid,
+                                          String flowid,
+                                          AsyncCallback cb);
 
-        /**
-         * Updates status of execution of a flow in interactive mode.
-         * @param sid String session ID.
-         * @param execid String execution ID.
-         * @param cb AsyncCallback Callback object returned from the server.
-         */
-        public void updateInteractiveExecution(String sid,
-                                               String execid,
-                                               AsyncCallback cb);
+    /**
+     * Updates status of execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param execid String execution ID.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void updateInteractiveExecution(String sid,
+                                           String execid,
+                                           AsyncCallback cb);
 
-        /**
-         * Log the user into the application.
-         * @param sid String session id
-         * @param cb AsyncCallback Callback object returned from the server.
-         */
-        public void checkSessionID(String sid, AsyncCallback cb);
+    /**
+     * Log the user into the application.
+     * @param sid String session id
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void checkSessionID(String sid, AsyncCallback cb);
 
-        /**
-          * Log the user into the application.
-          * @param userid String user's id
-          * @param password String user's password
-          * @param url String URL of server to connect with.
-          * @param cb AsyncCallback Callback object returned from the server.
-          */
-         public void login(String userid, String password, String url, AsyncCallback cb);
+    /**
+     * Log the user into the application.
+     * @param userid String user's id
+     * @param password String user's password
+     * @param url String URL of server to connect with.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void login(String userid, String password, String url,
+                      AsyncCallback cb);
 
 
-        /**
-         * Returns the set of active components in the repository via
-         * callback parameters.
-         *
-         * @param sid String session id
-         * @param cb AsyncCallback Callback object returned from the server.
-         */
-        public void getActiveComponents(String sid, AsyncCallback cb);
+    /**
+     * Returns the set of active components in the repository via
+     * callback parameters.
+     *
+     * @param sid String session id
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void getActiveComponents(String sid, AsyncCallback cb);
 
-        /**
-         * Get the active components in the current user's repository that match
-         * the search criteria.
-         *
-         * @param search String The search string for this query.
-         * @param sid String session id
-         * @param cb AsyncCallback Callback object returned from the server.
-         */
-        public void getActiveComponents(String search, String sid, AsyncCallback cb);
+    /**
+     * Get the active components in the current user's repository that match
+     * the search criteria.
+     *
+     * @param search String The search string for this query.
+     * @param sid String session id
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void getActiveComponents(String search, String sid, AsyncCallback cb);
 
-        /**
-         * Saves the flow and returns the callback object.
-         *
-         * @param flow WBFlow flow to save.
-         * @param sid String session id
-         * @param cb AsyncCallback Callback object returned from the server.
-         */
-        public void saveFlow(WBFlow flow, String sid, AsyncCallback cb);
+    /**
+     * Saves the flow and returns the callback object.
+     *
+     * @param flow WBFlow flow to save.
+     * @param sid String session id
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void saveFlow(WBFlow flow, String sid, AsyncCallback cb);
 
-        /**
-         * Returns the set of active flows in the repository via
-         * callback parameters.
-         *
-         * @param sid String session id
-         * @param cb AsyncCallback Callback object returned from the server.
-         */
-        public void getActiveFlows(String sid, AsyncCallback cb);
+    /**
+     * Returns the set of active flows in the repository via
+     * callback parameters.
+     *
+     * @param sid String session id
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void getActiveFlows(String sid, AsyncCallback cb);
 
 
 }

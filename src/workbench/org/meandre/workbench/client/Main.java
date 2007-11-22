@@ -152,6 +152,11 @@ public class Main implements EntryPoint, WindowResizeListener,
         _tabPan.add(_controller.buildFlowTree(_controller.getFlowTreeHandle(),
                                               _controller.getFlowTreeRoot(),
                                               "Available"), "FLOWS");
+        _tabPan.add(_controller.buildLocationTree(_controller.
+                                                  getLocationTreeHandle(),
+                                                  _controller.
+                                                  getLocationTreeRoot(),
+                                                  "Available"), "LOCATIONS");
         _tabPan.add(_controller.buildSearchPanel(), "SEARCH");
         _tabPan.selectTab(0);
 
@@ -239,7 +244,7 @@ public class Main implements EntryPoint, WindowResizeListener,
         resizeApp();
     }
 
-    private void resizeApp(){
+    private void resizeApp() {
         _dockPan.setSize("100%", "100%");
         _dockPan.setCellWidth(_buttPan, "100%");
         _dockPan.setCellWidth(_hsp, "100%");

@@ -60,6 +60,7 @@ import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.TabPanel;
+import org.meandre.workbench.client.beans.WBLocation;
 
 /**
  * <p>Title: Controller</p>
@@ -149,14 +150,23 @@ public class Controller {
     /* Root tree item for component tree.*/
     private TreeItem _compTreeRoot = null;
 
-    /* Flow tree.*/
+    /* Root tree item for flow tree.*/
     private TreeItem _flowTreeRoot = null;
 
-    /* Root tree item for flow tree.*/
+    /* Flow tree.*/
     private Tree _flowTree = null;
 
     /* TreeItem holder for tree roots so the callback can access them*/
     private TreeItem _flowRootTemp = null;
+
+    /* Root tree item for location tree.*/
+    private TreeItem _locTreeRoot = null;
+
+    /* Location tree.*/
+    private Tree _locTree = null;
+
+    /* TreeItem holder for tree roots so the callback can access them*/
+    private TreeItem _locRootTemp = null;
 
     /* TreeItem holder for tree roots so the callback can access them*/
     private TreeItem _compRootTemp = null;
@@ -226,6 +236,10 @@ public class Controller {
         _flowTree = new FlowTree(this, (TreeImages) GWT.create(FlowTreeImages.class));
         _flowTreeRoot = new WBTreeItem("Available", null);
         _flowTree.addItem(_flowTreeRoot);
+        _locTree = new LocationTree(this,
+                                    (TreeImages) GWT.create(LocationTreeImages.class));
+        _locTreeRoot = new WBTreeItem("Available", null);
+        _locTree.addItem(_locTreeRoot);
         _componentNameSet = new HashSet();
 
         newCanvas();
@@ -263,7 +277,7 @@ public class Controller {
         }
     }
 
-    public String getActiveDomain(){
+    public String getActiveDomain() {
         return _activeDomain;
     }
 
@@ -339,17 +353,26 @@ public class Controller {
 
     //redirect the browser to the given url
     public static native void redirectOrClose(String url) /*-{
-                   if ($wnd.opener && !$wnd.opener.closed){
-                       $wnd.close();
-                   } else {
-                     $wnd.location = url;
-                   }
-                 }-*/
+             if ($wnd.opener && !$wnd.opener.closed){
+                                                 $wnd.close();
+                                             } else {
+                                               $wnd.location = url;
+                                             }
+                                           }-*/
             ;
 
     //==================================================
     // Interface Implementation: WBRepositoryQueryAsync
     //==================================================
+
+
+    /**
+     * Fetches the locations for the current user repository.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void getLocations(AsyncCallback cb) {
+        _repquery.getLocations(getSessionID(), cb);
+    }
 
     /**
      * Starts execution of a flow in interactive mode.
@@ -499,22 +522,22 @@ public class Controller {
         return buttPan;
     }
 
-    Label buildStatusBar(){
+    Label buildStatusBar() {
         _statusBar = new Label();
         _statusBar.setWidth("100%");
         _statusBar.setStyleName("status-bar");
         return _statusBar;
     }
 
-    Label getStatusBar(){
+    Label getStatusBar() {
         return _statusBar;
     }
 
-    void setStatusMessage(String s){
+    void setStatusMessage(String s) {
         _statusBar.setText(s);
     }
 
-    void clearStatusMessage(){
+    void clearStatusMessage() {
         _statusBar.setText("");
     }
 
@@ -1113,10 +1136,10 @@ public class Controller {
         newCanvas();
     }
 
-    void regenerateRepository(){
+    void regenerateRepository() {
         if (Window.confirm(
                 "All unpublished components and flows will be deleted.  Are you certain that you want to regenerate the repository?")) {
-            if (_dirty){
+            if (_dirty) {
                 Window.alert("Save or clear the working flow first.");
             } else {
                 this.clearCanvas();
@@ -1126,18 +1149,21 @@ public class Controller {
         }
     }
 
-    void regenerateTabbedPanel(){
+    void regenerateTabbedPanel() {
         buildCompTree(getCompTreeHandle(),
                       getCompTreeRoot(),
                       "Available",
                       Controller.s_COMP_TREE_SORT_TYPE);
         buildFlowTree(getFlowTreeHandle(),
-                           getFlowTreeRoot(),
-                           "Available");
-             ((Panel)_main.getTabPanel().getWidget(2)).clear();
-             _main.getTabPanel().remove(2);
-             _main.getTabPanel().add(buildSearchPanel(), "SEARCH");
-             _main.getTabPanel().selectTab(0);
+                      getFlowTreeRoot(),
+                      "Available");
+        buildLocationTree(getLocationTreeHandle(),
+                          getLocationTreeRoot(),
+                          "Available");
+        ((Panel) _main.getTabPanel().getWidget(3)).clear();
+        _main.getTabPanel().remove(3);
+        _main.getTabPanel().add(buildSearchPanel(), "SEARCH");
+        _main.getTabPanel().selectTab(0);
     }
 
     /**
@@ -1734,6 +1760,23 @@ public class Controller {
     }
 
     /**
+     * Get the root tree item for the location tree.
+     *
+     * @return TreeItem Flow tree's root tree item.
+     */
+    TreeItem getLocationTreeRoot() {
+        return this._locTreeRoot;
+    }
+
+    /**
+     * Get a handle to the location tree.
+     * @return Tree The flow tree.
+     */
+    Tree getLocationTreeHandle() {
+        return this._locTree;
+    }
+
+    /**
      * Get the root tree item for the flow tree.
      *
      * @return TreeItem Flow tree's root tree item.
@@ -1797,7 +1840,7 @@ public class Controller {
                         public void onSuccess(Object result) {
                             // do some UI stuff to show success
 
-                            if (result == null){
+                            if (result == null) {
                                 Window.alert("Session ID no longer valid.");
                                 return;
                             }
@@ -1825,10 +1868,14 @@ public class Controller {
                                         comproot.addChild(new WBTreeNode(ti));
                                     } else if (obj instanceof WBFlow) {
                                         WBFlow f = (WBFlow) obj;
-                                        String fname = (f.getName() != null)?f.getName():"";
-                                        String flowid = (f.getFlowID() != null)?f.getFlowID():"";
-                                        String flowdesc = (f.getDescription() != null)?f.getDescription():"";
-                                        String flowrts = (f.getRights() != null)?f.getRights():"";
+                                        String fname = (f.getName() != null) ?
+                                                f.getName() : "";
+                                        String flowid = (f.getFlowID() != null) ?
+                                                f.getFlowID() : "";
+                                        String flowdesc = (f.getDescription() != null) ?
+                                                f.getDescription() : "";
+                                        String flowrts = (f.getRights() != null) ?
+                                                f.getRights() : "";
                                         String putxt = "Name:&nbsp;" +
                                                 fname + "<br>" +
                                                 "<font color=\"#0000ff\">" +
@@ -1840,7 +1887,7 @@ public class Controller {
                                                 "&nbsp;Creator:&nbsp;" +
                                                 flowrts +
                                                 "<br>" +
-                                                 "</font>";
+                                                "</font>";
                                         WBTreeItem ti = new WBTreeItem(f.
                                                 getName(), putxt);
                                         ti.setUserObject(f);
@@ -2134,7 +2181,7 @@ public class Controller {
                        "&nbsp;Creator:&nbsp;" + ecd.getCreator() +
                        "<br>" + /*
                        "&nbsp;Rights:&nbsp;" + ecd.getRights() +
-                                                 "<br>" + */
+                             "<br>" + */
                        "</font>";
         return putxt;
     }
@@ -2151,9 +2198,8 @@ public class Controller {
         if (flowTree != null) {
             flowTree.clear();
         } else {
-            flowTree = new DCTree(this,
-                                  (TreeImages) GWT.create(
-                                          ComponentTreeImages.class));
+            flowTree = new FlowTree(this,
+                                    (TreeImages) GWT.create(FlowTreeImages.class));
         }
         if (flowTreeRoot != null) {
             flowTreeRoot.removeItems();
@@ -2184,8 +2230,6 @@ public class Controller {
                                    f.getDescription() + "<br>" +
                                    "&nbsp;Creator:&nbsp;" + f.getCreator() +
                                    "<br>" +
-                                   /*"&nbsp;Rights:&nbsp;" + f.getRights() +
-                                   "<br>" +*/
                                    "</font>";
                     WBTreeItem ti = new WBTreeItem(f.getName()
                             + "<br><font color=\"#0000ff\" size=\"-4\">[" +
@@ -2221,6 +2265,72 @@ public class Controller {
         getActiveFlows(callback);
 
         return flowTree;
+    }
+
+    /**
+     * Build a Location tree.
+     * @param locTree Tree Tree object to use for building flow tree.
+     * @param locTreeRoot TreeItem Root node to use for flow tree.
+     * @param rootTxt String Text for the root node for this flow tree.
+     * @return Tree The constructed flow tree.
+     */
+    Tree buildLocationTree(Tree locTree, TreeItem locTreeRoot, String rootTxt) {
+
+        if (locTree != null) {
+            locTree.clear();
+        } else {
+            locTree = new LocationTree(this,
+                                       (TreeImages) GWT.create(
+                    LocationTreeImages.class));
+        }
+        if (locTreeRoot != null) {
+            locTreeRoot.removeItems();
+            locTreeRoot.setText(rootTxt);
+        } else {
+            locTreeRoot = new WBTreeItem(rootTxt, null);
+        }
+        locTree.addItem(locTreeRoot);
+
+        _locRootTemp = locTreeRoot;
+
+        AsyncCallback callback = new AsyncCallback() {
+            public void onSuccess(Object result) {
+                // do some UI stuff to show success
+                WBTreeNode root = new WBTreeNode();
+                Set items = (Set) result;
+                Iterator itty = items.iterator();
+                while (itty.hasNext()) {
+                    WBLocation l = (WBLocation) itty.next();
+                    String putxt = "Location:&nbsp;" + l.getLocation() + "<br>" +
+                                   "<font color=\"#0000ff\">" +
+                                   "&nbsp;Description:&nbsp;" +
+                                   l.getDescription() + "<br>" +
+                                   "</font>";
+                    WBTreeItem ti = new WBTreeItem(l.getLocation(), putxt);
+                    ti.setUserObject(l);
+
+                    root.addChild(new WBTreeNode(ti));
+                }
+                itty = root.getChildren().iterator();
+                while (itty.hasNext()) {
+                    _locRootTemp.addItem(((WBTreeNode) itty.next()).
+                                         getNodeItem());
+                }
+                _locRootTemp.setState(true);
+            }
+
+            public void onFailure(Throwable caught) {
+                // do some UI stuff to show failure
+                _locRootTemp.addItem("Failure Retrieving Locations");
+                _locRootTemp.setState(true);
+                Window.alert(
+                        "AsyncCallBack Failure -- getLocations:  " +
+                        caught.getMessage());
+            }
+        };
+        getLocations(callback);
+
+        return locTree;
     }
 
     boolean flowByNameBaseExists(String name, String base) {

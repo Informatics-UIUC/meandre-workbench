@@ -23,6 +23,7 @@ import org.meandre.workbench.server.proxy.beans.repository.*;
 import org.meandre.workbench.client.*;
 import org.meandre.workbench.client.beans.*;
 import org.meandre.workbench.server.proxy.MeandreProxy;
+import org.meandre.workbench.server.proxy.beans.location.LocationBean;
 
 
 /**
@@ -256,6 +257,31 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
         return wblb;
     }
 
+    /**
+     * Returns the set of active locations in the repository.
+     *
+     * @param sid String session id
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBLocation>
+     * @return Set Returns set of active locations.
+     */
+    public Set getLocations(String sid){
+        Object obj = _proxies.get(sid);
+        if (obj == null) {
+            return null;
+        } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+
+            //acquire Repository object from current session
+            LocationBean[] lbeans = proxy.getLocations();
+
+            Set ret = new HashSet();
+            for (int i = 0, n = lbeans.length; i < n; i++) {
+                ret.add(MeandreToWBBeanConverter.convertLocation(lbeans[i]));
+            }
+
+            return ret;
+        }
+    }
 
     /**
      * Get the active components in the current user's repository that match

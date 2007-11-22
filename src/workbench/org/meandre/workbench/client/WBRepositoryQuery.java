@@ -20,6 +20,15 @@ import org.meandre.workbench.client.beans.*;
 public interface WBRepositoryQuery extends RemoteService {
 
     /**
+     * Returns the set of active locations in the repository.
+     *
+     * @param sid String session id
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBLocation>
+     * @return Set Returns set of active locations.
+     */
+    public Set getLocations(String sid);
+
+    /**
      * Regenerate the repository from all of its locations.  NOTE: this
      * command will delete all unpublished components and flows.
      * @param sid String session id
