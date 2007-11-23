@@ -204,7 +204,7 @@ public class Main implements EntryPoint, WindowResizeListener,
 
         _dockPan.add(fp);
         _dockPan.add(_hsp);
-        _dockPan.add(_controller.buildStatusBar());
+        _dockPan.add(_controller.buildStatusPanel());
 
         resizeApp();
 

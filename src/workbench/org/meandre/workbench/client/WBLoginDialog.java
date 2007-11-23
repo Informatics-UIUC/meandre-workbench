@@ -180,6 +180,7 @@ public class WBLoginDialog extends DialogBox {
 
 
         Image logo = new Image("images/meandre-logo.jpg");
+        logo.setPixelSize(200, 36);
         _busy = new Image("images/wait-14x14.gif");
         _busy.setVisible(false);
         HorizontalPanel hpan = new HorizontalPanel();

@@ -61,6 +61,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.TabPanel;
 import org.meandre.workbench.client.beans.WBLocation;
+import org.meandre.workbench.client.beans.WBCallbackObject;
 
 /**
  * <p>Title: Controller</p>
@@ -211,7 +212,10 @@ public class Controller {
     private HashMap _flowsByName = new HashMap();
 
     /* Active Domain */
-    String _activeDomain = "";
+    private String _activeDomain = "";
+
+    /* the status bar image */
+    private Image _statusIcon = null;
 
     //================
     // Constructor(s)
@@ -353,18 +357,25 @@ public class Controller {
 
     //redirect the browser to the given url
     public static native void redirectOrClose(String url) /*-{
-             if ($wnd.opener && !$wnd.opener.closed){
-                                                 $wnd.close();
-                                             } else {
-                                               $wnd.location = url;
-                                             }
-                                           }-*/
+                          if ($wnd.opener && !$wnd.opener.closed){
+                                                              $wnd.close();
+                                                          } else {
+             $wnd.location = url;
+                                                          }
+                                                        }-*/
             ;
 
     //==================================================
     // Interface Implementation: WBRepositoryQueryAsync
     //==================================================
 
+    /**
+     * Fetches the locations for the current user repository.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void getRegeneratRepository(AsyncCallback cb) {
+        _repquery.regenerateRepository(getSessionID(), cb);
+    }
 
     /**
      * Fetches the locations for the current user repository.
@@ -482,6 +493,7 @@ public class Controller {
          * Add logo to header.
          */
         Image logo = new Image("images/meandre-logo.jpg");
+        logo.setPixelSize(200, 36);
         Grid gPan = new Grid(2, 1);
         buttPan.add(gPan);
         buttPan.add(logo);
@@ -522,11 +534,25 @@ public class Controller {
         return buttPan;
     }
 
-    Label buildStatusBar() {
+    Panel buildStatusPanel() {
+        HorizontalPanel pan = new HorizontalPanel();
+        _statusIcon = new Image("./images/timy-meandre-logo.png");
         _statusBar = new Label();
-        _statusBar.setWidth("100%");
-        _statusBar.setStyleName("status-bar");
-        return _statusBar;
+        _statusIcon.setPixelSize(16, 16);
+        pan.setSpacing(2);
+        pan.add(_statusIcon);
+        pan.add(_statusBar);
+        pan.setWidth("100%");
+        pan.setStyleName("status-bar");
+        return pan;
+    }
+
+    void showStatusBusy() {
+        _statusIcon.setUrl("images/wait-14x14.gif");
+    }
+
+    void hideStatusBusy() {
+        _statusIcon.setUrl("./images/timy-meandre-logo.png");
     }
 
     Label getStatusBar() {
@@ -1142,9 +1168,36 @@ public class Controller {
             if (_dirty) {
                 Window.alert("Save or clear the working flow first.");
             } else {
-                this.clearCanvas();
-                _main.getCompDescScrollPanel().clear();
-                regenerateTabbedPanel();
+                AsyncCallback callback = new AsyncCallback() {
+                    public void onSuccess(Object result) {
+                        WBCallbackObject cbo = (WBCallbackObject) result;
+                        if (cbo.getSuccess()) {
+                            Controller.this.clearCanvas();
+                            _main.getCompDescScrollPanel().clear();
+                            regenerateTabbedPanel();
+                            Controller.this.hideStatusBusy();
+                            Controller.this.setStatusMessage(
+                                    "Repository regenerated successfully.");
+                        } else {
+                            Controller.this.hideStatusBusy();
+                            Controller.this.setStatusMessage("");
+                            Window.alert(
+                                    "Repository regeneration operation was NOT successful: " +
+                                    cbo.getMessage());
+                        }
+                    }
+
+                    public void onFailure(Throwable caught) {
+                        Controller.this.hideStatusBusy();
+                        Controller.this.setStatusMessage("");
+                        Window.alert(
+                                "AsyncCallBack Failure -- regeneratRepository:  " +
+                                caught.getMessage());
+                    }
+                };
+                Controller.this.showStatusBusy();
+                Controller.this.setStatusMessage("Regenerating repository ...");
+                this.getRegeneratRepository(callback);
             }
         }
     }
@@ -2181,7 +2234,7 @@ public class Controller {
                        "&nbsp;Creator:&nbsp;" + ecd.getCreator() +
                        "<br>" + /*
                        "&nbsp;Rights:&nbsp;" + ecd.getRights() +
-                             "<br>" + */
+                                                    "<br>" + */
                        "</font>";
         return putxt;
     }
@@ -2281,7 +2334,7 @@ public class Controller {
         } else {
             locTree = new LocationTree(this,
                                        (TreeImages) GWT.create(
-                    LocationTreeImages.class));
+                                               LocationTreeImages.class));
         }
         if (locTreeRoot != null) {
             locTreeRoot.removeItems();
