@@ -27,9 +27,9 @@ import org.meandre.workbench.client.beans.WBCallbackObject;
  */
 class CommandDeleteFlow implements WBCommand {
 
-        //==============
-        // Data Members
-        //==============
+    //==============
+    // Data Members
+    //==============
 
     private Main _main = null;
     private WBRepositoryQueryAsync _repquery = null;
@@ -42,7 +42,7 @@ class CommandDeleteFlow implements WBCommand {
     //==============
 
     CommandDeleteFlow(WBRepositoryQueryAsync query,
-                           Controller cont, WBCommand cmd) {
+                      Controller cont, WBCommand cmd) {
         _main = cont.getMain();
         _repquery = query;
         _cmd = cmd;
@@ -61,30 +61,39 @@ class CommandDeleteFlow implements WBCommand {
                 // do some UI stuff to show success
                 WBCallbackObject cbo = (WBCallbackObject) result;
                 if (cbo.getSuccess()) {
-                     _cont.buildFlowTree(_cont.getFlowTreeHandle(),
+                    _cont.buildFlowTree(_cont.getFlowTreeHandle(),
                                         _cont.getFlowTreeRoot(),
                                         "Available");
                     _main.getTabPanel().selectTab(1);
+
+                    _cont.hideStatusBusy();
+                    _cont.setStatusMessage("Flow deleted successfully.  Regenerating flow list ...");
 
                     if (_cmd != null) {
                         _cmd.execute(_flow);
                     }
 
                 } else {
+                    _cont.hideStatusBusy();
+                    _cont.setStatusMessage("Flow deletion failed.");
                     Window.alert("Flow delete operation was NOT successful: " +
                                  cbo.getMessage());
                 }
             }
 
             public void onFailure(Throwable caught) {
-                // do some UI stuff to show failure
+                _cont.hideStatusBusy();
+                _cont.setStatusMessage("Flow deletion failed.");
                 Window.alert("AsyncCallBack Failure -- Delete Flow:  " +
                              caught.toString());
             }
         };
 
-            _repquery.deleteFlowFromRepository(_cont.getSessionID(), _flow.getFlowID(),
-                                               callback);
+        _cont.showStatusBusy();
+        _cont.setStatusMessage("Deleting flow " + _flow.getFlowID() + ".");
+        _repquery.deleteFlowFromRepository(_cont.getSessionID(),
+                                           _flow.getFlowID(),
+                                           callback);
     }
 
 }

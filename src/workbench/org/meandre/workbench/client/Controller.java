@@ -357,12 +357,12 @@ public class Controller {
 
     //redirect the browser to the given url
     public static native void redirectOrClose(String url) /*-{
-                          if ($wnd.opener && !$wnd.opener.closed){
-                                                              $wnd.close();
-                                                          } else {
-             $wnd.location = url;
-                                                          }
-                                                        }-*/
+                                       if ($wnd.opener && !$wnd.opener.closed){
+                $wnd.close();
+                                                                       } else {
+                          $wnd.location = url;
+                                                                       }
+                                                                     }-*/
             ;
 
     //==================================================
@@ -2234,7 +2234,7 @@ public class Controller {
                        "&nbsp;Creator:&nbsp;" + ecd.getCreator() +
                        "<br>" + /*
                        "&nbsp;Rights:&nbsp;" + ecd.getRights() +
-                                                    "<br>" + */
+                                          "<br>" + */
                        "</font>";
         return putxt;
     }
@@ -2307,7 +2307,6 @@ public class Controller {
             }
 
             public void onFailure(Throwable caught) {
-                // do some UI stuff to show failure
                 _flowRootTemp.addItem("Failure Retrieving Components");
                 _flowRootTemp.setState(true);
                 Window.alert(

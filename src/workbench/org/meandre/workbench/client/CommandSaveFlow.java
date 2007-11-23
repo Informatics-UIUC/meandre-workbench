@@ -27,9 +27,9 @@ import org.meandre.workbench.client.beans.WBCallbackObject;
  */
 class CommandSaveFlow implements WBCommand {
 
-        //==============
-        // Data Members
-        //==============
+    //==============
+    // Data Members
+    //==============
 
     private Main _main = null;
     private WBRepositoryQueryAsync _repquery = null;
@@ -42,7 +42,7 @@ class CommandSaveFlow implements WBCommand {
     //==============
 
     CommandSaveFlow(WBRepositoryQueryAsync query,
-                           Controller cont, WBCommand cmd) {
+                    Controller cont, WBCommand cmd) {
         _main = cont.getMain();
         _repquery = query;
         _cmd = cmd;
@@ -61,29 +61,38 @@ class CommandSaveFlow implements WBCommand {
                 // do some UI stuff to show success
                 WBCallbackObject cbo = (WBCallbackObject) result;
                 if (cbo.getSuccess()) {
-                     _cont.buildFlowTree(_cont.getFlowTreeHandle(),
+                    _cont.buildFlowTree(_cont.getFlowTreeHandle(),
                                         _cont.getFlowTreeRoot(),
                                         "Available");
                     _main.getTabPanel().selectTab(1);
 
                     _flow.setFlowID(cbo.getMessage());
 
+                    _cont.hideStatusBusy();
+                    _cont.setStatusMessage(
+                            "Flow saved sucessfully. Regenerating flow list ...");
+
                     if (_cmd != null) {
                         _cmd.execute(_flow);
                     }
 
                 } else {
+                    _cont.setStatusMessage("Flow save failure.");
+                    _cont.hideStatusBusy();
                     Window.alert("Flow save operation was NOT successful: " +
                                  cbo.getMessage());
                 }
             }
 
             public void onFailure(Throwable caught) {
-                // do some UI stuff to show failure
+                _cont.setStatusMessage("Flow save failure.");
+                _cont.hideStatusBusy();
                 Window.alert("AsyncCallBack Failure -- saveFlow:  " +
                              caught.toString());
             }
         };
+        _cont.showStatusBusy();
+        _cont.setStatusMessage("Saving flow " + _flow.getFlowID() + ".");
         _repquery.saveFlow(_flow, _cont.getSessionID(), callback);
 
     }

@@ -105,7 +105,7 @@ public class ExecutionTimer extends Timer {
 
     private void startRun(){
 
-        _cont.setStatusMessage("Running flow: " + this._flowID);
+        _cont.setStatusMessage("Running flow: " + this._flowID + ".");
         _cont.showStatusBusy();
         //_cont.showRunningIndicator();
 
