@@ -70,10 +70,14 @@ public class ExecutionTimer extends Timer {
                     if (!cbo.getCompleted()){
                         ExecutionTimer.this.schedule(1000);
                     } else {
-                        _cont.hideRunningIndicator();
+                        _cont.setStatusMessage("Flow executed successfully.");
+                        _cont.hideStatusBusy();
+                        //_cont.hideRunningIndicator();
                     }
                 } else {
-                    _cont.hideRunningIndicator();
+                    _cont.setStatusMessage("Flow execution failure.");
+                    _cont.hideStatusBusy();
+                    //_cont.hideRunningIndicator();
                     String msg = "Flow interactive execution was NOT successful: " +
                                  cbo.getFailureMessage();
                     Window.alert(msg);
@@ -82,7 +86,9 @@ public class ExecutionTimer extends Timer {
             }
 
             public void onFailure(Throwable caught) {
-                _cont.hideRunningIndicator();
+                _cont.setStatusMessage("Flow execution failure.");
+                _cont.hideStatusBusy();
+                //_cont.hideRunningIndicator();
                  Window.alert("AsyncCallBack Failure -- saveFlow:  " +
                              caught.toString());
             }
@@ -99,7 +105,9 @@ public class ExecutionTimer extends Timer {
 
     private void startRun(){
 
-        _cont.showRunningIndicator();
+        _cont.setStatusMessage("Running flow: " + this._flowID);
+        _cont.showStatusBusy();
+        //_cont.showRunningIndicator();
 
         AsyncCallback callback = new AsyncCallback() {
             public void onSuccess(Object result) {
@@ -111,7 +119,9 @@ public class ExecutionTimer extends Timer {
                     if (!cbo.getCompleted()){
                         ExecutionTimer.this.schedule(1000);
                     } else {
-                        _cont.hideRunningIndicator();
+                        _cont.setStatusMessage("Flow executed successfully.");
+                        _cont.hideStatusBusy();
+                        //_cont.hideRunningIndicator();
                     }
                 } else {
                     _cont.hideRunningIndicator();
@@ -123,7 +133,9 @@ public class ExecutionTimer extends Timer {
             }
 
             public void onFailure(Throwable caught) {
-                _cont.hideRunningIndicator();
+                _cont.setStatusMessage("Flow execution failure.");
+                _cont.hideStatusBusy();
+                //_cont.hideRunningIndicator();
                  Window.alert("AsyncCallBack Failure -- saveFlow:  " +
                              caught.toString());
             }
