@@ -8,8 +8,6 @@ package org.meandre.workbench.client;
 // Other Imports
 //===============
 
-import org.meandre.workbench.client.beans.WBLocation;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.TreeListener;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -17,28 +15,29 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.TreeImages;
 
 /**
- * <p>Title: </p>
+ * <p>Title: Location Tree</p>
  *
- * <p>Description: </p>
+ * <p>Description: Location tree object for the meandre workbench
+ * application.</p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
- * <p>Company: </p>
+ * <p>Company: NCSA, Automated Learning Group</p>
  *
- * @author not attributable
+ * @author D. Searsmith
  * @version 1.0
  */
 public class LocationTree extends Tree implements TreeListener {
 
-//==============
-// Data Members
-//==============
+    //==============
+    // Data Members
+    //==============
 
     Controller _controller = null;
 
-//==============
-// Constructors
-//==============
+    //==============
+    // Constructors
+    //==============
 
     public LocationTree(Controller cont, TreeImages imgs) {
         super(imgs);
@@ -47,9 +46,9 @@ public class LocationTree extends Tree implements TreeListener {
         this.addTreeListener(this);
     }
 
-//================
-// Public Methods
-//================
+    //================
+    // Public Methods
+    //================
 
 //    public void onBrowserEvent(Event event) {
 //        if (_controller.isFlowExecuting()){
@@ -70,9 +69,9 @@ public class LocationTree extends Tree implements TreeListener {
 //        }
 //    }
 
-//===========================
-// Interface Implementation: TreeListener
-//===========================
+    //===========================
+    // Interface Implementation: TreeListener
+    //===========================
 
     public void onTreeItemSelected(TreeItem item) {
 //        if (item.getUserObject() != null) {

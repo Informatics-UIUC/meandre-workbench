@@ -16,15 +16,16 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.EventPreview;
 
 /**
- * <p>Title: </p>
+ * <p>Title: Port Component</p>
  *
- * <p>Description: </p>
+ * <p>Description: The image component for meandre workbench component
+ * ports.</p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
- * <p>Company: </p>
+ * <p>Company: NCSA, Automated Learning Group</p>
  *
- * @author not attributable
+ * @author D. Searsmith
  * @version 1.0
  */
 public class PortComp extends Image implements EventPreview {

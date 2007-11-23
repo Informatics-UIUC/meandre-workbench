@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Date;
 
 //===============
 // Other Imports
@@ -55,7 +56,6 @@ import org.meandre.workbench.client.beans.WBPropertiesDefinition;
 import org.meandre.workbench.client.beans.WBDataport;
 import com.google.gwt.user.client.Cookies;
 import org.meandre.workbench.client.beans.WBLoginBean;
-import java.util.Date;
 import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -249,55 +249,12 @@ public class Controller {
         newCanvas();
     }
 
-    //=================
-    // Package Methods
-    //=================
-
-    void login() {
-        //Do we have a cookie already?
-        String sessionID = Cookies.getCookie(_sidKey);
-        if (sessionID != null) {
-            checkSessionID(sessionID, new AsyncCallback() {
-                public void onSuccess(Object result) {
-                    WBLoginBean lbean = (WBLoginBean) result;
-                    if (lbean.getSuccess()) {
-                        loginSuccess(lbean.getUserName(), lbean.getSessionID()
-                                     , lbean.getBaseURL());
-                    } else {
-                        new WBLoginDialog(_main, Controller.this);
-                    }
-                }
-
-                public void onFailure(Throwable caught) {
-                    // do some UI stuff to show failure
-                    _userName = null;
-                    Window.alert("AsyncCallBack Failure -- getUser():  " +
-                                 caught.getMessage());
-                    _main.closeApp();
-                }
-            });
-        } else {
-            new WBLoginDialog(_main, this);
-        }
-    }
+    //============================
+    // Property Getters / Setters
+    //============================
 
     public String getActiveDomain() {
         return _activeDomain;
-    }
-
-    void loginSuccess(String uname, String sid, String dom) {
-        setUserName(uname);
-        _sessionID = sid;
-        _activeDomain = dom;
-
-        final long DURATION = 1000 * 60 * 60 * 24 * 14; //duration remembering login. 2 weeks in this example.
-        Date expires = new Date(System.currentTimeMillis() + DURATION);
-        Cookies.setCookie(this._sidKey, sid, expires, null, "/", false);
-        _main.onModuleLoadContinued();
-    }
-
-    void logout() {
-        Cookies.removeCookie(this._sidKey);
     }
 
     String getSessionID() {
@@ -330,39 +287,133 @@ public class Controller {
     }
 
     /**
-     * Show the busy indicator for flow execution.
-     */
-    void showRunningIndicator() {
-        RunningIndicator.showRunning();
-        _flowExecuting = true;
-    }
-
-    /**
-     * Hide the busy inidicator for flow execution.
-     */
-    void hideRunningIndicator() {
-        RunningIndicator.hideRunning();
-        _flowExecuting = false;
-    }
-
-    /**
-     * Returns a boolean indicating whether a flow is executing or not.
+     * Get the root tree item for the location tree.
      *
-     * @return boolean A true/false value that indicates whether a flow
-     * is executing or not.
+     * @return TreeItem Flow tree's root tree item.
      */
-    boolean isFlowExecuting() {
-        return _flowExecuting;
+    TreeItem getLocationTreeRoot() {
+        return this._locTreeRoot;
     }
+
+    /**
+     * Get a handle to the location tree.
+     * @return Tree The flow tree.
+     */
+    Tree getLocationTreeHandle() {
+        return this._locTree;
+    }
+
+    /**
+     * Get the root tree item for the flow tree.
+     *
+     * @return TreeItem Flow tree's root tree item.
+     */
+    TreeItem getFlowTreeRoot() {
+        return this._flowTreeRoot;
+    }
+
+    /**
+     * Get a handle to the flow tree.
+     * @return Tree The flow tree.
+     */
+    Tree getFlowTreeHandle() {
+        return this._flowTree;
+    }
+
+    /**
+     * Get the root tree item for the component tree.
+     *
+     * @return TreeItem Component tree's root tree item.
+     */
+    TreeItem getCompTreeRoot() {
+        return this._compTreeRoot;
+    }
+
+    /**
+     * Get a handle to the component tree.
+     * @return Tree The flow tree.
+     */
+    Tree getCompTreeHandle() {
+        return this._compTree;
+    }
+
+    /**
+     * Set the working flow in this controller.
+     *
+     * @param flow WBFlow The flow to set into this controller.
+     */
+    void setWorkingFlow(WBFlow flow) {
+        _workingFlow = flow;
+    }
+
+    /**
+     * Get the working flow in thisa controller.
+     *
+     * @return WBFlow The working flow in this controller.
+     */
+    WBFlow getWorkingFlow() {
+        return _workingFlow;
+    }
+
+    //=================
+    // Package Methods
+    //=================
+
+    // login functions
+
+    void login() {
+        //Do we have a cookie already?
+        String sessionID = Cookies.getCookie(_sidKey);
+        if (sessionID != null) {
+            checkSessionID(sessionID, new AsyncCallback() {
+                public void onSuccess(Object result) {
+                    WBLoginBean lbean = (WBLoginBean) result;
+                    if (lbean.getSuccess()) {
+                        loginSuccess(lbean.getUserName(), lbean.getSessionID()
+                                     , lbean.getBaseURL());
+                    } else {
+                        new WBLoginDialog(_main, Controller.this);
+                    }
+                }
+
+                public void onFailure(Throwable caught) {
+                    // do some UI stuff to show failure
+                    _userName = null;
+                    Window.alert("AsyncCallBack Failure -- getUser():  " +
+                                 caught.getMessage());
+                    _main.closeApp();
+                }
+            });
+        } else {
+            new WBLoginDialog(_main, this);
+        }
+    }
+
+    void loginSuccess(String uname, String sid, String dom) {
+        setUserName(uname);
+        _sessionID = sid;
+        _activeDomain = dom;
+
+        final long DURATION = 1000 * 60 * 60 * 24 * 14; //duration remembering login. 2 weeks in this example.
+        Date expires = new Date(System.currentTimeMillis() + DURATION);
+        Cookies.setCookie(this._sidKey, sid, expires, null, "/", false);
+        _main.onModuleLoadContinued();
+    }
+
+    void logout() {
+        Cookies.removeCookie(this._sidKey);
+    }
+
+
 
     //redirect the browser to the given url
     public static native void redirectOrClose(String url) /*-{
-                                       if ($wnd.opener && !$wnd.opener.closed){
-                $wnd.close();
-                                                                       } else {
-                          $wnd.location = url;
-                                                                       }
-                                                                     }-*/
+             if ($wnd.opener && !$wnd.opener.closed){
+                             $wnd.close();
+                         } else {
+                                       $wnd.location = url;
+                         }
+                       }-*/
             ;
 
     //==================================================
@@ -862,6 +913,9 @@ public class Controller {
         _compDragController.makeDraggable(comp, handle);
     }
 
+    //==========================================================
+    //==========================================================
+    //==========================================================
 
     /**
      * Returns the "from" port of the connection under construction.
@@ -1134,6 +1188,35 @@ public class Controller {
     }
 
     // Canvas Actions ======================================================
+    //==========================================================
+    //==========================================================
+    //==========================================================
+
+    /**
+     * Show the busy indicator for flow execution.
+     */
+    void showRunningIndicator() {
+        RunningIndicator.showRunning();
+        _flowExecuting = true;
+    }
+
+    /**
+     * Hide the busy inidicator for flow execution.
+     */
+    void hideRunningIndicator() {
+        RunningIndicator.hideRunning();
+        _flowExecuting = false;
+    }
+
+    /**
+     * Returns a boolean indicating whether a flow is executing or not.
+     *
+     * @return boolean A true/false value that indicates whether a flow
+     * is executing or not.
+     */
+    boolean isFlowExecuting() {
+        return _flowExecuting;
+    }
 
     /**
      * Return boolean indicating if there are currently any components on the
@@ -1160,46 +1243,6 @@ public class Controller {
             removeComponent(conn);
         }
         newCanvas();
-    }
-
-    void regenerateRepository() {
-        if (Window.confirm(
-                "All unpublished components and flows will be deleted.  Are you certain that you want to regenerate the repository?")) {
-            if (_dirty) {
-                Window.alert("Save or clear the working flow first.");
-            } else {
-                AsyncCallback callback = new AsyncCallback() {
-                    public void onSuccess(Object result) {
-                        WBCallbackObject cbo = (WBCallbackObject) result;
-                        if (cbo.getSuccess()) {
-                            Controller.this.clearCanvas();
-                            _main.getCompDescScrollPanel().clear();
-                            regenerateTabbedPanel();
-                            Controller.this.hideStatusBusy();
-                            Controller.this.setStatusMessage(
-                                    "Repository regenerated successfully.");
-                        } else {
-                            Controller.this.hideStatusBusy();
-                            Controller.this.setStatusMessage("");
-                            Window.alert(
-                                    "Repository regeneration operation was NOT successful: " +
-                                    cbo.getMessage());
-                        }
-                    }
-
-                    public void onFailure(Throwable caught) {
-                        Controller.this.hideStatusBusy();
-                        Controller.this.setStatusMessage("");
-                        Window.alert(
-                                "AsyncCallBack Failure -- regeneratRepository:  " +
-                                caught.getMessage());
-                    }
-                };
-                Controller.this.showStatusBusy();
-                Controller.this.setStatusMessage("Regenerating repository ...");
-                this.getRegeneratRepository(callback);
-            }
-        }
     }
 
     void regenerateTabbedPanel() {
@@ -1363,23 +1406,6 @@ public class Controller {
         _dirty = false;
     }
 
-    /**
-     * Set the working flow in this controller.
-     *
-     * @param flow WBFlow The flow to set into this controller.
-     */
-    void setWorkingFlow(WBFlow flow) {
-        _workingFlow = flow;
-    }
-
-    /**
-     * Get the working flow in thisa controller.
-     *
-     * @return WBFlow The working flow in this controller.
-     */
-    WBFlow getWorkingFlow() {
-        return _workingFlow;
-    }
 
     /**
      * Save a flow to a newly generated name and then execute the flow.
@@ -1471,6 +1497,46 @@ public class Controller {
                 drawConnections();
             }
         });
+    }
+
+    void regenerateRepository() {
+        if (Window.confirm(
+                "All unpublished components and flows will be deleted.  Are you certain that you want to regenerate the repository?")) {
+            if (_dirty) {
+                Window.alert("Save or clear the working flow first.");
+            } else {
+                AsyncCallback callback = new AsyncCallback() {
+                    public void onSuccess(Object result) {
+                        WBCallbackObject cbo = (WBCallbackObject) result;
+                        if (cbo.getSuccess()) {
+                            Controller.this.clearCanvas();
+                            _main.getCompDescScrollPanel().clear();
+                            regenerateTabbedPanel();
+                            Controller.this.hideStatusBusy();
+                            Controller.this.setStatusMessage(
+                                    "Repository regenerated successfully.");
+                        } else {
+                            Controller.this.hideStatusBusy();
+                            Controller.this.setStatusMessage("");
+                            Window.alert(
+                                    "Repository regeneration operation was NOT successful: " +
+                                    cbo.getMessage());
+                        }
+                    }
+
+                    public void onFailure(Throwable caught) {
+                        Controller.this.hideStatusBusy();
+                        Controller.this.setStatusMessage("");
+                        Window.alert(
+                                "AsyncCallBack Failure -- regeneratRepository:  " +
+                                caught.getMessage());
+                    }
+                };
+                Controller.this.showStatusBusy();
+                Controller.this.setStatusMessage("Regenerating repository ...");
+                this.getRegeneratRepository(callback);
+            }
+        }
     }
 
     /**
@@ -1812,56 +1878,6 @@ public class Controller {
         new PropertiesDialog(cp, this);
     }
 
-    /**
-     * Get the root tree item for the location tree.
-     *
-     * @return TreeItem Flow tree's root tree item.
-     */
-    TreeItem getLocationTreeRoot() {
-        return this._locTreeRoot;
-    }
-
-    /**
-     * Get a handle to the location tree.
-     * @return Tree The flow tree.
-     */
-    Tree getLocationTreeHandle() {
-        return this._locTree;
-    }
-
-    /**
-     * Get the root tree item for the flow tree.
-     *
-     * @return TreeItem Flow tree's root tree item.
-     */
-    TreeItem getFlowTreeRoot() {
-        return this._flowTreeRoot;
-    }
-
-    /**
-     * Get a handle to the flow tree.
-     * @return Tree The flow tree.
-     */
-    Tree getFlowTreeHandle() {
-        return this._flowTree;
-    }
-
-    /**
-     * Get the root tree item for the component tree.
-     *
-     * @return TreeItem Component tree's root tree item.
-     */
-    TreeItem getCompTreeRoot() {
-        return this._compTreeRoot;
-    }
-
-    /**
-     * Get a handle to the component tree.
-     * @return Tree The flow tree.
-     */
-    Tree getCompTreeHandle() {
-        return this._compTree;
-    }
 
     /**
      * Build the search panel.
@@ -2234,7 +2250,7 @@ public class Controller {
                        "&nbsp;Creator:&nbsp;" + ecd.getCreator() +
                        "<br>" + /*
                        "&nbsp;Rights:&nbsp;" + ecd.getRights() +
-                                          "<br>" + */
+                                "<br>" + */
                        "</font>";
         return putxt;
     }

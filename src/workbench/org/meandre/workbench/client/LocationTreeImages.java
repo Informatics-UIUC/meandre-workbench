@@ -1,18 +1,22 @@
 package org.meandre.workbench.client;
 
+//===============
+// Other Imports
+//===============
+
 import com.google.gwt.user.client.ui.TreeImages;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 
 /**
- * <p>Title: </p>
+ * <p>Title: Location Tree Image Bundle</p>
  *
- * <p>Description: </p>
+ * <p>Description: An image bundle class for the location tree.</p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
- * <p>Company: </p>
+ * <p>Company: NCSA, Automated Learning Group</p>
  *
- * @author not attributable
+ * @author D. Sesarsmith
  * @version 1.0
  */
 /**

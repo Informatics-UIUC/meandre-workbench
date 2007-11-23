@@ -12,15 +12,15 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Label;
 
 /**
- * <p>Title: </p>
+ * <p>Title: Port Popup Panel</p>
  *
- * <p>Description: </p>
+ * <p>Description: A popup panel for port descriptions.</p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
- * <p>Company: </p>
+ * <p>Company: NCSA, Automated Learning Group</p>
  *
- * @author not attributable
+ * @author D. Searsmith
  * @version 1.0
  */
 public class PortPopUp extends PopupPanel{

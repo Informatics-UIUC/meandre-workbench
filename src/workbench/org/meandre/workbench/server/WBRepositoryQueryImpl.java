@@ -46,8 +46,13 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     // Data Members
     //==============
 
+    /* Active proxy objects per user.*/
     private static Map _proxies = new Hashtable();
+
+    /* Map of concurrent outputs being generated from flow executions.*/
     private static Map _runOutput = new Hashtable();
+
+    /* Singleton self reference. */
     static private WBRepositoryQueryImpl s_instance = null;
 
     //================
@@ -66,10 +71,6 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
         return (MeandreProxy)_proxies.get(sid);
     }
 
-    //=================
-    // Private Methods
-    //=================
-
 
     //===================================
     // Interface Impl: WBRepositoryQuery
@@ -83,7 +84,6 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      */
     public WBCallbackObject regenerateRepository(String sid){
         Object obj = _proxies.get(sid);
-        boolean saveas = false;
         WBCallbackObject wbc = new WBCallbackObject();
         if (obj == null) {
             wbc.setSuccess(false);
@@ -169,6 +169,14 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
         }
     }
 
+    /**
+     *
+     * <p>Description: Launches thread that launches execution and reads
+     * back results in real time.</p>
+     *
+     * @author D. Searsmith
+     * @version 1.0
+     */
     private class InteractiveExecutionRunner implements Runnable {
 
         private String _flowid = null;

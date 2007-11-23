@@ -1,25 +1,24 @@
 package org.meandre.workbench.client;
 
 /**
- * <p>Title: </p>
+ * <p>Title: Cursor Text Box Wrapper</p>
  *
- * <p>Description: </p>
+ * <p>Description: A wrapper class for text boxes that fixes a focus bug in
+ * firefox browser.</p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
  * <p>Company: NCSA</p>
  *
- * @author D. Searsmith
+ * @author D. Searsmith (adapted from GWT forum)
  * @version 1.0
  */
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBoxBase;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.FocusListener;
 import com.google.gwt.user.client.ui.FocusListenerAdapter;
 
 /**

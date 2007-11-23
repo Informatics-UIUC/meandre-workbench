@@ -9,11 +9,6 @@ package org.meandre.workbench.client;
 //===============
 
 import org.meandre.workbench.client.beans.WBFlow;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.ResponseTextHandler;
-import com.google.gwt.user.client.HTTPRequest;
-import com.google.gwt.user.client.ui.TextArea;
 
 /**
  * <p>Title: Command Execute Flow</p>
@@ -29,18 +24,18 @@ import com.google.gwt.user.client.ui.TextArea;
  */
 class CommandExecuteFlow implements WBCommand {
 
-//==============
-// Data Members
-//==============
+    //==============
+    // Data Members
+    //==============
 
     private Main _main = null;
     private WBCommand _cmd = null;
     private WBFlow _flow = null;
     private Controller _cont = null;
 
-//==============
-// Constructors
-//==============
+    //==============
+    // Constructors
+    //==============
 
     CommandExecuteFlow(Controller cont, WBCommand cmd) {
         _main = cont.getMain();
@@ -52,11 +47,11 @@ class CommandExecuteFlow implements WBCommand {
     // Interface Implementation: WBCommand
     //=====================================
 
-    public void execute(Object obj){
+    public void execute(Object obj) {
         _flow = (WBFlow) obj;
 
         new ExecutionTimer(_cont.getSessionID(),
-                           _flow.getFlowID()+"_"+System.currentTimeMillis(),
+                           _flow.getFlowID() + "_" + System.currentTimeMillis(),
                            _flow.getFlowID(),
                            _cont,
                            _main);
@@ -99,7 +94,7 @@ class CommandExecuteFlow implements WBCommand {
 //            }
 //        });
 
-        if (_cmd != null){
+        if (_cmd != null) {
             _cmd.execute(_flow);
         }
 

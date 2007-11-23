@@ -46,9 +46,9 @@ import com.google.gwt.user.client.ui.Widget;
 public class ComponentPanel extends DockPanel implements SourcesClickEvents,
         SourcesMouseEvents {
 
-//==============
-// Data Members
-//==============
+    //==============
+    // Data Members
+    //==============
 
     private ClickListenerCollection clickListeners;
     private MouseListenerCollection mouseListeners;
@@ -59,9 +59,9 @@ public class ComponentPanel extends DockPanel implements SourcesClickEvents,
     private Set _outputs = new HashSet();
     private Label _compLab = null;
 
-//==============
-// Constructors
-//==============
+    //==============
+    // Constructors
+    //==============
 
     /**
      * Null Constructor
@@ -100,17 +100,17 @@ public class ComponentPanel extends DockPanel implements SourcesClickEvents,
             _outputs.add(pc);
         }
 
-        if (_inputs.isEmpty()){
+        if (_inputs.isEmpty()) {
             leftVP.setWidth("10");
         }
-        if (_outputs.isEmpty()){
+        if (_outputs.isEmpty()) {
             rightVP.setWidth("10");
         }
 
         HorizontalPanel hpan = new HorizontalPanel();
         hpan.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
         hpan.add(leftVP);
-        if (comp.getExecutableComponent().getProperties().getKeys().isEmpty()){
+        if (comp.getExecutableComponent().getProperties().getKeys().isEmpty()) {
             _cg = new Image("images/gnome-reboot-48.png");
         } else {
             _cg = new Image("images/gnome-reboot-48-props.png");
@@ -206,7 +206,7 @@ public class ComponentPanel extends DockPanel implements SourcesClickEvents,
      * Get label object for this component.
      * @return Label Label object for this component.
      */
-    Label getComponentLabel(){
+    Label getComponentLabel() {
         return _compLab;
     }
 

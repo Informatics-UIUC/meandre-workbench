@@ -3,6 +3,7 @@ package org.meandre.workbench.server;
 //==============
 // Java Imports
 //==============
+
 import java.util.Iterator;
 import java.util.Set;
 import java.util.HashSet;
@@ -22,35 +23,36 @@ import org.meandre.workbench.server.proxy.beans.location.LocationBean;
 
 
 /**
- * <p>Title: </p>
+ * <p>Title: Meandre To Workbench Bean Converter</p>
  *
- * <p>Description: </p>
+ * <p>Description: Class for converting various meandre core beans into
+ * beans useable within the workbench client.</p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
- * <p>Company: </p>
+ * <p>Company: NCSA, Automated Learning Group</p>
  *
- * @author not attributable
+ * @author D. Searsmith
  * @version 1.0
  */
 public class MeandreToWBBeanConverter {
 
-//==============
-// Data Members
-//==============
+    //==============
+    // Data Members
+    //==============
 
-//==============
-// Constructors
-//==============
+    //==============
+    // Constructors
+    //==============
 
     public MeandreToWBBeanConverter() {
     }
 
-//================
-// Public Methods
-//================
+    //================
+    // Public Methods
+    //================
 
-    static public WBLocation convertLocation(LocationBean lbean){
+    static public WBLocation convertLocation(LocationBean lbean) {
         return new WBLocation(lbean.getLocation(), lbean.getDescription());
     }
 
@@ -80,9 +82,11 @@ public class MeandreToWBBeanConverter {
 
         WBFlow f = new WBFlow(_id, sName, sDescription, sRights, sCreator,
                               dateCreation, setInstances, setConns, tagDesc);
-        int pos = flow.getFlowComponent().getURI().toLowerCase().lastIndexOf("flow");
-        if (pos == -1){
-            pos = flow.getFlowComponent().getURI().toLowerCase().lastIndexOf("/");
+        int pos = flow.getFlowComponent().getURI().toLowerCase().lastIndexOf(
+                "flow");
+        if (pos == -1) {
+            pos = flow.getFlowComponent().getURI().toLowerCase().lastIndexOf(
+                    "/");
         }
         if (pos == -1) {
             f.setBaseURL(Controller.s_baseURL);

@@ -17,28 +17,29 @@ import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.TreeImages;
 
 /**
- * <p>Title: </p>
+ * <p>Title: Component Tree</p>
  *
- * <p>Description: </p>
+ * <p>Description: A tree object used to display components for the
+ * meandre workbench application.</p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
- * <p>Company: </p>
+ * <p>Company: NCSA, Automated Learning Group</p>
  *
- * @author not attributable
+ * @author D. Seasrsmith
  * @version 1.0
  */
 public class DCTree extends Tree implements TreeListener {
 
-//==============
-// Data Members
-//==============
+    //==============
+    // Data Members
+    //==============
 
     Controller _controller = null;
 
-//==============
-// Constructors
-//==============
+    //==============
+    // Constructors
+    //==============
 
     public DCTree(Controller cont, TreeImages imgs) {
         super(imgs);
@@ -47,19 +48,19 @@ public class DCTree extends Tree implements TreeListener {
         this.addTreeListener(this);
     }
 
-//================
-// Public Methods
-//================
+    //================
+    // Public Methods
+    //================
 
     public void onBrowserEvent(Event event) {
-        if (_controller.isFlowExecuting()){
+        if (_controller.isFlowExecuting()) {
             return;
         }
         super.onBrowserEvent(event);
         int type = DOM.eventGetType(event);
         switch (type) {
         case Event.ONDBLCLICK: {
-            if (getSelectedItem() != null){
+            if (getSelectedItem() != null) {
                 WBComponent comp = (WBComponent)this.getSelectedItem().
                                    getUserObject();
                 if (comp != null) {
@@ -71,9 +72,9 @@ public class DCTree extends Tree implements TreeListener {
         }
     }
 
-//===========================
-// Interface Implementation: TreeListener
-//===========================
+    //===========================
+    // Interface Implementation: TreeListener
+    //===========================
 
     public void onTreeItemSelected(TreeItem item) {
         if (item.getUserObject() != null) {

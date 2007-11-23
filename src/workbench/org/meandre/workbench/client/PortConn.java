@@ -1,15 +1,15 @@
 package org.meandre.workbench.client;
 
 /**
- * <p>Title: </p>
+ * <p>Title: Port Connection</p>
  *
- * <p>Description: </p>
+ * <p>Description: An object that holds port connection information.</p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
- * <p>Company: </p>
+ * <p>Company: NCSA, Automated Learning Group</p>
  *
- * @author not attributable
+ * @author D. Searsmith
  * @version 1.0
  */
 public class PortConn {

@@ -32,10 +32,6 @@ import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.SourcesTabEvents;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.DockPanel;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Label;
 
 
 /**
@@ -244,34 +240,6 @@ public class Main implements EntryPoint, WindowResizeListener,
         resizeApp();
     }
 
-    private void resizeApp() {
-        _dockPan.setSize("100%", "100%");
-        _dockPan.setCellWidth(_buttPan, "100%");
-        _dockPan.setCellWidth(_hsp, "100%");
-        _dockPan.setCellHeight(_hsp, "100%");
-        _hsp.setWidth("99%");
-        _hsp.setHeight("99%");
-        _controller.getStatusBar().setWidth("100%");
-        _buttPan.setWidth("100%");
-        _tabPan.setHeight("99%");
-        _tabPan.setWidth("99%");
-        _vsp.setWidth("100%");
-        _vsp.setHeight("100%");
-        _controller.getCompTreeHandle().setHeight("100%");
-        _controller.getCompTreeHandle().setWidth("100%");
-        _controller.getFlowTreeHandle().setHeight("100%");
-        _controller.getFlowTreeHandle().setWidth("100%");
-        _canvasPan.setWidth("100%");
-        _canvasPan.setHeight("100%");
-        _boundPan.setWidth("100%");
-        _canvasButtPan.setWidth("100%");
-        _boundPan.setHeight("100%");
-        _vscroll.setWidth("100%");
-        _vscroll.setHeight("100%");
-        _absPan.setSize("100%", "100%");
-        _jsgPan.setSize("100%", "100%");
-
-    }
 
     //===============================================
     // Interface Implementation: WindowCloseListener
@@ -350,6 +318,35 @@ public class Main implements EntryPoint, WindowResizeListener,
     //=================
     // Private Methods
     //=================
+
+    private void resizeApp() {
+        _dockPan.setSize("100%", "100%");
+        _dockPan.setCellWidth(_buttPan, "100%");
+        _dockPan.setCellWidth(_hsp, "100%");
+        _dockPan.setCellHeight(_hsp, "100%");
+        _hsp.setWidth("99%");
+        _hsp.setHeight("99%");
+        _controller.getStatusBar().setWidth("100%");
+        _buttPan.setWidth("100%");
+        _tabPan.setHeight("99%");
+        _tabPan.setWidth("99%");
+        _vsp.setWidth("100%");
+        _vsp.setHeight("100%");
+        _controller.getCompTreeHandle().setHeight("100%");
+        _controller.getCompTreeHandle().setWidth("100%");
+        _controller.getFlowTreeHandle().setHeight("100%");
+        _controller.getFlowTreeHandle().setWidth("100%");
+        _canvasPan.setWidth("100%");
+        _canvasPan.setHeight("100%");
+        _boundPan.setWidth("100%");
+        _canvasButtPan.setWidth("100%");
+        _boundPan.setHeight("100%");
+        _vscroll.setWidth("100%");
+        _vscroll.setHeight("100%");
+        _absPan.setSize("100%", "100%");
+        _jsgPan.setSize("100%", "100%");
+
+    }
 
     /**
      * Called on application shutdown to clean up any dangling resources.

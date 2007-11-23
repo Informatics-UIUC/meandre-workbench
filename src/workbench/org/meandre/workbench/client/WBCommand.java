@@ -1,17 +1,23 @@
 package org.meandre.workbench.client;
 
 /**
- * <p>Title: </p>
+ * <p>Title: Workbench Command</p>
  *
- * <p>Description: </p>
+ * <p>Description: A simple command interface for chaining asynchronous
+ * actions together.</p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
- * <p>Company: </p>
+ * <p>Company: NCSA, Automated Learning Group</p>
  *
- * @author not attributable
+ * @author D. Searsmith
  * @version 1.0
  */
 public interface WBCommand {
+
+    //================
+    // Public Methods
+    //================
+
     public void execute(Object work);
 }

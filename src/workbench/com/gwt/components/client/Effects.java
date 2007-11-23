@@ -18,11 +18,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 */
 
+/*
+Adapted for use in the Meandre Workbench.
+D. Searsmith
+*/
+
 
 package com.gwt.components.client;
 
+//==============
+// Java Imports
+//==============
+
 import java.util.Iterator;
 import java.util.Vector;
+
+//===============
+// Other Imports
+//===============
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.Element;

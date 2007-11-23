@@ -1,20 +1,24 @@
 package org.meandre.workbench.client;
 
+//===============
+// Other Imports
+//===============
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
-import org.meandre.workbench.client.beans.*;
 
 /**
- * <p>Title: </p>
+ * <p>Title: Uncaught Exception Handler</p>
  *
- * <p>Description: </p>
+ * <p>Description: Catches and displays any uncaught error messages generated
+ * by the workbench application.</p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
- * <p>Company: </p>
+ * <p>Company: NCSA, Automated Learning Group</p>
  *
- * @author not attributable
+ * @author D. Searsmith
  * @version 1.0
  */
 public class MyUncaughtExceptionHandler implements

@@ -46,9 +46,9 @@ import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
  */
 public class FlowBuildForm extends DialogBox {
 
-//==============
-// Data Members
-//==============
+    //==============
+    // Data Members
+    //==============
 
 
     private WBFlow _flow = null;
@@ -108,7 +108,7 @@ public class FlowBuildForm extends DialogBox {
      * Build this dialog panel.
      */
     private void buildPanel() {
-        if (_flow.getFlowID().trim().length() > 0){
+        if (_flow.getFlowID().trim().length() > 0) {
             _saveas = false;
         } else {
             _saveas = true;
@@ -128,21 +128,21 @@ public class FlowBuildForm extends DialogBox {
         });
         _name.setText("untitled");
         String nm = _flow.getName();
-        if (nm.length() > 0){
+        if (nm.length() > 0) {
             _name.setText(nm);
         }
         gp.setWidget(0, 1, CursorTextBox.wrapTextBox(_name));
-        if (!_saveas){
+        if (!_saveas) {
             _name.setEnabled(false);
         }
 
         lab = new HTML("<strong>Desc:</strong>");
         gp.setWidget(1, 0, lab);
         _desc = new TextArea();
-         _desc.setCharacterWidth(40);
+        _desc.setCharacterWidth(40);
         _desc.setVisibleLines(4);
         String de = _flow.getDescription();
-        if (de.length() > 0){
+        if (de.length() > 0) {
             _desc.setText(de);
         }
         gp.setWidget(1, 1, CursorTextBox.wrapTextBox(_desc));
@@ -156,7 +156,7 @@ public class FlowBuildForm extends DialogBox {
             }
         });
         String cr = _flow.getCreator();
-        if (cr.length() > 0){
+        if (cr.length() > 0) {
             _creator.setText(cr);
         } else {
             _creator.setText(Controller.s_controller.getUserName());
@@ -169,13 +169,13 @@ public class FlowBuildForm extends DialogBox {
         _rights.setCharacterWidth(40);
         _rights.setVisibleLines(4);
         String ri = _flow.getRights();
-        if (ri.length() > 0){
+        if (ri.length() > 0) {
             _rights.setText(ri);
         }
         gp.setWidget(3, 1, CursorTextBox.wrapTextBox(_rights));
 
         lab = new HTML("<strong>Base URL:</strong>");
-        if (!_saveas){
+        if (!_saveas) {
             lab = new HTML("<strong>URI:</strong>");
         }
 
@@ -188,13 +188,13 @@ public class FlowBuildForm extends DialogBox {
         });
         _baseURL.setVisibleLength(50);
         String bu = _flow.getBaseURL();
-        if (bu.length() > 0){
+        if (bu.length() > 0) {
             _baseURL.setText(bu);
         } else {
             _baseURL.setText(Controller.s_baseURL);
         }
         gp.setWidget(4, 1, CursorTextBox.wrapTextBox(_baseURL));
-        if (!_saveas){
+        if (!_saveas) {
             _baseURL.setText(_flow.getFlowID());
             _baseURL.setEnabled(false);
         }
@@ -209,7 +209,7 @@ public class FlowBuildForm extends DialogBox {
             }
         });
         String tgs = _flow.getTags().toString();
-        if (tgs.length() > 0){
+        if (tgs.length() > 0) {
             _tags.setText(tgs);
         }
         gp.setWidget(5, 1, CursorTextBox.wrapTextBox(_tags));
@@ -220,8 +220,9 @@ public class FlowBuildForm extends DialogBox {
             public void onClick(Widget sender) {
                 String burl = "";
                 _flow.setCreationDate(new Date());
-                _flow.setCreator((_creator.getText() == null)? "" : _creator.getText().trim());
-                if (_saveas){
+                _flow.setCreator((_creator.getText() == null) ? "" :
+                                 _creator.getText().trim());
+                if (_saveas) {
                     String name = _name.getText();
                     if ((name == null) || (name.trim().length() == 0)) {
                         Window.alert("Must enter a valid name!");
@@ -246,22 +247,24 @@ public class FlowBuildForm extends DialogBox {
                     _flow.setName(_name.getText().trim());
                 }
 
-                _flow.setDescription((_desc.getText() == null)? "" : _desc.getText().trim());
-                _flow.setRights((_rights.getText() == null)? "" : _rights.getText().trim());
+                _flow.setDescription((_desc.getText() == null) ? "" :
+                                     _desc.getText().trim());
+                _flow.setRights((_rights.getText() == null) ? "" :
+                                _rights.getText().trim());
 
-
-                if ((_tags.getText() == null) || (_tags.getText().trim().length() == 0)){
+                if ((_tags.getText() == null) ||
+                    (_tags.getText().trim().length() == 0)) {
                     _flow.getTags().clear();
                 } else {
-                    if (!_flow.getTags().toString().equals(_tags.getText())){
+                    if (!_flow.getTags().toString().equals(_tags.getText())) {
                         String txt = _tags.getText();
                         String[] txts = txt.split(" ");
                         Set tagset = new HashSet();
-                        for (int i = 0, n = txts.length; i < n; i++){
+                        for (int i = 0, n = txts.length; i < n; i++) {
                             tagset.add(txts[i].trim());
                         }
                         _flow.getTags().clear();
-                         _flow.setTags(new WBTags(tagset));
+                        _flow.setTags(new WBTags(tagset));
                     }
                 }
 
@@ -269,31 +272,35 @@ public class FlowBuildForm extends DialogBox {
                 hide();
 
                 //add component instances
-                 for (Iterator itty = _comps.iterator(); itty.hasNext(); ) {
-                    WBComponentInstance ci = (WBComponentInstance) ((ComponentPanel)
+                for (Iterator itty = _comps.iterator(); itty.hasNext(); ) {
+                    WBComponentInstance ci = (WBComponentInstance) ((
+                            ComponentPanel)
                             itty.next()).
                                              getComponent();
                     WBComponent comp = ci.getExecutableComponent();
                     ci.setExecutableComponentInstance(comp.getID() + "/"
-                                                      +  ci.getName().toLowerCase().replaceAll(" ", "-") + "/"
-                                                      + _flow.getName().toLowerCase().replaceAll(" ", "-"));
+                            + ci.getName().toLowerCase().replaceAll(" ", "-") +
+                            "/"
+                            + _flow.getName().toLowerCase().replaceAll(" ", "-"));
                     _flow.addExecutableComponentInstance(ci);
                 }
 
                 int connNum = 0;
-                if (_saveas){
+                if (_saveas) {
                     burl = _flow.getBaseURL();
                     if (burl.trim().length() == 0) {
                         burl = "http://test.org/flow/" +
                                System.currentTimeMillis()
                                +
-                               _flow.getName().toLowerCase().replaceAll(" ", "-");
+                               _flow.getName().toLowerCase().replaceAll(" ",
+                                "-");
                     }
                 }
                 for (Iterator itty = _conns.iterator(); itty.hasNext(); ) {
                     PortConn conn = (PortConn) itty.next();
                     WBComponentConnection cc = new WBComponentConnection(
-                            burl + _flow.getName().toLowerCase().replaceAll(" ", "-") +
+                            burl +
+                            _flow.getName().toLowerCase().replaceAll(" ", "-") +
                             "/connector/data/" +
                             connNum,
                             conn.getFrom().getParentComponent().getComponent().
@@ -306,7 +313,7 @@ public class FlowBuildForm extends DialogBox {
                     connNum++;
                 }
 
-                if (_cmd != null){
+                if (_cmd != null) {
                     _cmd.execute(_flow);
                 }
 
@@ -334,14 +341,14 @@ public class FlowBuildForm extends DialogBox {
         setWidget(vp);
     }
 
-    private void ifKeycodeEnterSubmit(char keyCode, Widget sender){
+    private void ifKeycodeEnterSubmit(char keyCode, Widget sender) {
         if (keyCode == '\r') {
             ((TextBox) sender).cancelKey();
             _ok.click();
         }
     }
 
-    private void closeForm(){
+    private void closeForm() {
         clear();
         hide();
     }

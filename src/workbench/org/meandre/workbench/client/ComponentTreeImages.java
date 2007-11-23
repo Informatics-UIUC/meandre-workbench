@@ -1,18 +1,23 @@
 package org.meandre.workbench.client;
 
+//===============
+// Other Imports
+//===============
+
 import com.google.gwt.user.client.ui.TreeImages;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 
 /**
- * <p>Title: </p>
+ * <p>Title: Component Tree Images</p>
  *
- * <p>Description: </p>
+ * <p>Description: A class that implements the image bundle for the component
+ * tree in the meandre workbench application.</p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
- * <p>Company: </p>
+ * <p>Company: NCSA, Automated Learning Group</p>
  *
- * @author not attributable
+ * @author D. Searsmith
  * @version 1.0
  */
 /**

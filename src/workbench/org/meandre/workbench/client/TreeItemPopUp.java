@@ -9,27 +9,21 @@ package org.meandre.workbench.client;
 //===============
 
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.HTML;
 
 /**
- * <p>Title: </p>
+ * <p>Title: Tree Item Popup</p>
  *
- * <p>Description: </p>
+ * <p>Description: A popup panel for tree items.</p>
  *
  * <p>Copyright: Copyright (c) 2007</p>
  *
- * <p>Company: </p>
+ * <p>Company: NCSA, Automated Learning Group</p>
  *
- * @author not attributable
+ * @author D. Searsmith
  * @version 1.0
  */
 public class TreeItemPopUp extends PopupPanel {
-
-    //==============
-    // Data Members
-    //==============
-
 
     //==============
     // Constructors
@@ -47,10 +41,5 @@ public class TreeItemPopUp extends PopupPanel {
         HTML htm = new HTML(s);
         setWidget(htm);
     }
-
-    //=================
-    // Package Methods
-    //=================
-
 
 }
