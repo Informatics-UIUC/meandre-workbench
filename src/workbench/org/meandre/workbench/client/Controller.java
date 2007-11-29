@@ -817,6 +817,11 @@ public class Controller {
                 Controller.this.regenerateRepository();
             }
         };
+        Command uploadRepositoryCmd = new Command() {
+            public void execute() {
+                new WBRepositoryUploadForm(Controller.this);
+            }
+        };
 
         // Make some sub-menus that we will cascade from the top menu.
 
@@ -855,7 +860,7 @@ public class Controller {
         //Repository
         MenuBar repoMenu = new MenuBar(true);
         repoMenu.addItem("Regenerate", regenerateRepositoryCmd);
-        repoMenu.addItem("Upload", cmd);
+        repoMenu.addItem("Upload", uploadRepositoryCmd);
         repoMenu.addItem("Add Location", cmd);
         repoMenu.addItem("Remove Location", cmd);
 
@@ -1245,7 +1250,7 @@ public class Controller {
         newCanvas();
     }
 
-    void regenerateTabbedPanel() {
+    void regenerateTabbedPanel(boolean b) {
         buildCompTree(getCompTreeHandle(),
                       getCompTreeRoot(),
                       "Available",
@@ -1260,6 +1265,10 @@ public class Controller {
         _main.getTabPanel().remove(3);
         _main.getTabPanel().add(buildSearchPanel(), "SEARCH");
         _main.getTabPanel().selectTab(0);
+        if (b){
+            this.setStatusMessage("Tree views regenerated.");
+            this.hideStatusBusy();
+        }
     }
 
     /**
@@ -1511,7 +1520,7 @@ public class Controller {
                         if (cbo.getSuccess()) {
                             Controller.this.clearCanvas();
                             _main.getCompDescScrollPanel().clear();
-                            regenerateTabbedPanel();
+                            regenerateTabbedPanel(false);
                             Controller.this.hideStatusBusy();
                             Controller.this.setStatusMessage(
                                     "Repository regenerated successfully.");
@@ -1910,6 +1919,8 @@ public class Controller {
                             // do some UI stuff to show success
 
                             if (result == null) {
+                                Controller.this.hideStatusBusy();
+                                Controller.this.setStatusMessage("Search failed.");
                                 Window.alert("Session ID no longer valid.");
                                 return;
                             }
@@ -1985,6 +1996,8 @@ public class Controller {
                             }
                             _flowSearchResultsRoot.setState(true);
                             _compSearchResultsRoot.setState(true);
+                            Controller.this.hideStatusBusy();
+                            Controller.this.setStatusMessage("Search completed.");
                         }
 
                         public void onFailure(Throwable caught) {
@@ -1993,11 +2006,15 @@ public class Controller {
                                     "Failure Retrieving Components");
                             _flowSearchResultsRoot.setText(
                                     "Failure Retrieving Components");
+                                    Controller.this.hideStatusBusy();
+                                    Controller.this.setStatusMessage("Search failed.");
                             Window.alert(
                                     "AsyncCallBack Failure -- getActiveComponents:  " +
                                     caught.getMessage());
                         }
                     };
+                    Controller.this.showStatusBusy();
+                    Controller.this.setStatusMessage("Searching for [" + txt + "] ...");
                     getActiveComponents(txt, callback);
                 }
             }

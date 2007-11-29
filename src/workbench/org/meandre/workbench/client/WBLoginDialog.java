@@ -60,13 +60,15 @@ public class WBLoginDialog extends DialogBox {
         _cont = cont;
         setWidget(buildPanel());
         setText("Meandre Workbench Login");
+        this.setVisible(false);
         show();
-        checkEnableSubmit();
-        _tbox.setFocus(true);
         setPopupPosition((Window.getClientWidth() / 2) -
                          (this.getOffsetWidth() / 2),
                          (Window.getClientHeight() / 2) -
                          (this.getOffsetHeight() / 2));
+        this.setVisible(true);
+        checkEnableSubmit();
+        _tbox.setFocus(true);
     }
 
     private Panel buildPanel() {

@@ -4,10 +4,12 @@
   cursor: default;
   padding-left: 5px;
   padding-right: 5px;
+  font-size: 90%;
+  font-weight: bold;
 }
 
 .gwt-MenuItem {
-  font-size: 90%;
+  font-size: 85%;
   font-weight: bold;
   margin: 5px;
   padding-left: 5px;
@@ -217,3 +219,31 @@ div#componentshow {
   padding-bottom: 0cm;
 }
 
+.fu-panel {
+  border-style: solid;
+  border-width: medium;
+  border-color: #c3d9ff;
+  margin: 4px;
+  background: #ffffff;
+}
+
+.fu-label{
+  font-size: 90%;
+  font-weight: bold;
+  cursor: text;
+}
+
+.gwt-FileUpload{
+  font-size: 90%;
+  font-weight: bold;
+  cursor: text;
+  background: #ffffff;
+}
+
+.fu-listbox{
+  font-size: 90%;
+  font-weight: bold;
+  cursor: pointer;
+  cursor: hand;
+  overflow: scroll;
+}

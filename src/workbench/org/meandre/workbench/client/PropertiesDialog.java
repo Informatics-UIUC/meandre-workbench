@@ -85,13 +85,15 @@ public class PropertiesDialog extends DialogBox {
         _descs = new java.util.HashMap();
         setText("Properties: " + _cp.getComponent().getName());
         buildPanel();
+        this.setVisible(false);
         show();
+        setPopupPosition(200, 200);
+        this.setVisible(true);
         _name.setFocus(true);
 //        setPopupPosition((Window.getClientWidth() / 2) -
 //                         (this.getOffsetWidth() / 2),
 //                         (Window.getClientHeight() / 2) -
 //                         (this.getOffsetHeight() / 2));
-        setPopupPosition(200, 200);
     }
 
     //=================

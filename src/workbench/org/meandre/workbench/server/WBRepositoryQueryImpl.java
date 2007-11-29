@@ -55,12 +55,15 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     /* Singleton self reference. */
     static private WBRepositoryQueryImpl s_instance = null;
 
+    static public final String s_PROXIES_KEY = "meandre_proxies";
+
     //================
     // Constructor(s)
     //================
 
     public WBRepositoryQueryImpl() {
         s_instance = this;
+//        registerWithContext(this);
     }
 
     //================
@@ -71,6 +74,9 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
         return (MeandreProxy)_proxies.get(sid);
     }
 
+//    private static void registerWithContext(WBRepositoryQueryImpl instance){
+//        instance.getServletContext().setAttribute(s_PROXIES_KEY, instance._proxies);
+//    }
 
     //===================================
     // Interface Impl: WBRepositoryQuery
@@ -230,6 +236,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @return LoginBean Bean containing login information.
      */
     public WBLoginBean checkSessionID(String sid) {
+        this.getThreadLocalRequest().getSession().setAttribute(s_PROXIES_KEY, _proxies);
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return new WBLoginBean("No longer valid session ID.");
@@ -250,6 +257,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @return LoginBean Bean containing login information.
      */
     public WBLoginBean login(String userid, String password, String url) {
+        this.getThreadLocalRequest().getSession().setAttribute(s_PROXIES_KEY, _proxies);
         WBLoginBean wblb = null;
         MeandreProxy proxy = new MeandreProxy(userid, password, url);
         if (proxy.isReady()) {

@@ -102,6 +102,10 @@ public class MeandreProxy {
         return this.sBaseURL;
     }
 
+    public String getUPEncoding(){
+        return this.sUPEncoding;
+    }
+
     /** Returns true if the last call was completed successfully.
      *
      * @return True if everything when well. False otherwise
