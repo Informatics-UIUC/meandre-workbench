@@ -1,7 +1,16 @@
 package org.meandre.workbench.client;
 
-import com.google.gwt.user.client.rpc.RemoteService;
+//==============
+// Java Imports
+//==============
+
 import java.util.Set;
+
+//===============
+// Other Imports
+//===============
+
+import com.google.gwt.user.client.rpc.RemoteService;
 import org.meandre.workbench.client.beans.*;
 
 
@@ -20,6 +29,16 @@ import org.meandre.workbench.client.beans.*;
 public interface WBRepositoryQuery extends RemoteService {
 
     /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param location String location url.
+     * @param desc String location description.
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject addLocation(String sid, String location,
+                                        String desc);
+
+    /**
      * Returns the set of active locations in the repository.
      *
      * @param sid String session id
@@ -28,21 +47,22 @@ public interface WBRepositoryQuery extends RemoteService {
      */
     public Set getLocations(String sid);
 
-    /**
-     * Regenerate the repository from all of its locations.  NOTE: this
-     * command will delete all unpublished components and flows.
-     * @param sid String session id
-     * @return WBCallbackObject Bean that contains return information.
-     */
-    public WBCallbackObject regenerateRepository(String sid);
-
-    /**
+    /**    /**
      * Starts execution of a flow in interactive mode.
      * @param sid String session ID.
      * @param flowid String flow uri.
      * @return WBCallbackObject Bean that contains return information.
      */
     public WBCallbackObject deleteFlowFromRepository(String sid, String flowid);
+
+    /**
+     * Regenerate the repository from all of its locations.NOTE : this
+     * command will delete all unpublished components and flows.
+     * @param sid String session id
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject regenerateRepository(String sid);
+
 
     /**
      * Starts execution of a flow in interactive mode.

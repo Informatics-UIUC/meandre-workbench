@@ -421,6 +421,14 @@ public class Controller {
     //==================================================
 
     /**
+     * Adds a location to the repository.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void addLocation(String location, String desc, AsyncCallback cb) {
+        _repquery.addLocation(getSessionID(), location, desc, cb);
+    }
+
+    /**
      * Fetches the locations for the current user repository.
      * @param cb AsyncCallback Callback object returned from the server.
      */
@@ -822,6 +830,11 @@ public class Controller {
                 new WBRepositoryUploadForm(Controller.this);
             }
         };
+        Command addLocationCmd = new Command() {
+            public void execute() {
+                new AddLocationForm(Controller.this);
+            }
+        };
 
         // Make some sub-menus that we will cascade from the top menu.
 
@@ -861,7 +874,7 @@ public class Controller {
         MenuBar repoMenu = new MenuBar(true);
         repoMenu.addItem("Regenerate", regenerateRepositoryCmd);
         repoMenu.addItem("Upload", uploadRepositoryCmd);
-        repoMenu.addItem("Add Location", cmd);
+        repoMenu.addItem("Add Location", addLocationCmd);
         repoMenu.addItem("Remove Location", cmd);
 
         //help

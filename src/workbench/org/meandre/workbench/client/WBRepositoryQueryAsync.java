@@ -29,6 +29,16 @@ import org.meandre.workbench.client.beans.WBExecBean;
 public interface WBRepositoryQueryAsync {
 
     /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param location String location url.
+     * @param desc String location description.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void addLocation(String sid, String location, String desc,
+                            AsyncCallback cb);
+
+    /**
      * Returns the set of active locations in the repository.
      *
      * @param sid String session id

@@ -83,6 +83,36 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     //===================================
 
     /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param location String location url.
+     * @param desc String location description.
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject addLocation(String sid, String location, String desc){
+        Object obj = _proxies.get(sid);
+        WBCallbackObject wbc = new WBCallbackObject();
+        if (obj == null) {
+            wbc.setSuccess(false);
+            wbc.setMessage("Session ID no longer valid.");
+         } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+            String msg = proxy.getAddLocation(location, desc);
+            if (msg == null){
+                wbc.setSuccess(false);
+                wbc.setMessage("Unable to addlocation. " + msg);
+            } else {
+                wbc.setSuccess(true);
+                wbc.setMessage(msg);
+                proxy.flushRepository();
+            }
+        }
+        return wbc;
+    }
+
+
+
+    /**
      * Regenerate the repository from all of its locations.  NOTE: this
      * command will delete all unpublished components and flows.
      * @param sid String session id

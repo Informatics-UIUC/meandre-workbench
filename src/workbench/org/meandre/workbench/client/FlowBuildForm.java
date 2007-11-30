@@ -88,6 +88,7 @@ public class FlowBuildForm extends DialogBox {
         _conns = conns;
         buildPanel();
         setText("Flow Properties");
+        setVisible(false);
         show();
         if (_saveas) {
             _name.setFocus(true);
@@ -98,6 +99,7 @@ public class FlowBuildForm extends DialogBox {
                          (this.getOffsetWidth() / 2),
                          (Window.getClientHeight() / 2) -
                          (this.getOffsetHeight() / 2));
+        setVisible(true);
     }
 
     //=================
