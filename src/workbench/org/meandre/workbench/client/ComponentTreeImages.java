@@ -37,7 +37,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
     AbstractImagePrototype treeClosed();
 
     /**
-     * @gwt.resource comp-tree-folder-leaf.png
+     * @gwt.resource duke.gif
      */
     AbstractImagePrototype treeLeaf();
 
