@@ -183,6 +183,10 @@ public class WBRepositoryUploadForm extends DialogBox {
         Hidden sid = new Hidden("sid", _cont.getSessionID());
         sid.setID("sid");
         panel.add(sid);
+
+        Hidden url = new Hidden("url", "services/repository/add.rdf");
+        sid.setID("url");
+        panel.add(url);
         //====================
         // Add ctx controls
         //====================
@@ -300,10 +304,58 @@ public class WBRepositoryUploadForm extends DialogBox {
             public void onSubmit(FormSubmitEvent event) {
                 // This event is fired just before the form is submitted. We can take
                 // this opportunity to perform validation.
-//                if (tb.getText().length() == 0) {
-//                    Window.alert("The text box must not be empty");
-//                    event.setCancelled(true);
-//                }
+
+                if ((_lbJars.getItemCount() == 0) && (_lbRepos.getItemCount() == 0)){
+                    Window.alert("Need to add at least one file.");
+                    event.setCancelled(true);
+                    return;
+                }
+                if (_lbRepos.getItemCount() > 0){
+                    int ttlCnt = 0, ntCnt = 0, rdfCnt = 0, otherCnt = 0;
+                    int cntSz = _lbRepos.getItemCount();
+                    for (int i = 0, n = cntSz; i < n; i++){
+                        String s = _lbRepos.getItemText(i);
+                        if (s.toLowerCase().endsWith(".ttl")){
+                            ttlCnt++;
+                        } else if (s.toLowerCase().endsWith(".nt")){
+                            ntCnt++;
+                        } else if (s.toLowerCase().endsWith(".rdf")){
+                            rdfCnt++;
+                        } else {
+                            otherCnt++;
+                        }
+                    }
+                    if (otherCnt > 0){
+                        Window.alert("Repository files must all have extensions 'rdf'.");
+                        event.setCancelled(true);
+                        return;
+                    }
+                    // For now, all repo files must end with rdf ...
+                    if (/*(ttlCnt != cntSz) && (ntCnt != cntSz) && */(rdfCnt != cntSz)){
+                        Window.alert("Repository files must all have extensions 'rdf'.");
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+                if (_lbJars.getItemCount() > 0){
+                    int jarCnt = 0, zipCnt = 0, otherCnt = 0;
+                    int cntSz = _lbJars.getItemCount();
+                    for (int i = 0, n = cntSz; i < n; i++){
+                        String s = _lbJars.getItemText(i);
+                        if (s.toLowerCase().endsWith(".jar")){
+                            jarCnt++;
+                        } else if (s.toLowerCase().endsWith(".zip")){
+                            zipCnt++;
+                        } else {
+                            otherCnt++;
+                        }
+                    }
+                    if (otherCnt > 0){
+                        Window.alert("Context files must have extensions either 'jar' or 'zip'.");
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
             }
 
             public void onSubmitComplete(FormSubmitCompleteEvent event) {
@@ -333,7 +385,9 @@ public class WBRepositoryUploadForm extends DialogBox {
 
                     _cont.setStatusMessage("Upload successful. Regenerating tree views ...");
 
-                    _cont.regenerateTabbedPanel(true);
+                    _cont.regenerateTabbedPanel(false);
+
+                    _cont.hideStatusBusy();
 
                 }
             }

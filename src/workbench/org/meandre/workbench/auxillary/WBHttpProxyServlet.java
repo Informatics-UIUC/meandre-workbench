@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 //===============
 // Other Imports
@@ -44,17 +46,14 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.PartSource;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.FilePartSource;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**Used for CROSS DOMAIN AJAX
  *
  * @author Amit Kumar
+ * @author D. Searsmith
  * Created on Nov 2, 2007 1:57:57 AM
  *
  */
@@ -144,6 +143,7 @@ public class WBHttpProxyServlet extends HttpServlet {
         MeandreProxy proxy = null;
         ServletFileUpload sfu = null;
         List fparts = new ArrayList();
+        String url = null;
         try {
             sfu = new ServletFileUpload(new DiskFileItemFactory());
 
@@ -164,6 +164,16 @@ public class WBHttpProxyServlet extends HttpServlet {
                     }
                     proxy = (MeandreProxy) proxies.get(sid);
                 }
+                if (fi.getFieldName().equals("url")) {
+                    String s = fi.getString();
+                    if (s == null) {
+                        System.out.println("URL is null!");
+                        response.sendError(response.SC_METHOD_NOT_ALLOWED,
+                                           "URL is null!");
+                        return;
+                    }
+                    url = s;
+                }
             }
 
         } catch (Exception e) {
@@ -180,8 +190,7 @@ public class WBHttpProxyServlet extends HttpServlet {
 
             HttpClient client = new HttpClient();
             System.out.println("Base URL: " + proxy.getBaseURL());
-            PostMethod post = new PostMethod(proxy.getBaseURL() +
-                                             "services/repository/add.rdf");
+            PostMethod post = new PostMethod(proxy.getBaseURL() + url);
 
             try {
                 post.addRequestHeader("Authorization",
@@ -230,7 +239,7 @@ public class WBHttpProxyServlet extends HttpServlet {
                 post.releaseConnection();
             }
             proxy.flushRepository();
-            String resp = "Upload completed successfully.";
+            String resp = "Proxy post completed successfully.";
             response.getOutputStream().write(resp.getBytes());
             response.getOutputStream().flush();
             response.getOutputStream().close();
