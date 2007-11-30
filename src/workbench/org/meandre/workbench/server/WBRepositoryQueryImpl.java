@@ -86,6 +86,36 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * Starts execution of a flow in interactive mode.
      * @param sid String session ID.
      * @param location String location url.
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject removeLocation(String sid, String location){
+        Object obj = _proxies.get(sid);
+         WBCallbackObject wbc = new WBCallbackObject();
+         if (obj == null) {
+             wbc.setSuccess(false);
+             wbc.setMessage("Session ID no longer valid.");
+          } else {
+             MeandreProxy proxy = (MeandreProxy) obj;
+             String uri = proxy.getRemoveLocation(location);
+             if ((uri == null) || (!uri.trim().equals(location.trim()))) {
+                 wbc.setSuccess(false);
+                 wbc.setMessage("Unable to remove location.  " + uri + " " +
+                                location);
+             } else {
+                 wbc.setSuccess(true);
+                 wbc.setMessage(uri);
+                 proxy.flushRepository();
+             }
+         }
+         return wbc;
+
+    }
+
+
+    /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param location String location url.
      * @param desc String location description.
      * @return WBCallbackObject Bean that contains return information.
      */
@@ -147,7 +177,6 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      */
     public WBCallbackObject deleteFlowFromRepository(String sid, String flowid){
         Object obj = _proxies.get(sid);
-         boolean saveas = false;
          WBCallbackObject wbc = new WBCallbackObject();
          if (obj == null) {
              wbc.setSuccess(false);

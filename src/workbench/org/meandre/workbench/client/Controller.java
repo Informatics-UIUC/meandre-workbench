@@ -421,6 +421,14 @@ public class Controller {
     //==================================================
 
     /**
+     * Removes a location from the repository.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void removeLocation(String location, AsyncCallback cb) {
+        _repquery.removeLocation(getSessionID(), location, cb);
+    }
+
+    /**
      * Adds a location to the repository.
      * @param cb AsyncCallback Callback object returned from the server.
      */
@@ -835,6 +843,11 @@ public class Controller {
                 new AddLocationForm(Controller.this);
             }
         };
+        Command removeLocationCmd = new Command() {
+            public void execute() {
+                removeLocation();
+            }
+        };
 
         // Make some sub-menus that we will cascade from the top menu.
 
@@ -875,7 +888,7 @@ public class Controller {
         repoMenu.addItem("Regenerate", regenerateRepositoryCmd);
         repoMenu.addItem("Upload", uploadRepositoryCmd);
         repoMenu.addItem("Add Location", addLocationCmd);
-        repoMenu.addItem("Remove Location", cmd);
+        repoMenu.addItem("Remove Location", removeLocationCmd);
 
         //help
         MenuBar helpMenu = new MenuBar(true);
@@ -1308,6 +1321,35 @@ public class Controller {
                     }
                     new CommandDeleteFlow(this._repquery, this,
                                           null).execute(flow);
+                }
+            }
+        }
+    }
+
+    /**
+     * Delete a selected flow from the flow tree.
+     */
+    void removeLocation() {
+        TabPanel tp = _main.getTabPanel();
+        if (tp.getTabBar().getSelectedTab() != 2) {
+            Window.alert("Please select a location first!");
+        } else {
+            Tree tree = this.getLocationTreeHandle();
+            TreeItem ti = tree.getSelectedItem();
+            if (ti == null) {
+                Window.alert("Please select a location first!");
+            } else {
+                WBLocation location = (WBLocation) ti.getUserObject();
+                if (Window.confirm(
+                        "Are you certain that you want to remove this location from the repository?")) {
+                    if (this.isDirty()) {
+                        Window.alert("Save or clear the current canvas.");
+                        return;
+                    } else {
+                        this.clearCanvas();
+                        _main.getCompDescScrollPanel().clear();
+                    }
+                    new CommandRemoveLocation(this, null).execute(location);
                 }
             }
         }

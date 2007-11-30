@@ -8,15 +8,15 @@ package org.meandre.workbench.client;
 // Other Imports
 //===============
 
-import org.meandre.workbench.client.beans.WBFlow;
+import org.meandre.workbench.client.beans.WBLocation;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.Window;
 import org.meandre.workbench.client.beans.WBCallbackObject;
 
 /**
- * <p>Title: Command Save Flow </p>
+ * <p>Title: Command Remove Location </p>
  *
- * <p>Description: This command class performs the save flow operations.</p>
+ * <p>Description: This command class performs the remove location operations.</p>
  *
  * <p>Copyright: UIUC Copyright (c) 2007</p>
  *
@@ -25,7 +25,7 @@ import org.meandre.workbench.client.beans.WBCallbackObject;
  * @author Duane Searsmith
  * @version 1.0
  */
-class CommandDeleteFlow implements WBCommand {
+class CommandRemoveLocation implements WBCommand {
 
     //==============
     // Data Members
@@ -34,17 +34,15 @@ class CommandDeleteFlow implements WBCommand {
     private Main _main = null;
     private WBRepositoryQueryAsync _repquery = null;
     private WBCommand _cmd = null;
-    private WBFlow _flow = null;
+    private WBLocation _location = null;
     private Controller _cont = null;
 
     //==============
     // Constructors
     //==============
 
-    CommandDeleteFlow(WBRepositoryQueryAsync query,
-                      Controller cont, WBCommand cmd) {
+    CommandRemoveLocation(Controller cont, WBCommand cmd) {
         _main = cont.getMain();
-        _repquery = query;
         _cmd = cmd;
         _cont = cont;
     }
@@ -54,45 +52,43 @@ class CommandDeleteFlow implements WBCommand {
     //=====================================
 
     public void execute(Object obj) {
-        _flow = (WBFlow) obj;
+        _location = (WBLocation) obj;
 
         AsyncCallback callback = new AsyncCallback() {
             public void onSuccess(Object result) {
                 // do some UI stuff to show success
                 WBCallbackObject cbo = (WBCallbackObject) result;
                 if (cbo.getSuccess()) {
-                    _cont.buildFlowTree(_cont.getFlowTreeHandle(),
-                                        _cont.getFlowTreeRoot(),
-                                        "Available");
-                    _main.getTabPanel().selectTab(1);
+                    _cont.regenerateTabbedPanel(false);
+                    //selectlocation tab
+                    _cont.getMain().getTabPanel().selectTab(2);
 
                     _cont.hideStatusBusy();
-                    _cont.setStatusMessage("Flow deleted successfully.  Regenerating flow list ...");
+                    _cont.setStatusMessage("Location removed successfully.  Regenerating location list ...");
 
                     if (_cmd != null) {
-                        _cmd.execute(_flow);
+                        _cmd.execute(_location);
                     }
 
                 } else {
                     _cont.hideStatusBusy();
-                    _cont.setStatusMessage("Flow deletion failed.");
-                    Window.alert("Flow delete operation was NOT successful: " +
+                    _cont.setStatusMessage("Location removal failed.");
+                    Window.alert("Location removal operation was NOT successful: " +
                                  cbo.getMessage());
                 }
             }
 
             public void onFailure(Throwable caught) {
                 _cont.hideStatusBusy();
-                _cont.setStatusMessage("Flow deletion failed.");
+                _cont.setStatusMessage("Location removal failed.");
                 Window.alert("AsyncCallBack Failure -- Delete Flow:  " +
                              caught.toString());
             }
         };
 
         _cont.showStatusBusy();
-        _cont.setStatusMessage("Deleting flow " + _flow.getFlowID() + ".");
-        _cont.deleteFlowFromRepository(_cont.getSessionID(), _flow.getFlowID(),
-                                       callback);
+        _cont.setStatusMessage("Removing location " + _location.getLocation()+ ".");
+        _cont.removeLocation(_location.getLocation(), callback);
     }
 
 }

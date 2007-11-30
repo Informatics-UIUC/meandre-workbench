@@ -34,10 +34,10 @@ import org.meandre.workbench.client.beans.WBCallbackObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
- * <p>Title: Flow Build Form</p>
+ * <p>Title: Add Location Form</p>
  *
- * <p>Description: This is a dialog that appears when a flow is being saved
- * that prompts the user for key information need to save the new flow.</p>
+ * <p>Description: This is a dialog that appears when a location is being added
+ * that prompts the user for key information need to add the new location.</p>
  *
  * <p>Copyright: UIUC Copyright (c) 2007</p>
  *

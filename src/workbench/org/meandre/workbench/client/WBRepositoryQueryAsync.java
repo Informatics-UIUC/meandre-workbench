@@ -32,6 +32,14 @@ public interface WBRepositoryQueryAsync {
      * Starts execution of a flow in interactive mode.
      * @param sid String session ID.
      * @param location String location url.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void removeLocation(String sid, String location, AsyncCallback cb);
+
+    /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param location String location url.
      * @param desc String location description.
      * @param cb AsyncCallback Callback object returned from the server.
      */

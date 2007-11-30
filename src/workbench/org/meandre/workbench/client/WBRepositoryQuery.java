@@ -32,6 +32,14 @@ public interface WBRepositoryQuery extends RemoteService {
      * Starts execution of a flow in interactive mode.
      * @param sid String session ID.
      * @param location String location url.
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject removeLocation(String sid, String location);
+
+    /**
+     * Starts execution of a flow in interactive mode.
+     * @param sid String session ID.
+     * @param location String location url.
      * @param desc String location description.
      * @return WBCallbackObject Bean that contains return information.
      */
