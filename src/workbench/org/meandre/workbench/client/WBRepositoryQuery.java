@@ -29,6 +29,40 @@ import org.meandre.workbench.client.beans.*;
 public interface WBRepositoryQuery extends RemoteService {
 
     /**
+     * Unpublish a compnent or flow.
+     * @param sid String session ID.
+     * @param uri String identifier.
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject unpublish(String sid, String uri);
+
+    /**
+     * Publish a component or flow.
+     * @param sid String session ID.
+     * @param uri String identifier.
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject publish(String sid, String uri);
+
+    /**
+     * Returns the set of active flows in the public repository.
+     *
+     * @param sid String session id
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBFlow>
+     * @return Set Returns set of active flows in the public repository.
+     */
+    public Set getPublicRepositoryFlows(String sid);
+
+    /**
+     * Returns the set of active components in the public repository.
+     *
+     * @param sid String session id
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
+     * @return Set Returns set of active components in the public repository.
+     */
+    public Set getPublicRepositoryComponents(String sid);
+
+    /**
      * Starts execution of a flow in interactive mode.
      * @param sid String session ID.
      * @param location String location url.

@@ -217,6 +217,12 @@ public class Controller {
     /* the status bar image */
     private Image _statusIcon = null;
 
+    /* Component ID's from the public repository.*/
+    private Map _publicComponents = null;
+
+    /* Flow ID's from the public repository.*/
+    private Map _publicFlows = null;
+
     //================
     // Constructor(s)
     //================
@@ -246,12 +252,23 @@ public class Controller {
         _locTree.addItem(_locTreeRoot);
         _componentNameSet = new HashSet();
 
+        _publicComponents = new HashMap();
+        _publicFlows = new HashMap();
+
         newCanvas();
     }
 
     //============================
     // Property Getters / Setters
     //============================
+
+    Map getPublicComponentsMap() {
+        return this._publicComponents;
+    }
+
+    Map getPublicFlowsMap() {
+        return this._publicFlows;
+    }
 
     public String getActiveDomain() {
         return _activeDomain;
@@ -359,6 +376,19 @@ public class Controller {
     // Package Methods
     //=================
 
+    /**
+     * A chained sequence of commands that retrieve public repository
+     * components and then flows and popuylate the map objects in the controller
+     * and then execute the follow on command.
+     * @param followOnCMD WBCommand Command to be executed at end of
+     * command sequence.
+     */
+    void buildPublicRepoMaps(WBCommand followOnCMD) {
+        new CommandGetPublicComponents(this,
+                                       new CommandGetPublicFlows(this,
+                followOnCMD)).execute(null);
+    }
+
     // login functions
 
     void login() {
@@ -397,7 +427,11 @@ public class Controller {
         final long DURATION = 1000 * 60 * 60 * 24 * 14; //duration remembering login. 2 weeks in this example.
         Date expires = new Date(System.currentTimeMillis() + DURATION);
         Cookies.setCookie(this._sidKey, sid, expires, null, "/", false);
-        _main.onModuleLoadContinued();
+        buildPublicRepoMaps(new WBCommand() {
+            public void execute(Object work) {
+                _main.onModuleLoadContinued();
+            }
+        });
     }
 
     void logout() {
@@ -405,20 +439,57 @@ public class Controller {
     }
 
 
-
     //redirect the browser to the given url
     public static native void redirectOrClose(String url) /*-{
-             if ($wnd.opener && !$wnd.opener.closed){
-                             $wnd.close();
-                         } else {
-                                       $wnd.location = url;
-                         }
-                       }-*/
+                                       if ($wnd.opener && !$wnd.opener.closed){
+                                                       $wnd.close();
+                                                   } else {
+             $wnd.location = url;
+                                                   }
+                                                 }-*/
             ;
 
     //==================================================
     // Interface Implementation: WBRepositoryQueryAsync
     //==================================================
+
+    /**
+     * Unpublish a compnent or flow.
+     * @param sid String session ID.
+     * @param uri String identifier.
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    void unpublish(String uri, AsyncCallback cb){
+        _repquery.unpublish(getSessionID(), uri, cb);
+    }
+
+    /**
+     * Publish a component or flow.
+     * @param sid String session ID.
+     * @param uri String identifier.
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    void publish(String uri, AsyncCallback cb){
+        _repquery.publish(getSessionID(), uri, cb);
+    }
+
+    /**
+     * Get the active components in the public repository.
+     *
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    void getPublicRepositoryComponents(AsyncCallback cb) {
+        _repquery.getPublicRepositoryComponents(getSessionID(), cb);
+    }
+
+    /**
+     * Get the active flows in the public repository.
+     *
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    void getPublicRepositoryFlows(AsyncCallback cb) {
+        _repquery.getPublicRepositoryFlows(getSessionID(), cb);
+    }
 
     /**
      * Removes a location from the repository.
@@ -778,7 +849,7 @@ public class Controller {
     MenuBar buildMenu() {
         Command cmd = new Command() {
             public void execute() {
-                Window.alert("You selected a menu item!");
+                Window.alert("Not yet implemented.");
             }
         };
 
@@ -848,6 +919,16 @@ public class Controller {
                 removeLocation();
             }
         };
+        Command publishComponentCmd = new Command() {
+            public void execute() {
+                publishComponent();
+            }
+        };
+        Command unpublishComponentCmd = new Command() {
+            public void execute() {
+                unpublishComponent();
+            }
+        };
 
         // Make some sub-menus that we will cascade from the top menu.
 
@@ -874,8 +955,8 @@ public class Controller {
         //component commands
         MenuBar compMenu = new MenuBar(true);
         compMenu.addItem("Create", cmd);
-        compMenu.addItem("Publish", cmd);
-        compMenu.addItem("Unpublish", cmd);
+        compMenu.addItem("Publish", publishComponentCmd);
+        compMenu.addItem("Unpublish", unpublishComponentCmd);
         compMenu.addItem("Properties", cmd);
         compMenu.addItem("Delete", cmd);
 
@@ -1291,7 +1372,7 @@ public class Controller {
         _main.getTabPanel().remove(3);
         _main.getTabPanel().add(buildSearchPanel(), "SEARCH");
         _main.getTabPanel().selectTab(0);
-        if (b){
+        if (b) {
             this.setStatusMessage("Tree views regenerated.");
             this.hideStatusBusy();
         }
@@ -1327,7 +1408,7 @@ public class Controller {
     }
 
     /**
-     * Delete a selected flow from the flow tree.
+     * Delete a selected location from the location tree.
      */
     void removeLocation() {
         TabPanel tp = _main.getTabPanel();
@@ -1354,6 +1435,79 @@ public class Controller {
             }
         }
     }
+
+    /**
+     * Delete a selected location from the location tree.
+     */
+    void publishComponent() {
+        TabPanel tp = _main.getTabPanel();
+        if (tp.getTabBar().getSelectedTab() != 0) {
+            Window.alert("Please select a component first!");
+        } else {
+            Tree tree = this.getCompTreeHandle();
+            TreeItem ti = tree.getSelectedItem();
+            if (ti == null) {
+                Window.alert("Please select a component first!");
+            } else {
+                WBComponent comp = (WBComponent) ti.getUserObject();
+
+                if (this.getPublicComponentsMap().get(comp.getID()) != null){
+                    Window.alert("Selected component is alread published.");
+                    return;
+                }
+
+                if (Window.confirm(
+                        "Are you certain that you want to publish this component?")) {
+                    new CommandPublishComponent(this,
+                                                new CommandGetPublicComponents(this,
+                            new WBCommand() {
+                        public void execute(Object work) {
+                            Controller.this.regenerateTabbedPanel(false);
+                            Controller.this.getMain().getTabPanel().selectTab(0);
+                            Controller.this.expandAllTreeItems(Controller.this.getCompTreeHandle());
+                        }
+                            })).execute(comp.getID());
+                }
+            }
+        }
+    }
+
+    /**
+     * Delete a selected location from the location tree.
+     */
+    void unpublishComponent() {
+        TabPanel tp = _main.getTabPanel();
+        if (tp.getTabBar().getSelectedTab() != 0) {
+            Window.alert("Please select a component first!");
+        } else {
+            Tree tree = this.getCompTreeHandle();
+            TreeItem ti = tree.getSelectedItem();
+            if (ti == null) {
+                Window.alert("Please select a component first!");
+            } else {
+                WBComponent comp = (WBComponent) ti.getUserObject();
+
+                if (this.getPublicComponentsMap().get(comp.getID()) == null){
+                    Window.alert("Selected component is alread unpublished.");
+                    return;
+                }
+
+                if (Window.confirm(
+                        "Are you certain that you want to unpublish this component?")) {
+                    new CommandUnpublishComponent(this,
+                                                new CommandGetPublicComponents(this,
+                             new WBCommand() {
+                        public void execute(Object work) {
+                            Controller.this.regenerateTabbedPanel(false);
+                            Controller.this.getMain().getTabPanel().selectTab(0);
+                            Controller.this.expandAllTreeItems(Controller.this.getCompTreeHandle());
+                        }
+                            })).execute(comp.getID());
+                }
+            }
+        }
+    }
+
 
     /**
      * If a component is currently marked as selected then remove it.
@@ -1975,7 +2129,8 @@ public class Controller {
 
                             if (result == null) {
                                 Controller.this.hideStatusBusy();
-                                Controller.this.setStatusMessage("Search failed.");
+                                Controller.this.setStatusMessage(
+                                        "Search failed.");
                                 Window.alert("Session ID no longer valid.");
                                 return;
                             }
@@ -2052,7 +2207,8 @@ public class Controller {
                             _flowSearchResultsRoot.setState(true);
                             _compSearchResultsRoot.setState(true);
                             Controller.this.hideStatusBusy();
-                            Controller.this.setStatusMessage("Search completed.");
+                            Controller.this.setStatusMessage(
+                                    "Search completed.");
                         }
 
                         public void onFailure(Throwable caught) {
@@ -2061,15 +2217,16 @@ public class Controller {
                                     "Failure Retrieving Components");
                             _flowSearchResultsRoot.setText(
                                     "Failure Retrieving Components");
-                                    Controller.this.hideStatusBusy();
-                                    Controller.this.setStatusMessage("Search failed.");
+                            Controller.this.hideStatusBusy();
+                            Controller.this.setStatusMessage("Search failed.");
                             Window.alert(
                                     "AsyncCallBack Failure -- getActiveComponents:  " +
                                     caught.getMessage());
                         }
                     };
                     Controller.this.showStatusBusy();
-                    Controller.this.setStatusMessage("Searching for [" + txt + "] ...");
+                    Controller.this.setStatusMessage("Searching for [" + txt +
+                            "] ...");
                     getActiveComponents(txt, callback);
                 }
             }
@@ -2187,13 +2344,19 @@ public class Controller {
         while (itty.hasNext()) {
             WBComponent ecd = (WBComponent) itty.next();
             String putxt = getCompTreeItemPopUpText(ecd);
-            WBTreeItem ti = new WBTreeItem(ecd.getName(), putxt);
+            String pubstr = null;
+            if (this.getPublicComponentsMap().get(ecd.getID()) == null){
+                pubstr = "<br><font color=\"#ff0000\" size=\"-4\">[Unpublished]</font>";
+            } else {
+                pubstr = "<br><font color=\"#00ff00\" size=\"-4\">[Published]</font>";
+            }
+            WBTreeItem ti = new WBTreeItem(ecd.getName() + pubstr, putxt);
             ti.setUserObject(ecd);
             root.addChild(new WBTreeNode(ti));
         }
         itty = root.getChildren().iterator();
         while (itty.hasNext()) {
-            _compTreeRoot.addItem(((WBTreeNode) itty.next()).getNodeItem());
+            compTreeRoot.addItem(((WBTreeNode) itty.next()).getNodeItem());
         }
     }
 
@@ -2269,7 +2432,13 @@ public class Controller {
             Object val = rootMap.get(key);
             WBTreeNode newND = new WBTreeNode();
             if (val instanceof org.meandre.workbench.client.beans.WBComponent) {
-                WBTreeItem newItem = new WBTreeItem(key,
+                String pubstr = null;
+                if (this.getPublicComponentsMap().get(((WBComponent)val).getID()) == null){
+                    pubstr = "<br><font color=\"#ff0000\" size=\"-4\">[Unpublished]</font>";
+                } else {
+                    pubstr = "<br><font color=\"#00ff00\" size=\"-4\">[Published]</font>";
+                }
+                WBTreeItem newItem = new WBTreeItem(key + pubstr,
                         getCompTreeItemPopUpText((WBComponent) val));
                 newItem.setUserObject(val);
                 newND.setNodeItem(newItem);
@@ -2322,7 +2491,7 @@ public class Controller {
                        "&nbsp;Creator:&nbsp;" + ecd.getCreator() +
                        "<br>" + /*
                        "&nbsp;Rights:&nbsp;" + ecd.getRights() +
-                                "<br>" + */
+                                             "<br>" + */
                        "</font>";
         return putxt;
     }
@@ -2360,6 +2529,7 @@ public class Controller {
                 WBTreeNode root = new WBTreeNode();
                 Set items = (Set) result;
                 Iterator itty = items.iterator();
+                Map pfs = Controller.this.getPublicFlowsMap();
                 while (itty.hasNext()) {
                     WBFlow f = (WBFlow) itty.next();
                     String putxt = "Name:&nbsp;" + f.getName() + "<br>" +
@@ -2372,9 +2542,15 @@ public class Controller {
                                    "&nbsp;Creator:&nbsp;" + f.getCreator() +
                                    "<br>" +
                                    "</font>";
+                    String pubstr = null;
+                    if (pfs.get(f.getFlowID()) == null){
+                        pubstr = "<br><font color=\"#ff0000\" size=\"-4\">[Unpublished]</font>";
+                    } else {
+                        pubstr = "<br><font color=\"#00ff00\" size=\"-4\">[Published]</font>";
+                    }
                     WBTreeItem ti = new WBTreeItem(f.getName()
                             + "<br><font color=\"#0000ff\" size=\"-4\">[" +
-                            f.getFlowID() + "]</font>", putxt);
+                            f.getFlowID() + "]</font>"+pubstr, putxt);
                     ti.setUserObject(f);
                     //add to flows by name
                     Object obj = _flowsByName.get(f.getName());

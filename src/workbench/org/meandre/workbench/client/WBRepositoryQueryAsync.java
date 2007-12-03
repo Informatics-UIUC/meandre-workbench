@@ -4,15 +4,12 @@ package org.meandre.workbench.client;
 // Java Imports
 //==============
 
-import java.util.Set;
-
 //===============
 // Other Imports
 //===============
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.meandre.workbench.client.beans.WBFlow;
-import org.meandre.workbench.client.beans.WBExecBean;
 
 /**
  * <p>Title: Workbench Repository Query Asynchronous</p>
@@ -27,6 +24,38 @@ import org.meandre.workbench.client.beans.WBExecBean;
  * @version 1.0
  */
 public interface WBRepositoryQueryAsync {
+
+    /**
+     * Unpublish a compnent or flow.
+     * @param sid String session ID.
+     * @param uri String identifier.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void unpublish(String sid, String uri, AsyncCallback cb);
+
+    /**
+     * Publish a component or flow.
+     * @param sid String session ID.
+     * @param uri String identifier.
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void publish(String sid, String uri, AsyncCallback cb);
+
+    /**
+     * Returns the set of active flows in the public repository.
+     *
+     * @param sid String session id
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void getPublicRepositoryFlows(String sid, AsyncCallback cb);
+
+    /**
+     * Returns the set of active components in the public repository.
+     *
+     * @param sid String session id
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void getPublicRepositoryComponents(String sid, AsyncCallback cb);
 
     /**
      * Starts execution of a flow in interactive mode.

@@ -70,8 +70,8 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     // Static Methods
     //================
 
-    public static MeandreProxy getProxy(String sid){
-        return (MeandreProxy)_proxies.get(sid);
+    public static MeandreProxy getProxy(String sid) {
+        return (MeandreProxy) _proxies.get(sid);
     }
 
 //    private static void registerWithContext(WBRepositoryQueryImpl instance){
@@ -83,31 +83,143 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     //===================================
 
     /**
+     * Unpublish a compnent or flow.
+     * @param sid String session ID.
+     * @param uri String identifier.
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject unpublish(String sid, String uri) {
+        Object obj = _proxies.get(sid);
+        WBCallbackObject wbc = new WBCallbackObject();
+        if (obj == null) {
+            wbc.setSuccess(false);
+            wbc.setMessage("Session ID no longer valid.");
+        } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+            uri = proxy.getUnpublish(uri);
+            if ((uri == null) || (!uri.trim().equals(uri.trim()))) {
+                wbc.setSuccess(false);
+                wbc.setMessage("Unable to unpublish.  " + uri);
+            } else {
+                wbc.setSuccess(true);
+                wbc.setMessage(uri);
+            }
+        }
+        return wbc;
+    }
+
+    /**
+     * Publish a component or flow.
+     * @param sid String session ID.
+     * @param uri String identifier.
+     * @return WBCallbackObject Bean that contains return information.
+     */
+    public WBCallbackObject publish(String sid, String uri) {
+        Object obj = _proxies.get(sid);
+        WBCallbackObject wbc = new WBCallbackObject();
+        if (obj == null) {
+            wbc.setSuccess(false);
+            wbc.setMessage("Session ID no longer valid.");
+        } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+            uri = proxy.getPublish(uri);
+            if ((uri == null) || (!uri.trim().equals(uri.trim()))) {
+                wbc.setSuccess(false);
+                wbc.setMessage("Unable to publish.  " + uri);
+            } else {
+                wbc.setSuccess(true);
+                wbc.setMessage(uri);
+            }
+        }
+        return wbc;
+    }
+
+
+    /**
+     * Returns the set of active flows in the public repository.
+     *
+     * @param sid String session id
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBFlow>
+     * @return Set Returns set of active flows in the public repository.
+     */
+    public Set getPublicRepositoryFlows(String sid) {
+        Object obj = _proxies.get(sid);
+        if (obj == null) {
+            return null;
+        } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+            //acquire Repository object from current session
+            QueryableRepository queryableRep = proxy.getPublicRepository();
+            Set ret = new HashSet();
+            Set flows = queryableRep.getAvailableFlows();
+            for (Iterator itty = flows.iterator(); itty.hasNext(); ) {
+                Resource res = (Resource) itty.next();
+                FlowDescription flow = queryableRep.getFlowDescription(res);
+                ret.add(MeandreToWBBeanConverter.convertFlow(flow,
+                        queryableRep));
+            }
+            return ret;
+        }
+    }
+
+    /**
+     * Returns the set of active components in the public repository.
+     *
+     * @param sid String session id
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
+     * @return Set Returns set of active components in the public repository.
+     */
+    public Set getPublicRepositoryComponents(String sid) {
+        Object obj = _proxies.get(sid);
+        if (obj == null) {
+            return null;
+        } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+
+            //acquire Repository object from current session
+            QueryableRepository queryableRep = proxy.getPublicRepository();
+
+            Set ret = new HashSet();
+            Set comps = queryableRep.getAvailableExecutableComponents();
+            for (Iterator itty = comps.iterator(); itty.hasNext(); ) {
+                Resource res = (Resource) itty.next();
+                ExecutableComponentDescription ecd = queryableRep.
+                        getExecutableComponentDescription(
+                                res);
+                ret.add(MeandreToWBBeanConverter.convertComponent(ecd));
+            }
+
+            return ret;
+        }
+    }
+
+
+    /**
      * Starts execution of a flow in interactive mode.
      * @param sid String session ID.
      * @param location String location url.
      * @return WBCallbackObject Bean that contains return information.
      */
-    public WBCallbackObject removeLocation(String sid, String location){
+    public WBCallbackObject removeLocation(String sid, String location) {
         Object obj = _proxies.get(sid);
-         WBCallbackObject wbc = new WBCallbackObject();
-         if (obj == null) {
-             wbc.setSuccess(false);
-             wbc.setMessage("Session ID no longer valid.");
-          } else {
-             MeandreProxy proxy = (MeandreProxy) obj;
-             String uri = proxy.getRemoveLocation(location);
-             if ((uri == null) || (!uri.trim().equals(location.trim()))) {
-                 wbc.setSuccess(false);
-                 wbc.setMessage("Unable to remove location.  " + uri + " " +
-                                location);
-             } else {
-                 wbc.setSuccess(true);
-                 wbc.setMessage(uri);
-                 proxy.flushRepository();
-             }
-         }
-         return wbc;
+        WBCallbackObject wbc = new WBCallbackObject();
+        if (obj == null) {
+            wbc.setSuccess(false);
+            wbc.setMessage("Session ID no longer valid.");
+        } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+            String uri = proxy.getRemoveLocation(location);
+            if ((uri == null) || (!uri.trim().equals(location.trim()))) {
+                wbc.setSuccess(false);
+                wbc.setMessage("Unable to remove location.  " + uri + " " +
+                               location);
+            } else {
+                wbc.setSuccess(true);
+                wbc.setMessage(uri);
+                proxy.flushRepository();
+            }
+        }
+        return wbc;
 
     }
 
@@ -119,16 +231,17 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param desc String location description.
      * @return WBCallbackObject Bean that contains return information.
      */
-    public WBCallbackObject addLocation(String sid, String location, String desc){
+    public WBCallbackObject addLocation(String sid, String location,
+                                        String desc) {
         Object obj = _proxies.get(sid);
         WBCallbackObject wbc = new WBCallbackObject();
         if (obj == null) {
             wbc.setSuccess(false);
             wbc.setMessage("Session ID no longer valid.");
-         } else {
+        } else {
             MeandreProxy proxy = (MeandreProxy) obj;
             String msg = proxy.getAddLocation(location, desc);
-            if (msg == null){
+            if (msg == null) {
                 wbc.setSuccess(false);
                 wbc.setMessage("Unable to addlocation. " + msg);
             } else {
@@ -141,20 +254,19 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     }
 
 
-
     /**
      * Regenerate the repository from all of its locations.  NOTE: this
      * command will delete all unpublished components and flows.
      * @param sid String session id
      * @return WBCallbackObject Bean that contains return information.
      */
-    public WBCallbackObject regenerateRepository(String sid){
+    public WBCallbackObject regenerateRepository(String sid) {
         Object obj = _proxies.get(sid);
         WBCallbackObject wbc = new WBCallbackObject();
         if (obj == null) {
             wbc.setSuccess(false);
             wbc.setMessage("Session ID no longer valid.");
-         } else {
+        } else {
             MeandreProxy proxy = (MeandreProxy) obj;
             String msg = proxy.getRegenerate();
             if ((msg == null) || (msg.indexOf("successfully regenerated") == -1)) {
@@ -175,25 +287,25 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param flowid String flow uri.
      * @return WBCallbackObject Bean that contains return information.
      */
-    public WBCallbackObject deleteFlowFromRepository(String sid, String flowid){
+    public WBCallbackObject deleteFlowFromRepository(String sid, String flowid) {
         Object obj = _proxies.get(sid);
-         WBCallbackObject wbc = new WBCallbackObject();
-         if (obj == null) {
-             wbc.setSuccess(false);
-             wbc.setMessage("Session ID no longer valid.");
-          } else {
-             MeandreProxy proxy = (MeandreProxy) obj;
-             String uri = proxy.getRemove(flowid);
-             if ((uri == null) || (!uri.trim().equals(flowid.trim()))) {
-                 wbc.setSuccess(false);
-                 wbc.setMessage("Unable to delete old flow.  " + uri + " " +
-                                flowid);
-             } else {
-                 wbc.setSuccess(true);
-                 wbc.setMessage(uri);
-             }
-         }
-         return wbc;
+        WBCallbackObject wbc = new WBCallbackObject();
+        if (obj == null) {
+            wbc.setSuccess(false);
+            wbc.setMessage("Session ID no longer valid.");
+        } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+            String uri = proxy.getRemove(flowid);
+            if ((uri == null) || (!uri.trim().equals(flowid.trim()))) {
+                wbc.setSuccess(false);
+                wbc.setMessage("Unable to delete old flow.  " + uri + " " +
+                               flowid);
+            } else {
+                wbc.setSuccess(true);
+                wbc.setMessage(uri);
+            }
+        }
+        return wbc;
     }
 
 
@@ -206,7 +318,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      */
     public WBExecBean startInteractiveExecution(String sid,
                                                 String execid,
-                                                String flowid){
+                                                String flowid) {
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return new WBExecBean("No longer valid session ID.");
@@ -215,16 +327,17 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
             Vector v = new Vector();
             _runOutput.put(execid, v);
 
-            new Thread(new InteractiveExecutionRunner(flowid, "txt", v, proxy)).start();
+            new Thread(new InteractiveExecutionRunner(flowid, "txt", v, proxy)).
+                    start();
 
             try {
                 Thread.currentThread().sleep(500);
-            } catch (Exception e){}
+            } catch (Exception e) {}
 
             StringBuffer buff = new StringBuffer("");
-            while(!v.isEmpty()){
-                char[] iarr = (char[])v.remove(0);
-                if ((iarr.length == 1) && (iarr[0] == '`')){
+            while (!v.isEmpty()) {
+                char[] iarr = (char[]) v.remove(0);
+                if ((iarr.length == 1) && (iarr[0] == '`')) {
                     _runOutput.remove(v);
                     return new WBExecBean(buff.toString(), execid, true);
                 }
@@ -249,17 +362,19 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
         private Vector _v = null;
         private MeandreProxy _proxy = null;
 
-        public InteractiveExecutionRunner(String flowid, String fmt, Vector v, MeandreProxy proxy){
+        public InteractiveExecutionRunner(String flowid, String fmt, Vector v,
+                                          MeandreProxy proxy) {
             _flowid = flowid;
             _fmt = fmt;
             _v = v;
             _proxy = proxy;
         }
 
-        public void run(){
+        public void run() {
             _proxy.runWBFlowInteractively(_flowid, _fmt, _v);
         }
     }
+
 
     /**
      * Updates status of execution of a flow in interactive mode.
@@ -267,19 +382,19 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param execid String execution ID.
      * @return WBExecBean
      */
-    public WBExecBean updateInteractiveExecution(String sid, String execid){
+    public WBExecBean updateInteractiveExecution(String sid, String execid) {
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return new WBExecBean("No longer valid session ID.");
         } else {
             WBExecBean eb = null;
             MeandreProxy proxy = (MeandreProxy) obj;
-            Vector v = (Vector)_runOutput.get(execid);
+            Vector v = (Vector) _runOutput.get(execid);
 
             StringBuffer buff = new StringBuffer("");
-            while(!v.isEmpty()){
-                char[] iarr = (char[])v.remove(0);
-                if ((iarr.length == 1) && (iarr[0] == '`')){
+            while (!v.isEmpty()) {
+                char[] iarr = (char[]) v.remove(0);
+                if ((iarr.length == 1) && (iarr[0] == '`')) {
                     _runOutput.remove(v);
                     return new WBExecBean(buff.toString(), execid, true);
                 }
@@ -295,7 +410,8 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @return LoginBean Bean containing login information.
      */
     public WBLoginBean checkSessionID(String sid) {
-        this.getThreadLocalRequest().getSession().setAttribute(s_PROXIES_KEY, _proxies);
+        this.getThreadLocalRequest().getSession().setAttribute(s_PROXIES_KEY,
+                _proxies);
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return new WBLoginBean("No longer valid session ID.");
@@ -316,7 +432,8 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @return LoginBean Bean containing login information.
      */
     public WBLoginBean login(String userid, String password, String url) {
-        this.getThreadLocalRequest().getSession().setAttribute(s_PROXIES_KEY, _proxies);
+        this.getThreadLocalRequest().getSession().setAttribute(s_PROXIES_KEY,
+                _proxies);
         WBLoginBean wblb = null;
         MeandreProxy proxy = new MeandreProxy(userid, password, url);
         if (proxy.isReady()) {
@@ -339,7 +456,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @gwt.typeArgs <org.meandre.workbench.client.beans.WBLocation>
      * @return Set Returns set of active locations.
      */
-    public Set getLocations(String sid){
+    public Set getLocations(String sid) {
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return null;
@@ -395,181 +512,185 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
         }
     }
 
-        /**
-         * Returns the set of active components in the repository.
-         *
-         * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
-         * @return Set Returns set of active components.
-         */
-        public Set getActiveComponents(String sid) {
-            Object obj = _proxies.get(sid);
-            if (obj == null) {
-                return null;
-            } else {
-                MeandreProxy proxy = (MeandreProxy) obj;
+    /**
+     * Returns the set of active components in the repository.
+     *
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
+     * @return Set Returns set of active components.
+     */
+    public Set getActiveComponents(String sid) {
+        Object obj = _proxies.get(sid);
+        if (obj == null) {
+            return null;
+        } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
 
-                //acquire Repository object from current session
-                QueryableRepository queryableRep = proxy.getRepository();
+            //acquire Repository object from current session
+            QueryableRepository queryableRep = proxy.getRepository();
 
-                Set ret = new HashSet();
-                Set comps = queryableRep.getAvailableExecutableComponents();
-                for (Iterator itty = comps.iterator(); itty.hasNext(); ) {
-                    Resource res = (Resource) itty.next();
-                    ExecutableComponentDescription ecd = queryableRep.
-                            getExecutableComponentDescription(
-                                    res);
-                    ret.add(MeandreToWBBeanConverter.convertComponent(ecd));
-                }
-
-                return ret;
+            Set ret = new HashSet();
+            Set comps = queryableRep.getAvailableExecutableComponents();
+            for (Iterator itty = comps.iterator(); itty.hasNext(); ) {
+                Resource res = (Resource) itty.next();
+                ExecutableComponentDescription ecd = queryableRep.
+                        getExecutableComponentDescription(
+                                res);
+                ret.add(MeandreToWBBeanConverter.convertComponent(ecd));
             }
+
+            return ret;
         }
-
-        /**
-         *
-         * @gwt.typeArgs <org.meandre.workbench.client.beans.WBFlow>
-         */
-        public Set getActiveFlows(String sid) {
-            Object obj = _proxies.get(sid);
-            if (obj == null) {
-                return null;
-            } else {
-                MeandreProxy proxy = (MeandreProxy) obj;
-
-                //acquire Repository object from current session
-                QueryableRepository queryableRep = proxy.getRepository();
-                Set ret = new HashSet();
-                Set flows = queryableRep.getAvailableFlows();
-                for (Iterator itty = flows.iterator(); itty.hasNext(); ) {
-                    Resource res = (Resource) itty.next();
-                    FlowDescription flow = queryableRep.getFlowDescription(res);
-                    ret.add(MeandreToWBBeanConverter.convertFlow(flow,
-                            queryableRep));
-                }
-                return ret;
-            }
-        }
-
-        /**
-         * Saves the flow and returns the callback object.
-         *
-         * @return WBCallbackObject Returns callback object.
-         */
-        public WBCallbackObject saveFlow(WBFlow flow, String sid) {
-            Object obj = _proxies.get(sid);
-            boolean saveas = false;
-            WBCallbackObject wbc = new WBCallbackObject();
-            if (obj == null) {
-                wbc.setSuccess(false);
-                wbc.setMessage("Session ID no longer valid.");
-                return wbc;
-            } else {
-                MeandreProxy proxy = (MeandreProxy) obj;
-
-
-                // Convert WBFlow to FlowDescription
-
-                Model model = ModelFactory.createDefaultModel();
-                Resource resExecutableComponent = null;
-                if (flow.getFlowID().trim().length() > 0){
-                    resExecutableComponent = model.createResource(flow.getFlowID());
-                } else {
-                    saveas = true;
-                    if (flow.getBaseURL().trim().length() > 0) {
-                        resExecutableComponent = model.createResource(flow.
-                                getBaseURL() + "flow/"
-                                + flow.getName().toLowerCase().replaceAll(" ", "-"));
-                    } else {
-                        resExecutableComponent = model.createResource("http://test.org/flow/"
-                                + System.currentTimeMillis()
-                                + flow.getName().toLowerCase().replaceAll(" ", "-"));
-                    }
-                }
-                Set instances = new HashSet();
-                for (Iterator itty = flow.getExecutableComponentInstances().
-                                     iterator(); itty.hasNext(); ) {
-                    WBComponentInstance ci = (WBComponentInstance) itty.next();
-                    model = ModelFactory.createDefaultModel();
-                    Resource res1 = model.createResource(ci.
-                            getExecutableComponentInstance().trim());
-                    model = ModelFactory.createDefaultModel();
-                    Resource res2 = model.createResource(ci.
-                            getExecutableComponent().getID().trim());
-                    PropertiesDescription pd = new PropertiesDescription(new
-                            Hashtable(ci.getProperties().getValuesMap()));
-                    ExecutableComponentInstanceDescription ecid = new
-                            ExecutableComponentInstanceDescription(res1,
-                            res2,
-                            ci.getName().trim(),
-                            ci.getDescription().trim(),
-                            pd);
-                    instances.add(ecid);
-
-                }
-                Set connections = new HashSet();
-                for (Iterator itty = flow.getConnectorDescriptions().
-                                     iterator(); itty.hasNext(); ) {
-                    WBComponentConnection cc = (WBComponentConnection) itty.
-                                               next();
-                    model = ModelFactory.createDefaultModel();
-                    Resource res1 = model.createResource(cc.getConnector().trim());
-                    model = ModelFactory.createDefaultModel();
-                    Resource res2 = model.createResource(cc.getSourceInstance().trim());
-                    model = ModelFactory.createDefaultModel();
-                    Resource res3 = model.createResource(cc.
-                            getSourceIntanceDataPort().trim());
-                    model = ModelFactory.createDefaultModel();
-                    Resource res4 = model.createResource(cc.getTargetInstance().trim());
-                    model = ModelFactory.createDefaultModel();
-                    Resource res5 = model.createResource(cc.
-                            getTargetIntanceDataPort().trim());
-                    ConnectorDescription cd = new ConnectorDescription(res1,
-                            res2,
-                            res3,
-                            res4,
-                            res5);
-                    connections.add(cd);
-
-                }
-                FlowDescription flowdesc = new FlowDescription(
-                        resExecutableComponent,
-                        flow.getName(),
-                        flow.getDescription(),
-                        flow.getRights(),
-                        flow.getCreator(),
-                        flow.getCreationDate(),
-                        instances,
-                        connections,
-                        new TagsDescription(new HashSet(flow.getTags().getTags())));
-
-                Map params = new HashMap<String,String>();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                flowdesc.getModel().write(baos, "TTL");
-                try {
-                    baos.flush();
-                } catch (Exception e){}
-                //System.out.println(new String(baos.toByteArray()));
-                params.put("repository", new String(baos.toByteArray()));
-                try {
-                    baos.close();
-                } catch (Exception e){}
-
-                if (!saveas){
-                    String uri = proxy.getRemove(flow.getFlowID());
-                    if ((uri == null) || (!uri.trim().equals(flow.getFlowID().trim()))){
-                        wbc.setSuccess(false);
-                        wbc.setMessage("Unable to delete old flow.  " + uri + " "  + flow.getFlowID());
-                        return wbc;
-                    }
-                }
-
-                proxy.executePost("services/repository/add_flow_descriptors.ttl", params);
-                wbc.setMessage(flowdesc.getFlowComponent().getURI());
-
-                /* This is necessary for the web app. */
-                proxy.flushRepository();
-            }
-            return wbc;
-        }
-
     }
+
+    /**
+     *
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBFlow>
+     */
+    public Set getActiveFlows(String sid) {
+        Object obj = _proxies.get(sid);
+        if (obj == null) {
+            return null;
+        } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+
+            //acquire Repository object from current session
+            QueryableRepository queryableRep = proxy.getRepository();
+            Set ret = new HashSet();
+            Set flows = queryableRep.getAvailableFlows();
+            for (Iterator itty = flows.iterator(); itty.hasNext(); ) {
+                Resource res = (Resource) itty.next();
+                FlowDescription flow = queryableRep.getFlowDescription(res);
+                ret.add(MeandreToWBBeanConverter.convertFlow(flow,
+                        queryableRep));
+            }
+            return ret;
+        }
+    }
+
+    /**
+     * Saves the flow and returns the callback object.
+     *
+     * @return WBCallbackObject Returns callback object.
+     */
+    public WBCallbackObject saveFlow(WBFlow flow, String sid) {
+        Object obj = _proxies.get(sid);
+        boolean saveas = false;
+        WBCallbackObject wbc = new WBCallbackObject();
+        if (obj == null) {
+            wbc.setSuccess(false);
+            wbc.setMessage("Session ID no longer valid.");
+            return wbc;
+        } else {
+            MeandreProxy proxy = (MeandreProxy) obj;
+
+            // Convert WBFlow to FlowDescription
+
+            Model model = ModelFactory.createDefaultModel();
+            Resource resExecutableComponent = null;
+            if (flow.getFlowID().trim().length() > 0) {
+                resExecutableComponent = model.createResource(flow.getFlowID());
+            } else {
+                saveas = true;
+                if (flow.getBaseURL().trim().length() > 0) {
+                    resExecutableComponent = model.createResource(flow.
+                            getBaseURL() + "flow/"
+                            + flow.getName().toLowerCase().replaceAll(" ", "-"));
+                } else {
+                    resExecutableComponent = model.createResource(
+                            "http://test.org/flow/"
+                            + System.currentTimeMillis()
+                            + flow.getName().toLowerCase().replaceAll(" ", "-"));
+                }
+            }
+            Set instances = new HashSet();
+            for (Iterator itty = flow.getExecutableComponentInstances().
+                                 iterator(); itty.hasNext(); ) {
+                WBComponentInstance ci = (WBComponentInstance) itty.next();
+                model = ModelFactory.createDefaultModel();
+                Resource res1 = model.createResource(ci.
+                        getExecutableComponentInstance().trim());
+                model = ModelFactory.createDefaultModel();
+                Resource res2 = model.createResource(ci.
+                        getExecutableComponent().getID().trim());
+                PropertiesDescription pd = new PropertiesDescription(new
+                        Hashtable(ci.getProperties().getValuesMap()));
+                ExecutableComponentInstanceDescription ecid = new
+                        ExecutableComponentInstanceDescription(res1,
+                        res2,
+                        ci.getName().trim(),
+                        ci.getDescription().trim(),
+                        pd);
+                instances.add(ecid);
+
+            }
+            Set connections = new HashSet();
+            for (Iterator itty = flow.getConnectorDescriptions().
+                                 iterator(); itty.hasNext(); ) {
+                WBComponentConnection cc = (WBComponentConnection) itty.
+                                           next();
+                model = ModelFactory.createDefaultModel();
+                Resource res1 = model.createResource(cc.getConnector().trim());
+                model = ModelFactory.createDefaultModel();
+                Resource res2 = model.createResource(cc.getSourceInstance().
+                        trim());
+                model = ModelFactory.createDefaultModel();
+                Resource res3 = model.createResource(cc.
+                        getSourceIntanceDataPort().trim());
+                model = ModelFactory.createDefaultModel();
+                Resource res4 = model.createResource(cc.getTargetInstance().
+                        trim());
+                model = ModelFactory.createDefaultModel();
+                Resource res5 = model.createResource(cc.
+                        getTargetIntanceDataPort().trim());
+                ConnectorDescription cd = new ConnectorDescription(res1,
+                        res2,
+                        res3,
+                        res4,
+                        res5);
+                connections.add(cd);
+
+            }
+            FlowDescription flowdesc = new FlowDescription(
+                    resExecutableComponent,
+                    flow.getName(),
+                    flow.getDescription(),
+                    flow.getRights(),
+                    flow.getCreator(),
+                    flow.getCreationDate(),
+                    instances,
+                    connections,
+                    new TagsDescription(new HashSet(flow.getTags().getTags())));
+
+            Map params = new HashMap<String, String>();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            flowdesc.getModel().write(baos, "TTL");
+            try {
+                baos.flush();
+            } catch (Exception e) {}
+            //System.out.println(new String(baos.toByteArray()));
+            params.put("repository", new String(baos.toByteArray()));
+            try {
+                baos.close();
+            } catch (Exception e) {}
+
+            if (!saveas) {
+                String uri = proxy.getRemove(flow.getFlowID());
+                if ((uri == null) || (!uri.trim().equals(flow.getFlowID().trim()))) {
+                    wbc.setSuccess(false);
+                    wbc.setMessage("Unable to delete old flow.  " + uri + " " +
+                                   flow.getFlowID());
+                    return wbc;
+                }
+            }
+
+            proxy.executePost("services/repository/add_flow_descriptors.ttl",
+                              params);
+            wbc.setMessage(flowdesc.getFlowComponent().getURI());
+
+            /* This is necessary for the web app. */
+            proxy.flushRepository();
+        }
+        return wbc;
+    }
+
+}
