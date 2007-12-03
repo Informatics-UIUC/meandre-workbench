@@ -53,6 +53,9 @@ class CommandPublishComponent implements WBCommand {
             public void onSuccess(Object result) {
                 // do some UI stuff to show success
 
+                _cont.hideStatusBusy();
+                _cont.setStatusMessage("Publish component operation successful!");
+
                 if (_cmd != null) {
                     _cmd.execute(null);
                 }
@@ -61,6 +64,8 @@ class CommandPublishComponent implements WBCommand {
 
             public void onFailure(Throwable caught) {
                 // do some UI stuff to show failure
+                _cont.hideStatusBusy();
+                _cont.setStatusMessage("Publish component operation failed!");
                 Window.alert(
                         "AsyncCallBack Failure -- publish:  " +
                         caught.getMessage());

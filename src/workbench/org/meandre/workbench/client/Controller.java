@@ -1458,13 +1458,14 @@ public class Controller {
 
                 if (Window.confirm(
                         "Are you certain that you want to publish this component?")) {
+                    this.showStatusBusy();
+                    this.setStatusMessage("Publishing component " + comp.getID());
                     new CommandPublishComponent(this,
                                                 new CommandGetPublicComponents(this,
                             new WBCommand() {
                         public void execute(Object work) {
                             Controller.this.regenerateTabbedPanel(false);
                             Controller.this.getMain().getTabPanel().selectTab(0);
-                            Controller.this.expandAllTreeItems(Controller.this.getCompTreeHandle());
                         }
                             })).execute(comp.getID());
                 }
@@ -1494,13 +1495,14 @@ public class Controller {
 
                 if (Window.confirm(
                         "Are you certain that you want to unpublish this component?")) {
+                            this.showStatusBusy();
+                            this.setStatusMessage("Unpublishing component " + comp.getID());
                     new CommandUnpublishComponent(this,
                                                 new CommandGetPublicComponents(this,
                              new WBCommand() {
                         public void execute(Object work) {
                             Controller.this.regenerateTabbedPanel(false);
                             Controller.this.getMain().getTabPanel().selectTab(0);
-                            Controller.this.expandAllTreeItems(Controller.this.getCompTreeHandle());
                         }
                             })).execute(comp.getID());
                 }
@@ -2285,7 +2287,7 @@ public class Controller {
      * @return Tree The constructed component tree.
      */
     Tree buildCompTree(Tree compTree, TreeItem compTreeRoot, String rootTxt,
-                       int compTreeSort) {
+                       int compTreeSort){
         if (compTree != null) {
             compTree.clear();
         } else {

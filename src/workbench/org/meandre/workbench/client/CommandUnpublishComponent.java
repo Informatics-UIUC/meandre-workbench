@@ -53,6 +53,8 @@ class CommandUnpublishComponent implements WBCommand {
         AsyncCallback callback = new AsyncCallback() {
             public void onSuccess(Object result) {
                 // do some UI stuff to show success
+                _cont.hideStatusBusy();
+                _cont.setStatusMessage("Unpublish component operation successful!");
 
                 if (_cmd != null) {
                     _cmd.execute(null);
@@ -62,6 +64,8 @@ class CommandUnpublishComponent implements WBCommand {
 
             public void onFailure(Throwable caught) {
                 // do some UI stuff to show failure
+                _cont.hideStatusBusy();
+                _cont.setStatusMessage("Unpublish component operation failed!");
                 Window.alert(
                         "AsyncCallBack Failure -- unpublish:  " +
                         caught.getMessage());
