@@ -13,9 +13,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.Window;
 
 /**
- * <p>Title: Command Unpublish Components</p>
+ * <p>Title: Command Unpublish Flows</p>
  *
- * <p>Description: This command class unpublishes components to the public
+ * <p>Description: This command class unpublishes flows from the public
  * repository.</p>
  *
  * <p>Copyright: UIUC Copyright (c) 2007</p>
@@ -25,7 +25,7 @@ import com.google.gwt.user.client.Window;
  * @author Duane Searsmith
  * @version 1.0
  */
-class CommandUnpublishComponent implements WBCommand {
+class CommandUnpublishFlow implements WBCommand {
 
     //==============
     // Data Members
@@ -38,7 +38,7 @@ class CommandUnpublishComponent implements WBCommand {
     // Constructors
     //==============
 
-    CommandUnpublishComponent(Controller cont, WBCommand cmd) {
+    CommandUnpublishFlow(Controller cont, WBCommand cmd) {
         _cont = cont;
         _cmd = cmd;
     }
@@ -54,7 +54,7 @@ class CommandUnpublishComponent implements WBCommand {
             public void onSuccess(Object result) {
                 // do some UI stuff to show success
                 _cont.hideStatusBusy();
-                _cont.setStatusMessage("Unpublish component operation successful!");
+                _cont.setStatusMessage("Unpublish flow operation successful!");
 
                 if (_cmd != null) {
                     _cmd.execute(null);
@@ -65,7 +65,7 @@ class CommandUnpublishComponent implements WBCommand {
             public void onFailure(Throwable caught) {
                 // do some UI stuff to show failure
                 _cont.hideStatusBusy();
-                _cont.setStatusMessage("Unpublish component operation failed!");
+                _cont.setStatusMessage("Unpublish flow operation failed!");
                 Window.alert(
                         "AsyncCallBack Failure -- unpublish:  " +
                         caught.getMessage());

@@ -150,13 +150,16 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
             MeandreProxy proxy = (MeandreProxy) obj;
             //acquire Repository object from current session
             QueryableRepository queryableRep = proxy.getPublicRepository();
+            /* we need this because not all the components may be in the public
+            repository */
+            QueryableRepository queryableRep2 = proxy.getRepository();
             Set ret = new HashSet();
             Set flows = queryableRep.getAvailableFlows();
             for (Iterator itty = flows.iterator(); itty.hasNext(); ) {
                 Resource res = (Resource) itty.next();
                 FlowDescription flow = queryableRep.getFlowDescription(res);
                 ret.add(MeandreToWBBeanConverter.convertFlow(flow,
-                        queryableRep));
+                        queryableRep2));
             }
             return ret;
         }

@@ -929,6 +929,16 @@ public class Controller {
                 unpublishComponent();
             }
         };
+        Command publishFlowCmd = new Command() {
+            public void execute() {
+                publishFlow();
+            }
+        };
+        Command unpublishFlowCmd = new Command() {
+            public void execute() {
+                unpublishFlow();
+            }
+        };
 
         // Make some sub-menus that we will cascade from the top menu.
 
@@ -940,8 +950,8 @@ public class Controller {
 
         //flow commands
         MenuBar flowMenu = new MenuBar(true);
-        flowMenu.addItem("Publish", cmd);
-        flowMenu.addItem("Unpublish", cmd);
+        flowMenu.addItem("Publish", publishFlowCmd);
+        flowMenu.addItem("Unpublish", unpublishFlowCmd);
         flowMenu.addItem("Delete", deleteFlowCmd);
 
         //canvas commands
@@ -1437,7 +1447,7 @@ public class Controller {
     }
 
     /**
-     * Delete a selected location from the location tree.
+     * publish a component to the public repository.
      */
     void publishComponent() {
         TabPanel tp = _main.getTabPanel();
@@ -1474,7 +1484,7 @@ public class Controller {
     }
 
     /**
-     * Delete a selected location from the location tree.
+     * Unpublish component from public repository.
      */
     void unpublishComponent() {
         TabPanel tp = _main.getTabPanel();
@@ -1510,6 +1520,79 @@ public class Controller {
         }
     }
 
+    /**
+     * publish a flow to the public repository.
+     */
+    void publishFlow() {
+        TabPanel tp = _main.getTabPanel();
+        if (tp.getTabBar().getSelectedTab() != 1) {
+            Window.alert("Please select a flow first!");
+        } else {
+            Tree tree = this.getFlowTreeHandle();
+            TreeItem ti = tree.getSelectedItem();
+            if (ti == null) {
+                Window.alert("Please select a flow first!");
+            } else {
+                WBFlow flow = (WBFlow) ti.getUserObject();
+
+                if (this.getPublicFlowsMap().get(flow.getFlowID()) != null){
+                    Window.alert("Selected flow is alread published.");
+                    return;
+                }
+
+                if (Window.confirm(
+                        "Are you certain that you want to publish this flow?")) {
+                    this.showStatusBusy();
+                    this.setStatusMessage("Publishing flow " + flow.getFlowID());
+                    new CommandPublishFlow(this,
+                                                new CommandGetPublicFlows(this,
+                            new WBCommand() {
+                        public void execute(Object work) {
+                            Controller.this.regenerateTabbedPanel(false);
+                            Controller.this.getMain().getTabPanel().selectTab(1);
+                        }
+                            })).execute(flow.getFlowID());
+                }
+            }
+        }
+    }
+
+    /**
+     * unpublish a flow in the public repository.
+     */
+    void unpublishFlow() {
+        TabPanel tp = _main.getTabPanel();
+        if (tp.getTabBar().getSelectedTab() != 1) {
+            Window.alert("Please select a flow first!");
+        } else {
+            Tree tree = this.getFlowTreeHandle();
+            TreeItem ti = tree.getSelectedItem();
+            if (ti == null) {
+                Window.alert("Please select a flow first!");
+            } else {
+                WBFlow flow = (WBFlow) ti.getUserObject();
+
+                if (this.getPublicFlowsMap().get(flow.getFlowID()) == null){
+                    Window.alert("Selected flow is not published.");
+                    return;
+                }
+
+                if (Window.confirm(
+                        "Are you certain that you want to unpublish this flow?")) {
+                    this.showStatusBusy();
+                    this.setStatusMessage("Unpublishing flow " + flow.getFlowID());
+                    new CommandUnpublishFlow(this,
+                                                new CommandGetPublicFlows(this,
+                            new WBCommand() {
+                        public void execute(Object work) {
+                            Controller.this.regenerateTabbedPanel(false);
+                            Controller.this.getMain().getTabPanel().selectTab(1);
+                        }
+                            })).execute(flow.getFlowID());
+                }
+            }
+        }
+    }
 
     /**
      * If a component is currently marked as selected then remove it.
