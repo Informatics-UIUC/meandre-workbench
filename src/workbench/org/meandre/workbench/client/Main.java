@@ -32,6 +32,8 @@ import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.SourcesTabEvents;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.DockPanel;
+import com.google.gwt.user.client.ui.FlexTable;
 
 
 /**
@@ -83,7 +85,7 @@ public class Main implements EntryPoint, WindowResizeListener,
      */
     private HorizontalPanel _buttPan = null;
 
-    private FlowPanel _canvasPan = null;
+    private FlexTable _canvasPan = null;
 
     private HorizontalPanel _canvasButtPan = null;
 
@@ -176,16 +178,39 @@ public class Main implements EntryPoint, WindowResizeListener,
         _boundPan.add(_absPan);
         _absPan.add(_jsgPan);
 
-        _canvasPan = new FlowPanel();
-
+        _canvasPan = new FlexTable();
         _canvasButtPan = _controller.buildCanvasButtPan();
-        _canvasPan.add(_canvasButtPan);
-        _canvasPan.add(_boundPan);
+        _canvasPan.setWidget(0, 0, _canvasButtPan);
+        _canvasPan.setWidget(1, 0, _boundPan);
+        _canvasPan.getCellFormatter().setHeight(0, 0, "70px");
+        _boundPan.addStyleName("auto-scroll");
+        _hsp.setRightWidget(_canvasPan);
 
-        _vsp.setTopWidget(_canvasPan);
+        _vsp.setTopWidget(_hsp);
         _vsp.setBottomWidget(_vscroll);
 
-        _hsp.setRightWidget(_vsp);
+
+
+//        _hsp.setLeftWidget(_tabPan);
+//
+//        _vscroll = new ScrollPanel();
+//        _boundPan.add(_absPan);
+//        _absPan.add(_jsgPan);
+//
+//        _canvasPan = new FlowPanel();
+//
+//        _canvasButtPan = _controller.buildCanvasButtPan();
+//        _canvasPan.add(_canvasButtPan);
+//        _canvasPan.add(_boundPan);
+//
+//        _vsp.setTopWidget(_canvasPan);
+//        _vsp.setBottomWidget(_vscroll);
+//
+//        _hsp.setRightWidget(_vsp);
+
+
+
+
 
         // Hook the window resize event, so that we can adjust the UI.
         Window.addWindowResizeListener(this);
@@ -199,12 +224,12 @@ public class Main implements EntryPoint, WindowResizeListener,
         fp.add(_buttPan);
 
         _dockPan.add(fp);
-        _dockPan.add(_hsp);
+        _dockPan.add(_vsp);
         _dockPan.add(_controller.buildStatusPanel());
 
         resizeApp();
 
-        _hsp.setSplitPosition("220px");
+        _hsp.setSplitPosition("280px");
         _vsp.setSplitPosition("80%");
 
         _controller.setStatusMessage("User " +
@@ -322,16 +347,16 @@ public class Main implements EntryPoint, WindowResizeListener,
     private void resizeApp() {
         _dockPan.setSize("100%", "100%");
         _dockPan.setCellWidth(_buttPan, "100%");
-        _dockPan.setCellWidth(_hsp, "100%");
-        _dockPan.setCellHeight(_hsp, "100%");
-        _hsp.setWidth("99%");
-        _hsp.setHeight("99%");
+        _dockPan.setCellWidth(_vsp, "100%");
+        _dockPan.setCellHeight(_vsp, "100%");
+        _vsp.setWidth("99%");
+        _vsp.setHeight("99%");
+        _hsp.setWidth("100%");
+        _hsp.setHeight("100%");
         _controller.getStatusBar().setWidth("100%");
         _buttPan.setWidth("100%");
         _tabPan.setHeight("99%");
         _tabPan.setWidth("99%");
-        _vsp.setWidth("100%");
-        _vsp.setHeight("100%");
         _controller.getCompTreeHandle().setHeight("100%");
         _controller.getCompTreeHandle().setWidth("100%");
         _controller.getFlowTreeHandle().setHeight("100%");

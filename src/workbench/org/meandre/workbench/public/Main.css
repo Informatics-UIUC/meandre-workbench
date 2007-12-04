@@ -21,7 +21,7 @@
   background: #e8eef7;
 }
 
-.gwt-HorizontalSplitPanel {
+.gwt-VerticalSplitPanel {
   border-style: solid;
   border-width: medium;
   border-color: #c3d9ff;
@@ -245,5 +245,13 @@ div#componentshow {
   font-weight: bold;
   cursor: pointer;
   cursor: hand;
+  overflow: scroll;
+}
+
+.no-scroll{
+  overflow: hidden;
+}
+
+.auto-scroll{
   overflow: scroll;
 }
