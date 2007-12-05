@@ -223,6 +223,8 @@ public class Controller {
     /* Flow ID's from the public repository.*/
     private Map _publicFlows = null;
 
+    private HTML _canvasLabel = new HTML("<strong><font color=\"#000000\" size=\"-2\">Untitled</font></strong>");;
+
     //================
     // Constructor(s)
     //================
@@ -836,9 +838,23 @@ public class Controller {
         lab.addStyleName("menu-button-text");
         //gPan.setWidget(1, 6, lab);
 
+        buttPan.add(_canvasLabel);
 
-
+        buttPan.setCellHorizontalAlignment(_canvasLabel, buttPan.ALIGN_LEFT);
+        buttPan.setCellVerticalAlignment(_canvasLabel, buttPan.ALIGN_MIDDLE);
+        buttPan.setSpacing(10);
         return buttPan;
+    }
+
+    void setCanvasLabel(String flowname, String id){
+        if (id == null){
+            this._canvasLabel.setHTML("<strong><font color=\"#000000\" size=\"-2\">"
+                                      + flowname + "</font></strong>");
+        } else {
+            this._canvasLabel.setHTML("<strong><font color=\"#000000\" size=\"-2\">"
+                                      + flowname + "</font></strong><br><strong><font color=\"#0000ff\" size=\"-4\">["
+                                      + id + "]</font></strong>");
+        }
     }
 
     /**
@@ -1088,6 +1104,7 @@ public class Controller {
         _workingFlow = null;
         _dirty = false;
         _flowExecuting = false;
+        setCanvasLabel("Untitled", null);
         clearConnections();
     }
 
@@ -1940,6 +1957,7 @@ public class Controller {
         flownew.setBaseURL(flow.getBaseURL());
         flownew.setName(flow.getName());
         _workingFlow = flownew;
+        this.setCanvasLabel(flownew.getName(), flownew.getFlowID());
         _dirty = false;
 
         //attemp to fix drawing canvas initialization bug ===

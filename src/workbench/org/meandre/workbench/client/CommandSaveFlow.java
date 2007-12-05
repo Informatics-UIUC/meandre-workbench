@@ -72,6 +72,8 @@ class CommandSaveFlow implements WBCommand {
                     _cont.setStatusMessage(
                             "Flow saved sucessfully. Regenerating flow list ...");
 
+                    _cont.setCanvasLabel(_flow.getName(), _flow.getFlowID());
+
                     if (_cmd != null) {
                         _cmd.execute(_flow);
                     }
