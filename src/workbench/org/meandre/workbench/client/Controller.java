@@ -62,6 +62,7 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.TabPanel;
 import org.meandre.workbench.client.beans.WBLocation;
 import org.meandre.workbench.client.beans.WBCallbackObject;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
  * <p>Title: Controller</p>
@@ -223,7 +224,9 @@ public class Controller {
     /* Flow ID's from the public repository.*/
     private Map _publicFlows = null;
 
-    private HTML _canvasLabel = new HTML("<strong><font color=\"#000000\" size=\"-2\">Untitled</font></strong>");;
+    private HTML _canvasLabel = new HTML("<left><font color=\"#ffffff\">FLOW:&nbsp;</font><font color=\"#000000\">Untitled</font></left>");
+
+    private HTML _canvasLabelID = new HTML("");
 
     //================
     // Constructor(s)
@@ -629,13 +632,14 @@ public class Controller {
      */
     HorizontalPanel buildButtPan() {
         HorizontalPanel buttPan = new HorizontalPanel();
+        buttPan.setHeight("50px");
         /**
          * Add logo to header.
          */
         Image logo = new Image("images/meandre-logo.jpg");
         logo.setPixelSize(200, 36);
-        Grid gPan = new Grid(2, 1);
-        buttPan.add(gPan);
+//        Grid gPan = new Grid(2, 1);
+        //buttPan.add(gPan);
         buttPan.add(logo);
         /**
          * Add user name to header.
@@ -644,11 +648,10 @@ public class Controller {
                                 + getUserName() + "</font></bold>"
                                 , true);
         buttPan.add(userlab);
-        //buttPan.addStyleName("menu-panel");
         buttPan.setCellVerticalAlignment(logo, HorizontalPanel.ALIGN_MIDDLE);
-        buttPan.setCellVerticalAlignment(userlab, HorizontalPanel.ALIGN_TOP);
+        buttPan.setCellVerticalAlignment(userlab, HorizontalPanel.ALIGN_MIDDLE);
         buttPan.setCellHorizontalAlignment(userlab, HorizontalPanel.ALIGN_RIGHT);
-        buttPan.setCellHorizontalAlignment(logo, HorizontalPanel.ALIGN_RIGHT);
+        buttPan.setCellHorizontalAlignment(logo, HorizontalPanel.ALIGN_LEFT);
 
         Button button = new Button("<IMG SRC='images/gnome-quit-32.png'>",
                                    new ClickListener() {
@@ -663,13 +666,13 @@ public class Controller {
                 }
             }
         });
-        button.setHeight("40px");
-        button.setWidth("40px");
-        button.addStyleName("top-menu-button");
-        gPan.setWidget(0, 0, button);
-        Label lab = new Label("Exit");
-        lab.addStyleName("top-menu-button-text");
-        gPan.setWidget(1, 0, lab);
+//        button.setHeight("40px");
+//        button.setWidth("40px");
+//        button.addStyleName("top-menu-button");
+//        gPan.setWidget(0, 0, button);
+//        Label lab = new Label("Exit");
+//        lab.addStyleName("top-menu-button-text");
+//        gPan.setWidget(1, 0, lab);
 
         return buttPan;
     }
@@ -713,8 +716,22 @@ public class Controller {
      *
      * @return VerticalPanel The vertical panel containing the buttons.
      */
-    HorizontalPanel buildCanvasButtPan() {
-        HorizontalPanel buttPan = new HorizontalPanel();
+  Panel buildCanvasButtPan() {
+        VerticalPanel outerButtPan = new VerticalPanel();
+
+        HorizontalPanel canvasLabelPanel = new HorizontalPanel();
+        canvasLabelPanel.addStyleName("canvas-label-bar");
+        canvasLabelPanel.add(_canvasLabel);
+        canvasLabelPanel.add(_canvasLabelID);
+        _canvasLabel.addStyleName("canvas-label-bar-flow-title");
+        canvasLabelPanel.setCellHorizontalAlignment(_canvasLabel, canvasLabelPanel.ALIGN_LEFT);
+        canvasLabelPanel.setCellVerticalAlignment(_canvasLabel, canvasLabelPanel.ALIGN_MIDDLE);
+        canvasLabelPanel.setCellHorizontalAlignment(_canvasLabelID, canvasLabelPanel.ALIGN_RIGHT);
+        canvasLabelPanel.setCellVerticalAlignment(_canvasLabelID, canvasLabelPanel.ALIGN_MIDDLE);
+        canvasLabelPanel.setWidth("100%");
+        _canvasLabel.setWidth("100%");
+        outerButtPan.add(canvasLabelPanel);
+
 
         Grid gPan = new Grid(2, 6);
         gPan.getColumnFormatter().setWidth(0, "52px");
@@ -737,8 +754,11 @@ public class Controller {
         gPan.getCellFormatter().setHorizontalAlignment(0, 5,
                 HasHorizontalAlignment.ALIGN_CENTER);
 
-        buttPan.add(gPan);
-        buttPan.addStyleName("menu-panel");
+        outerButtPan.add(gPan);
+
+        outerButtPan.addStyleName("menu-panel");
+        outerButtPan.setCellHorizontalAlignment(gPan, outerButtPan.ALIGN_RIGHT);
+        outerButtPan.setCellVerticalAlignment(gPan, outerButtPan.ALIGN_MIDDLE);
 
         Button button = new Button("<IMG SRC='images/gnome-save-22.png'>",
                                    new ClickListener() {
@@ -838,22 +858,18 @@ public class Controller {
         lab.addStyleName("menu-button-text");
         //gPan.setWidget(1, 6, lab);
 
-        buttPan.add(_canvasLabel);
-
-        buttPan.setCellHorizontalAlignment(_canvasLabel, buttPan.ALIGN_LEFT);
-        buttPan.setCellVerticalAlignment(_canvasLabel, buttPan.ALIGN_MIDDLE);
-        buttPan.setSpacing(10);
-        return buttPan;
+        return outerButtPan;
     }
 
     void setCanvasLabel(String flowname, String id){
         if (id == null){
-            this._canvasLabel.setHTML("<strong><font color=\"#000000\" size=\"-2\">"
-                                      + flowname + "</font></strong>");
+            this._canvasLabel.setHTML("<span CLASS=\"leftalign\"><font color=\"#ffffff\">FLOW:&nbsp;</font><font color=\"#000000\">"
+                                      + flowname + "</font></span>");
         } else {
-            this._canvasLabel.setHTML("<strong><font color=\"#000000\" size=\"-2\">"
-                                      + flowname + "</font></strong><br><strong><font color=\"#0000ff\" size=\"-4\">["
-                                      + id + "]</font></strong>");
+            this._canvasLabel.setHTML("<span CLASS=\"leftalign\"><font color=\"#ffffff\">FLOW:&nbsp;</font><font color=\"#000000\">"
+                                      + flowname + "</font></span>");
+            this._canvasLabelID.setHTML("<span CLASS=\"rightalign\"><font size=\"-2\" color=\"#000000\">"
+                                      + id + "&nbsp;&nbsp;</font></span>");
         }
     }
 
@@ -997,6 +1013,10 @@ public class Controller {
         repoMenu.addItem("Add Location", addLocationCmd);
         repoMenu.addItem("Remove Location", removeLocationCmd);
 
+        MenuBar adminMenu = new MenuBar(true);
+        adminMenu.addItem("See Roles", cmd);
+        adminMenu.addItem("Manage Users", cmd);
+
         //help
         MenuBar helpMenu = new MenuBar(true);
         helpMenu.addItem("About", cmd);
@@ -1009,6 +1029,7 @@ public class Controller {
         menu.addItem("Component", compMenu);
         menu.addItem("Execute", execMenu);
         menu.addItem("Repository", repoMenu);
+        menu.addItem("Admin", adminMenu);
         menu.addItem("Help", helpMenu);
 
         menu.setStyleName("gwt-MenuBar");

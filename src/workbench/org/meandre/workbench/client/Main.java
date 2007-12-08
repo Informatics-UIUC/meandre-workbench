@@ -34,6 +34,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.Panel;
 
 
 /**
@@ -87,7 +88,7 @@ public class Main implements EntryPoint, WindowResizeListener,
 
     private FlexTable _canvasPan = null;
 
-    private HorizontalPanel _canvasButtPan = null;
+    private Panel _canvasButtPan = null;
 
     /** The vertical split panel that partitions the canvas from the
      * lower detail window.
