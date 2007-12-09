@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.HTML;
 
 
 /**
@@ -173,7 +174,16 @@ public class Main implements EntryPoint, WindowResizeListener,
 
         });
 
-        _hsp.setLeftWidget(_tabPan);
+        FlowPanel fpt = new FlowPanel();
+        HorizontalPanel hpt = new HorizontalPanel();
+        HTML tptit = new HTML("<span CLASS=\"leftalign\"><font color=\"#ffffff\">REPOSITORY</font></span>");
+        hpt.add(tptit);
+        hpt.setWidth("100%");
+        hpt.addStyleName("canvas-label-bar");
+        tptit.addStyleName("canvas-label-bar-flow-title");
+        fpt.add(hpt);
+        fpt.add(_tabPan);
+        _hsp.setLeftWidget(fpt);
 
         _vscroll = new ScrollPanel();
         _boundPan.add(_absPan);
@@ -350,14 +360,14 @@ public class Main implements EntryPoint, WindowResizeListener,
         _dockPan.setCellWidth(_buttPan, "100%");
         _dockPan.setCellWidth(_vsp, "100%");
         _dockPan.setCellHeight(_vsp, "100%");
-        _vsp.setWidth("99%");
-        _vsp.setHeight("99%");
+        _vsp.setWidth("100%");
+        _vsp.setHeight("100%");
         _hsp.setWidth("100%");
         _hsp.setHeight("100%");
         _controller.getStatusBar().setWidth("100%");
         _buttPan.setWidth("100%");
-        _tabPan.setHeight("99%");
-        _tabPan.setWidth("99%");
+        _tabPan.setHeight("100%");
+        _tabPan.setWidth("100%");
         _controller.getCompTreeHandle().setHeight("100%");
         _controller.getCompTreeHandle().setWidth("100%");
         _controller.getFlowTreeHandle().setHeight("100%");

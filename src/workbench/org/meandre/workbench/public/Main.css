@@ -46,10 +46,6 @@ SPLIT PANELS *****************************************************
 */
 
 .gwt-VerticalSplitPanel {
-  /*border-style: solid;
-  border-width: medium;
-  border-color: #c3d9ff;*/
-  margin: 1px;
 }
 
 .gwt-HorizontalSplitPanel .hsplitter {
@@ -215,33 +211,30 @@ div#componentshow {
 }
 
 .gwt-TabPanelBottom {
-   /*background-color: #E8EEF7;*/
 }
 
 .gwt-TabBar {
   padding-top: 2px;
-  /*border-bottom: 4px solid #f5dabc;*/
   background-color: #f5dabc;
 }
 
-.gwt-TabBar .gwt-TabBarItem-selected {
-  padding: 4px;
-  font-weight: bold;
-  cursor: default;
-  background-color: #9f9f9f;
-  /*border-bottom: 2px solid white;*/
-  margin-right: 2px;
-  font-size: 60%;
-}
 
 .gwt-TabBar .gwt-TabBarItem {
   padding: 4px;
   cursor: pointer;
   cursor: hand;
   background-color: #eab87b;
-  /*border-bottom: 2px solid white;*/
   margin-right: 2px;
  font-size: 60%;
+}
+
+.gwt-TabBar .gwt-TabBarItem-selected {
+  padding: 4px;
+  font-weight: bold;
+  cursor: default;
+  background-color: #ffffff;
+  margin-right: 2px;
+  font-size: 60%;
 }
 
 /*
