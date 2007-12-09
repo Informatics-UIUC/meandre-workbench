@@ -51,6 +51,8 @@ SPLIT PANELS *****************************************************
 .gwt-HorizontalSplitPanel .hsplitter {
   cursor: e-resize;
   background-color: #9f9f9f;
+  margin-right: 1px;
+  margin-left: 1px;
 }
 
 .gwt-VerticalSplitPanel .vsplitter  {
@@ -139,8 +141,6 @@ SPLIT PANELS *****************************************************
   cursor: pointer;
   cursor: hand;
   background-color: #ffffff;
-  margin-left: auto;
-  margin-right: auto;
   }
 
 .menu-button-text {
@@ -207,7 +207,6 @@ div#componentshow {
   */
 
 .gwt-TabPanel {
-  margin-top: 4px;
 }
 
 .gwt-TabPanelBottom {

@@ -32,10 +32,10 @@ import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.SourcesTabEvents;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 
 
 /**
@@ -73,9 +73,6 @@ public class Main implements EntryPoint, WindowResizeListener,
     /* Drop panel used for Drag n Drop library.*/
     private AbsolutePanel _boundPan = new AbsolutePanel();
 
-    /* Root menu bar for work bench application */
-    private MenuBar _mb = null;
-
     /* Tab panel used to hold the different tree views.*/
     private TabPanel _tabPan = new TabPanel();
 
@@ -87,7 +84,7 @@ public class Main implements EntryPoint, WindowResizeListener,
      */
     private HorizontalPanel _buttPan = null;
 
-    private FlexTable _canvasPan = null;
+    private VerticalPanel _canvasPan = null;
 
     private Panel _canvasButtPan = null;
 
@@ -183,41 +180,27 @@ public class Main implements EntryPoint, WindowResizeListener,
         tptit.addStyleName("canvas-label-bar-flow-title");
         fpt.add(hpt);
         fpt.add(_tabPan);
+
         _hsp.setLeftWidget(fpt);
 
+        _hsp.getLeftWidget().addStyleName("no-scroll");
+
         _vscroll = new ScrollPanel();
+
         _boundPan.add(_absPan);
         _absPan.add(_jsgPan);
 
-        _canvasPan = new FlexTable();
+        _canvasPan = new VerticalPanel();
         _canvasButtPan = _controller.buildCanvasButtPan();
-        _canvasPan.setWidget(0, 0, _canvasButtPan);
-        _canvasPan.setWidget(1, 0, _boundPan);
-        _canvasPan.getCellFormatter().setHeight(0, 0, "70px");
+        _canvasPan.add( _canvasButtPan);
+        _canvasPan.add(_boundPan);
+        _canvasPan.setCellHeight(_canvasButtPan, "70px");
         _boundPan.addStyleName("auto-scroll");
         _hsp.setRightWidget(_canvasPan);
+        _canvasPan.addStyleName("no-scroll");
 
         _vsp.setTopWidget(_hsp);
         _vsp.setBottomWidget(_vscroll);
-
-
-
-//        _hsp.setLeftWidget(_tabPan);
-//
-//        _vscroll = new ScrollPanel();
-//        _boundPan.add(_absPan);
-//        _absPan.add(_jsgPan);
-//
-//        _canvasPan = new FlowPanel();
-//
-//        _canvasButtPan = _controller.buildCanvasButtPan();
-//        _canvasPan.add(_canvasButtPan);
-//        _canvasPan.add(_boundPan);
-//
-//        _vsp.setTopWidget(_canvasPan);
-//        _vsp.setBottomWidget(_vscroll);
-//
-//        _hsp.setRightWidget(_vsp);
 
 
 
