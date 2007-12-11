@@ -26,6 +26,13 @@ import org.meandre.workbench.client.beans.WBFlow;
 public interface WBRepositoryQueryAsync {
 
     /**
+     * Get a list of all running flows and their webui url's.
+     * @param sid String session id
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void listRunningFlows(String sid, AsyncCallback cb);
+
+    /**
      * Unpublish a compnent or flow.
      * @param sid String session ID.
      * @param uri String identifier.

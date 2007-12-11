@@ -29,6 +29,14 @@ import org.meandre.workbench.client.beans.*;
 public interface WBRepositoryQuery extends RemoteService {
 
     /**
+     * Get a list of all running flows and their webui url's.
+     * @param sid String session id
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBRunningFlow>
+     * @return Set Returns set of running flow beans.
+     */
+    public Set listRunningFlows(String sid);
+
+    /**
      * Unpublish a compnent or flow.
      * @param sid String session ID.
      * @param uri String identifier.

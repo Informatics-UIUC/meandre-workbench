@@ -134,6 +134,9 @@ public class WBLoginDialog extends DialogBox {
                 if (_prtbox.getText().trim().length() > 0){
                     prt = ":" + _prtbox.getText().trim();
                 }
+                if (_ubox.getText().toLowerCase().equals("localhost")){
+                    _ubox.setText("127.0.0.1");
+                }
                 _cont.login(_tbox.getText(), _pbox.getText(), "http://"
                             + _ubox.getText() + prt + "/",
                             new AsyncCallback() {
@@ -169,7 +172,7 @@ public class WBLoginDialog extends DialogBox {
         gp.setWidget(1, 0, pLab);
         gp.setWidget(1, 1, _pbox);
         gp.setWidget(2, 0, uLab);
-        _ubox.setText("localhost");
+        _ubox.setText("127.0.0.1");
         gp.setWidget(2, 1, _ubox);
         gp.setWidget(3, 0, prtLab);
         _prtbox.setText("1714");

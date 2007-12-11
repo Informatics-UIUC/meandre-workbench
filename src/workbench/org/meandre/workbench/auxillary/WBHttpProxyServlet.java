@@ -48,6 +48,8 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.FilePartSource;
+import java.net.URLEncoder;
+import org.meandre.workbench.client.Controller;
 
 
 /**Used for CROSS DOMAIN AJAX
@@ -63,6 +65,7 @@ public class WBHttpProxyServlet extends HttpServlet {
 
     /** The basic handler for all the loggers */
     public static Handler handler = null;
+
 
     // Initializing the logger and its handlers
 //    static {
@@ -90,40 +93,101 @@ public class WBHttpProxyServlet extends HttpServlet {
             ServletException, IOException {
         InputStream is = null;
         ServletOutputStream out = null;
-        //key
-        //site
-        String target = req.getParameter("target");
-        //log.info("Calling: " + target + " by " + req.getRemoteAddr());
-        if (target == null) {
-            res.setStatus(404);
+
+        //authenticate
+        Map proxies = (Map) req.getSession().getAttribute(
+                WBRepositoryQueryImpl.s_PROXIES_KEY);
+        if (proxies == null) {
+            System.out.println("Proxies is null.");
+            res.sendError(res.SC_METHOD_NOT_ALLOWED,
+                               "Proxies is null.");
             return;
         }
-        try {
-            URL url = new URL(target);
-            URLConnection uc = url.openConnection();
-            res.setContentType(uc.getContentType());
-            is = uc.getInputStream();
-            out = res.getOutputStream();
-            byte[] buf = new byte[4096];
-            int bytesRead;
-            while ((bytesRead = is.read(buf)) != -1) {
-                out.write(buf, 0, bytesRead);
-            }
-        } catch (MalformedURLException e) {
-            //log.info("Error in the url: " + e.getMessage());
-            res.setStatus(404);
-        } catch (IOException e) {
-            //log.info("IOException: " + e.getMessage());
-            res.setStatus(404);
-        } finally {
-            if (is != null) {
-                is.close();
-            }
-            if (out != null) {
-                out.close();
-            }
+        String sid = req.getParameter("sid");
+        if (sid == null) {
+            System.out.println("SID is null!");
+            res.sendError(res.SC_METHOD_NOT_ALLOWED,
+                               "SID is null!");
+            return;
+        }
+        MeandreProxy proxy = null;
+        proxy = (MeandreProxy) proxies.get(sid);
+        if (proxy == null) {
+            res.sendError(res.SC_METHOD_NOT_ALLOWED,
+                               "Session ID is no longer valid.");
         }
 
+
+        String method = req.getParameter(Controller.s_METHOD_KEY);
+
+        if (method == null){
+            res.sendError(res.SC_METHOD_NOT_ALLOWED,
+                               "Method is null.");
+        }
+
+        if (method.equals(Controller.s_METHOD_WEBUI)){
+
+            //key
+            //site
+            String target = req.getParameter("target");
+            //System.out.println("Calling: " + target + " by " + req.getRemoteAddr());
+            if (target == null) {
+                res.setStatus(404);
+                return;
+            }
+            try {
+                URL url = new URL(target);
+                URLConnection uc = url.openConnection();
+                res.setContentType(uc.getContentType());
+                is = uc.getInputStream();
+                out = res.getOutputStream();
+                byte[] buf = new byte[4096];
+                int bytesRead;
+                StringBuffer sbuf = new StringBuffer("");
+                while ((bytesRead = is.read(buf)) != -1) {
+                    byte[] readbytes = new byte[bytesRead];
+                    System.arraycopy(buf, 0, readbytes, 0, bytesRead);
+                    sbuf.append(new String(readbytes));
+                }
+                //make replacement(s)
+                int pos = -1;
+                int ptr = 0;
+
+                while ((pos = sbuf.indexOf("/http", ptr)) != -1) {
+                    String sub = "http://" + req.getLocalAddr() + ":"
+                                 + req.getLocalPort()
+                                 + "/meandre_core_proxy?sid="
+                                 + URLEncoder.encode(sid, "UTF-8")
+                                 + "&" + Controller.s_METHOD_KEY + "="
+                                 + Controller.s_METHOD_WEBUI
+                                 + "&target=" + URLEncoder.encode(target, "UTF-8");
+
+                    //System.out.println("Subbing: " + sub + " for: " + sbuf.substring(pos, pos+1));
+                    sbuf.replace(pos, pos + 1, sub);
+                    ptr = pos + sub.length();
+                    pos = -1;
+                }
+
+                out.write(sbuf.toString().getBytes());
+                out.flush();
+            } catch (MalformedURLException e) {
+                //log.info("Error in the url: " + e.getMessage());
+                res.setStatus(404);
+            } catch (IOException e) {
+                //log.info("IOException: " + e.getMessage());
+                res.setStatus(404);
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
+            }
+        } else {
+            res.sendError(res.SC_METHOD_NOT_ALLOWED,
+                               "Method is unknown.");
+        }
         //log.info("done proxy call.");
     }
 

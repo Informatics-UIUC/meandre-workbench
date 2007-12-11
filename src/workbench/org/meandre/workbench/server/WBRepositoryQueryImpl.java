@@ -24,6 +24,7 @@ import org.meandre.workbench.client.*;
 import org.meandre.workbench.client.beans.*;
 import org.meandre.workbench.server.proxy.MeandreProxy;
 import org.meandre.workbench.server.proxy.beans.location.LocationBean;
+import org.meandre.workbench.server.proxy.beans.execute.RunningFlow;
 
 
 /**
@@ -81,6 +82,33 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     //===================================
     // Interface Impl: WBRepositoryQuery
     //===================================
+
+    /**
+     * Get a list of all running flows and their webui url's.
+     * @param sid String session id
+     * @gwt.typeArgs <org.meandre.workbench.client.beans.WBRunningFlow>
+     * @return Set Returns set of running flow beans.
+     */
+    public Set listRunningFlows(String sid){
+        Object obj = _proxies.get(sid);
+        if (obj == null) {
+            return null;
+         } else {
+             MeandreProxy proxy = (MeandreProxy) obj;
+             /* we need this because not all the components may be in the public
+             repository */
+             Set ret = new HashSet();
+             RunningFlow[] rbeans = proxy.getRunningFlows();
+             if (rbeans == null){
+                 return ret;
+             }
+             for (int i = 0, n = rbeans.length; i < n; i++){
+                 RunningFlow rbean = rbeans[i];
+                 ret.add(MeandreToWBBeanConverter.convertRunningFlow(rbean));
+             }
+             return ret;
+        }
+    }
 
     /**
      * Unpublish a compnent or flow.

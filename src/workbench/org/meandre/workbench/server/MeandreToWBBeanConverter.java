@@ -20,6 +20,7 @@ import org.meandre.workbench.server.proxy.beans.repository.*;
 import com.hp.hpl.jena.rdf.model.Resource;
 import org.meandre.workbench.client.Controller;
 import org.meandre.workbench.server.proxy.beans.location.LocationBean;
+import org.meandre.workbench.server.proxy.beans.execute.RunningFlow;
 
 
 /**
@@ -51,6 +52,10 @@ public class MeandreToWBBeanConverter {
     //================
     // Public Methods
     //================
+
+    static public WBRunningFlow convertRunningFlow(RunningFlow rflow){
+        return new WBRunningFlow(rflow.getID(), rflow.getWebUIURL());
+    }
 
     static public WBLocation convertLocation(LocationBean lbean) {
         return new WBLocation(lbean.getLocation(), lbean.getDescription());

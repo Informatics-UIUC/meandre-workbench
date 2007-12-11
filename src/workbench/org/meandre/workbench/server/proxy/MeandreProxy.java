@@ -1,5 +1,8 @@
 package org.meandre.workbench.server.proxy;
 
+//==============
+// Java Imports
+//==============
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -13,20 +16,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.servlet.jsp.JspWriter;
+import java.util.Vector;
+
+//===============
+// Other Imports
+//===============
 
 //import org.meandre.workbench.bootstrap.jetty.Bootstrapper;
 import org.meandre.workbench.server.proxy.beans.location.LocationBean;
 import org.meandre.workbench.server.proxy.beans.repository.QueryableRepository;
 import org.meandre.workbench.server.proxy.beans.repository.RepositoryImpl;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
-
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import java.util.Vector;
+import org.meandre.workbench.server.proxy.beans.execute.RunningFlow;
 
 /** Create a meandre autheticated proxy to access the web services
  *
@@ -34,6 +39,10 @@ import java.util.Vector;
  * @author D. Searsmith
  */
 public class MeandreProxy {
+
+    //==============
+    // Data Members
+    //==============
 
     /** The logger for the bootstrapper */
     protected static Logger log = null;
@@ -98,11 +107,11 @@ public class MeandreProxy {
         return bIsReady;
     }
 
-    public String getBaseURL(){
+    public String getBaseURL() {
         return this.sBaseURL;
     }
 
-    public String getUPEncoding(){
+    public String getUPEncoding() {
         return this.sUPEncoding;
     }
 
@@ -136,6 +145,37 @@ public class MeandreProxy {
     public void flushRepository() {
         qrCached = null;
     }
+
+    /** Return the list of running flows of this proxy.
+     *
+     * @return The array of running flows
+     */
+    @SuppressWarnings("unchecked")
+            public RunningFlow[] getRunningFlows() {
+        bWasCallOK = true;
+        RunningFlow[] rfa = null;
+
+        if (mapRoles != null) {
+            String sLocations = executeGetRequest(sBaseURL +
+                    "services/execute/list_running_flows.txt");
+            if (sLocations == null) {
+                bWasCallOK = false;
+                return null;
+            } else {
+                // Parse and generate the sets
+                String[] sa = sLocations.split("\n");
+                int iMax = sa.length / 2;
+                rfa = new RunningFlow[iMax];
+                for (int i = 0; i < iMax; i++) {
+                    rfa[i] = new RunningFlow(sa[i * 2].trim(),
+                                             sa[i * 2 + 1].trim());
+                }
+            }
+        }
+
+        return rfa;
+    }
+
 
     /** Return the roles for the user of this proxy.
      *
@@ -496,9 +536,10 @@ public class MeandreProxy {
 
         try {
             post.addRequestHeader("Authorization",
-                              "Basic " + sUPEncoding);
+                                  "Basic " + sUPEncoding);
             for (String key : data.keySet()) {
-                post.addParameter(key, new String(data.get(key).trim().getBytes(),"UTF-8"));
+                post.addParameter(key,
+                                  new String(data.get(key).trim().getBytes(), "UTF-8"));
             }
 
             // execute the post
@@ -508,7 +549,7 @@ public class MeandreProxy {
                 // print the status and response
                 sbuff = post.getResponseBodyAsString();
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         } finally {
             // release any connection resources used by the method
@@ -550,14 +591,14 @@ public class MeandreProxy {
             char[] iarr = new char[40];
             int cnt = 0;
             while ((iTmp = is.read()) != -1) {
-                iarr[cnt++] = (char)iTmp;
-                if (cnt == 40){
+                iarr[cnt++] = (char) iTmp;
+                if (cnt == 40) {
                     v.add(iarr);
                     iarr = new char[40];
                     cnt = 0;
                 }
             }
-            if (cnt > 0){
+            if (cnt > 0) {
                 char[] ifin = new char[cnt];
                 System.arraycopy(iarr, 0, ifin, 0, cnt);
                 v.add(ifin);

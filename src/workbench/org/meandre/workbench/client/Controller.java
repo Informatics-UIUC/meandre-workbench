@@ -63,6 +63,8 @@ import com.google.gwt.user.client.ui.TabPanel;
 import org.meandre.workbench.client.beans.WBLocation;
 import org.meandre.workbench.client.beans.WBCallbackObject;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.http.client.URL;
+
 
 /**
  * <p>Title: Controller</p>
@@ -227,6 +229,9 @@ public class Controller {
     private HTML _canvasLabel = new HTML("<left><font color=\"#ffffff\">FLOW:&nbsp;</font><font color=\"#000000\">Untitled</font></left>");
 
     private HTML _canvasLabelID = new HTML("");
+
+    public static final String s_METHOD_KEY = "method";
+    public static final String s_METHOD_WEBUI = "webui";
 
     //================
     // Constructor(s)
@@ -457,6 +462,15 @@ public class Controller {
     //==================================================
     // Interface Implementation: WBRepositoryQueryAsync
     //==================================================
+
+    /**
+     * Get a list of all running flows and their webui url's.
+     * @param sid String session id
+     * @param cb AsyncCallback Callback object returned from the server.
+     */
+    public void listRunningFlows(AsyncCallback cb){
+        _repquery.listRunningFlows(getSessionID(), cb);
+    }
 
     /**
      * Unpublish a compnent or flow.
@@ -865,6 +879,7 @@ public class Controller {
         if (id == null){
             this._canvasLabel.setHTML("<span CLASS=\"leftalign\"><font color=\"#ffffff\">FLOW:&nbsp;</font><font color=\"#000000\">"
                                       + flowname + "</font></span>");
+            this._canvasLabelID.setHTML("");
         } else {
             this._canvasLabel.setHTML("<span CLASS=\"leftalign\"><font color=\"#ffffff\">FLOW:&nbsp;</font><font color=\"#000000\">"
                                       + flowname + "</font></span>");
@@ -2220,6 +2235,16 @@ public class Controller {
         new PropertiesDialog(cp, this);
     }
 
+    void showWebUI(String webUI, String flowID){
+
+        webUI = "./meandre_core_proxy?sid="
+                + URL.encodeComponent(getSessionID())
+                + "&" + s_METHOD_KEY + "=" + s_METHOD_WEBUI
+                + "&target=" + URL.encodeComponent(webUI);
+
+
+        Window.open(webUI, "Web UI for flow: " + flowID, "resizable=yes,scrollbars=yes,status=yes");
+    }
 
     /**
      * Build the search panel.
