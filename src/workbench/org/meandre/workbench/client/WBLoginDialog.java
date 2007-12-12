@@ -180,7 +180,7 @@ public class WBLoginDialog extends DialogBox {
 
         // FOR DEV ONLY
         _tbox.setText("admin");
-        _pbox.setText("admin");
+        //_pbox.setText("admin");
 
 
 

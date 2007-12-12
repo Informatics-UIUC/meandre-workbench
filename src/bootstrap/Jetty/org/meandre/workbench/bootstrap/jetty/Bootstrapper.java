@@ -32,7 +32,7 @@ public class Bootstrapper {
     public final static String VERSION = "0.2 pre-alpha";
 
     /** The base Meandre port */
-    public static final int BASE_PORT = 1713;
+    public static final int BASE_PORT = 1712;
 
     /** The base directory for Jetty */
     public static final String JETTY_HOME = ".";
