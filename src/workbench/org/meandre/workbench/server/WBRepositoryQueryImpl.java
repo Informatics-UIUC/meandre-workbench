@@ -25,6 +25,7 @@ import org.meandre.workbench.client.beans.*;
 import org.meandre.workbench.server.proxy.MeandreProxy;
 import org.meandre.workbench.server.proxy.beans.location.LocationBean;
 import org.meandre.workbench.server.proxy.beans.execute.RunningFlow;
+import java.util.Random;
 
 
 /**
@@ -89,7 +90,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @gwt.typeArgs <org.meandre.workbench.client.beans.WBRunningFlow>
      * @return Set Returns set of running flow beans.
      */
-    public Set listRunningFlows(String sid){
+    synchronized public Set listRunningFlows(String sid){
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return null;
@@ -116,7 +117,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param uri String identifier.
      * @return WBCallbackObject Bean that contains return information.
      */
-    public WBCallbackObject unpublish(String sid, String uri) {
+    synchronized public WBCallbackObject unpublish(String sid, String uri) {
         Object obj = _proxies.get(sid);
         WBCallbackObject wbc = new WBCallbackObject();
         if (obj == null) {
@@ -142,7 +143,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param uri String identifier.
      * @return WBCallbackObject Bean that contains return information.
      */
-    public WBCallbackObject publish(String sid, String uri) {
+    synchronized public WBCallbackObject publish(String sid, String uri) {
         Object obj = _proxies.get(sid);
         WBCallbackObject wbc = new WBCallbackObject();
         if (obj == null) {
@@ -170,7 +171,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @gwt.typeArgs <org.meandre.workbench.client.beans.WBFlow>
      * @return Set Returns set of active flows in the public repository.
      */
-    public Set getPublicRepositoryFlows(String sid) {
+    synchronized public Set getPublicRepositoryFlows(String sid) {
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return null;
@@ -200,7 +201,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
      * @return Set Returns set of active components in the public repository.
      */
-    public Set getPublicRepositoryComponents(String sid) {
+    synchronized public Set getPublicRepositoryComponents(String sid) {
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return null;
@@ -231,7 +232,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param location String location url.
      * @return WBCallbackObject Bean that contains return information.
      */
-    public WBCallbackObject removeLocation(String sid, String location) {
+    synchronized public WBCallbackObject removeLocation(String sid, String location) {
         Object obj = _proxies.get(sid);
         WBCallbackObject wbc = new WBCallbackObject();
         if (obj == null) {
@@ -262,7 +263,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param desc String location description.
      * @return WBCallbackObject Bean that contains return information.
      */
-    public WBCallbackObject addLocation(String sid, String location,
+    synchronized public WBCallbackObject addLocation(String sid, String location,
                                         String desc) {
         Object obj = _proxies.get(sid);
         WBCallbackObject wbc = new WBCallbackObject();
@@ -291,7 +292,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param sid String session id
      * @return WBCallbackObject Bean that contains return information.
      */
-    public WBCallbackObject regenerateRepository(String sid) {
+    synchronized public WBCallbackObject regenerateRepository(String sid) {
         Object obj = _proxies.get(sid);
         WBCallbackObject wbc = new WBCallbackObject();
         if (obj == null) {
@@ -318,7 +319,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param flowid String flow uri.
      * @return WBCallbackObject Bean that contains return information.
      */
-    public WBCallbackObject deleteFlowFromRepository(String sid, String flowid) {
+    synchronized public WBCallbackObject deleteFlowFromRepository(String sid, String flowid) {
         Object obj = _proxies.get(sid);
         WBCallbackObject wbc = new WBCallbackObject();
         if (obj == null) {
@@ -347,7 +348,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param flowid String flow uri.
      * @return WBExecBean Bean that contains execution information.
      */
-    public WBExecBean startInteractiveExecution(String sid,
+    synchronized public WBExecBean startInteractiveExecution(String sid,
                                                 String execid,
                                                 String flowid) {
         Object obj = _proxies.get(sid);
@@ -413,7 +414,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param execid String execution ID.
      * @return WBExecBean
      */
-    public WBExecBean updateInteractiveExecution(String sid, String execid) {
+    synchronized public WBExecBean updateInteractiveExecution(String sid, String execid) {
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return new WBExecBean("No longer valid session ID.");
@@ -440,7 +441,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param sid String session id
      * @return LoginBean Bean containing login information.
      */
-    public WBLoginBean checkSessionID(String sid) {
+    synchronized public WBLoginBean checkSessionID(String sid) {
         this.getThreadLocalRequest().getSession().setAttribute(s_PROXIES_KEY,
                 _proxies);
         Object obj = _proxies.get(sid);
@@ -449,6 +450,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
         } else {
             MeandreProxy proxy = (MeandreProxy) obj;
             if (proxy.getRoles() != null) {
+                proxy.flushRepository();
                 return new WBLoginBean(proxy.getName(), sid, proxy.getBaseURL());
             }
         }
@@ -462,7 +464,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @param url String URL of server to connect with.
      * @return LoginBean Bean containing login information.
      */
-    public WBLoginBean login(String userid, String password, String url) {
+    synchronized public WBLoginBean login(String userid, String password, String url) {
         this.getThreadLocalRequest().getSession().setAttribute(s_PROXIES_KEY,
                 _proxies);
         WBLoginBean wblb = null;
@@ -471,9 +473,10 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
             try {
                 Thread.currentThread().sleep(5);
             } catch (Exception e) {}
-            String sid = "sid:" + System.currentTimeMillis();
+            String sid = "sid:" + System.currentTimeMillis() + "-" +(new Random().nextInt());
             wblb = new WBLoginBean(proxy.getName(), sid, url);
             _proxies.put(sid, proxy);
+            proxy.flushRepository();
         } else {
             wblb = new WBLoginBean("Login failed.");
         }
@@ -487,7 +490,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @gwt.typeArgs <org.meandre.workbench.client.beans.WBLocation>
      * @return Set Returns set of active locations.
      */
-    public Set getLocations(String sid) {
+    synchronized public Set getLocations(String sid) {
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return null;
@@ -514,7 +517,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
      * @return Set Returns set of active components matching search query.
      */
-    public Set getActiveComponents(String search, String sid) {
+    synchronized public Set getActiveComponents(String search, String sid) {
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return null;
@@ -549,7 +552,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      * @gwt.typeArgs <org.meandre.workbench.client.beans.WBComponent>
      * @return Set Returns set of active components.
      */
-    public Set getActiveComponents(String sid) {
+    synchronized public Set getActiveComponents(String sid) {
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return null;
@@ -577,7 +580,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      *
      * @gwt.typeArgs <org.meandre.workbench.client.beans.WBFlow>
      */
-    public Set getActiveFlows(String sid) {
+    synchronized public Set getActiveFlows(String sid) {
         Object obj = _proxies.get(sid);
         if (obj == null) {
             return null;
@@ -603,7 +606,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
      *
      * @return WBCallbackObject Returns callback object.
      */
-    public WBCallbackObject saveFlow(WBFlow flow, String sid) {
+    synchronized public WBCallbackObject saveFlow(WBFlow flow, String sid) {
         Object obj = _proxies.get(sid);
         boolean saveas = false;
         WBCallbackObject wbc = new WBCallbackObject();

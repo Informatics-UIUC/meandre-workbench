@@ -434,7 +434,7 @@ public class Controller {
         _sessionID = sid;
         _activeDomain = dom;
 
-        final long DURATION = 1000 * 60 * 60 * 24 * 14; //duration remembering login. 2 weeks in this example.
+        final long DURATION = 1000 * 60 * 60; //duration remembering login. 2 weeks in this example.
         Date expires = new Date(System.currentTimeMillis() + DURATION);
         Cookies.setCookie(this._sidKey, sid, expires, null, "/", false);
         buildPublicRepoMaps(new WBCommand() {
