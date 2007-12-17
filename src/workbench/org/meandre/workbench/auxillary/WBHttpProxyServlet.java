@@ -192,6 +192,10 @@ public class WBHttpProxyServlet extends HttpServlet {
                        HttpServletResponse response) throws ServletException,
             IOException {
 
+        System.out.println("\n\n=======================");
+        System.out.println(" UPLOADING COMPONENTS");
+        System.out.println("=======================\n\n");
+
         MeandreProxy proxy = null;
         ServletFileUpload sfu = null;
         List fparts = new ArrayList();
