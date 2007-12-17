@@ -52,8 +52,8 @@ public class WBRepositoryUploadForm extends DialogBox {
 
 
 
-    static final String s_repoFileName = "repository";
-    static final String s_ctxFileName = "jar";
+    static final String s_repoFileName = Controller.s_PROXY_POST_REPO_FIELDS_KEY;
+    static final String s_ctxFileName = Controller.s_PROXY_POST_JAR_FIELDS_KEY;
 
     private FileUpload _currentFU = null;
     private ListBox _lbRepos = null;
@@ -88,7 +88,7 @@ public class WBRepositoryUploadForm extends DialogBox {
         // Create a FormPanel and point it at a service.
         _form = new FormPanel();
         this.setWidget(_form);
-        _form.setAction("/meandre_core_proxy");
+        _form.setAction(Controller.s_PROXY_SERVLET_PATH);
 
 
         //===================================
@@ -177,13 +177,17 @@ public class WBRepositoryUploadForm extends DialogBox {
         //===================================
         // Add session id to form as hidden
         //===================================
-        Hidden sid = new Hidden("sid", _cont.getSessionID());
-        sid.setID("sid");
+        Hidden sid = new Hidden(Controller.s_GET_PARAM_SID_KEY, _cont.getSessionID());
+        sid.setID(Controller.s_GET_PARAM_SID_KEY);
         panel.add(sid);
 
-        Hidden url = new Hidden("url", "services/repository/add.rdf");
-        sid.setID("url");
+        Hidden url = new Hidden(Controller.s_PROXY_TARGET_KEY, Controller.s_CORE_ADD_PATH);
+        sid.setID(Controller.s_PROXY_TARGET_KEY);
         panel.add(url);
+
+        Hidden meth = new Hidden(Controller.s_PROXY_POST_METHOD_KEY, Controller.s_PROXY_POST_METHOD_REPO_UPLOAD);
+        sid.setID(Controller.s_PROXY_POST_METHOD_KEY);
+        panel.add(meth);
         //====================
         // Add ctx controls
         //====================

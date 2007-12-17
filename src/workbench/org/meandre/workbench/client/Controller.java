@@ -84,6 +84,24 @@ public class Controller {
     // Data Members
     //==============
 
+    /* HTTP proxy post method identifiers */
+    static public final String s_PROXY_POST_METHOD_REPO_UPLOAD = "RU01";
+    static public final String s_PROXY_POST_METHOD_PEAR_UPLOAD = "PU01";
+    /* HTTP proxy get method identifiers */
+    public static final String s_PROXY_GET_METHOD_WEBUI = "WEBUI01";
+
+    /* HTTP keys */
+    static public final String s_PROXY_POST_METHOD_KEY = "PPMKEY01";
+    public static final String s_PROXY_GET_METHOD_KEY = "PGMKEY01";
+    static public final String s_GET_PARAM_SID_KEY = "SID01";
+    static public final String s_PROXY_TARGET_KEY = "TARG01";
+    static public final String s_PROXY_POST_JAR_FIELDS_KEY = "PPJAR01";
+    static public final String s_PROXY_POST_REPO_FIELDS_KEY = "PPREPO01";
+
+    /* HTTP Paths */
+    static public final String s_PROXY_SERVLET_PATH = "/meandre_core_proxy";
+    static public final String s_CORE_ADD_PATH = "services/repository/add.rdf";
+
     /* Component placement properties.*/
     static private String s_TopKey = "wb_top_pix_pos";
     static private String s_LeftKey = "wb_left_pix_pos";
@@ -230,8 +248,6 @@ public class Controller {
 
     private HTML _canvasLabelID = new HTML("");
 
-    public static final String s_METHOD_KEY = "method";
-    public static final String s_METHOD_WEBUI = "webui";
 
     //================
     // Constructor(s)
@@ -2237,10 +2253,11 @@ public class Controller {
 
     void showWebUI(String webUI, String flowID){
 
-        webUI = "./meandre_core_proxy?sid="
+        webUI = "." + this.s_PROXY_SERVLET_PATH + "?"
+                + s_GET_PARAM_SID_KEY + "="
                 + URL.encodeComponent(getSessionID())
-                + "&" + s_METHOD_KEY + "=" + s_METHOD_WEBUI
-                + "&target=" + URL.encodeComponent(webUI);
+                + "&" + s_PROXY_GET_METHOD_KEY + "=" + s_PROXY_GET_METHOD_WEBUI
+                + "&" + s_PROXY_TARGET_KEY + "=" + URL.encodeComponent(webUI);
 
 
         Window.open(webUI, "Web UI for flow: " + flowID, "resizable=yes,scrollbars=yes,status=yes");

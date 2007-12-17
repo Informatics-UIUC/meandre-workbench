@@ -3,10 +3,8 @@ package org.meandre.workbench.auxillary;
 /*
  * @(#) HttpProxyServlet.java @VERSION@
  *
- * Copyright (c) 2007+ Amit Kumar
- *
- * The software is released under GNU GPL, Please
- * read License.txt
+ * @author Amit Kumar
+ * @modified D. Searsmith
  *
  */
 
@@ -19,19 +17,17 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.logging.FileHandler;
 import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.URLEncoder;
 
 //===============
 // Other Imports
@@ -48,7 +44,6 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.FilePartSource;
-import java.net.URLEncoder;
 import org.meandre.workbench.client.Controller;
 
 
@@ -65,13 +60,11 @@ public class WBHttpProxyServlet extends HttpServlet {
     // Data Members
     //==============
 
-
     /** The logger for the bootstrapper */
     private static Logger log = null;
 
     /** The basic handler for all the loggers */
     public static Handler handler = null;
-
 
     // Initializing the logger and its handlers
 //    static {
@@ -105,16 +98,7 @@ public class WBHttpProxyServlet extends HttpServlet {
         InputStream is = null;
         ServletOutputStream out = null;
 
-//        //authenticate
-//        Map proxies = (Map) req.getSession().getAttribute(
-//                WBRepositoryQueryImpl.s_PROXIES_KEY);
-//        if (proxies == null) {
-//            System.out.println("Proxies is null.");
-//            res.sendError(res.SC_METHOD_NOT_ALLOWED,
-//                          "Proxies is null.");
-//            return;
-//        }
-        String sid = req.getParameter("sid");
+        String sid = req.getParameter(Controller.s_GET_PARAM_SID_KEY);
         if (sid == null) {
             System.out.println("SID is null!");
             res.sendError(res.SC_METHOD_NOT_ALLOWED,
@@ -129,18 +113,18 @@ public class WBHttpProxyServlet extends HttpServlet {
                           "Session ID is no longer valid.");
         }
 
-        String method = req.getParameter(Controller.s_METHOD_KEY);
+        String method = req.getParameter(Controller.s_PROXY_GET_METHOD_KEY);
 
         if (method == null) {
             res.sendError(res.SC_METHOD_NOT_ALLOWED,
                           "Method is null.");
         }
 
-        if (method.equals(Controller.s_METHOD_WEBUI)) {
+        if (method.equals(Controller.s_PROXY_GET_METHOD_WEBUI)) {
 
             //key
             //site
-            String target = req.getParameter("target");
+            String target = req.getParameter(Controller.s_PROXY_TARGET_KEY);
             //System.out.println("Calling: " + target + " by " + req.getRemoteAddr());
             if (target == null) {
                 res.setStatus(404);
@@ -167,11 +151,12 @@ public class WBHttpProxyServlet extends HttpServlet {
                 while ((pos = sbuf.indexOf("/http", ptr)) != -1) {
                     String sub = "http://" + req.getLocalAddr() + ":"
                                  + req.getLocalPort()
-                                 + "/meandre_core_proxy?sid="
+                                 + Controller.s_PROXY_SERVLET_PATH + "?"
+                                 + Controller.s_GET_PARAM_SID_KEY + "="
                                  + URLEncoder.encode(sid, "UTF-8")
-                                 + "&" + Controller.s_METHOD_KEY + "="
-                                 + Controller.s_METHOD_WEBUI
-                                 + "&target=" +
+                                 + "&" + Controller.s_PROXY_GET_METHOD_KEY + "="
+                                 + Controller.s_PROXY_GET_METHOD_WEBUI
+                                 + "&" + Controller.s_PROXY_TARGET_KEY + "=" +
                                  URLEncoder.encode(target, "UTF-8");
 
                     //System.out.println("Subbing: " + sub + " for: " + sbuf.substring(pos, pos+1));
@@ -207,19 +192,12 @@ public class WBHttpProxyServlet extends HttpServlet {
                        HttpServletResponse response) throws ServletException,
             IOException {
 
-        Map proxies = (Map) request.getSession().getAttribute(
-                WBRepositoryQueryImpl.s_PROXIES_KEY);
-        if (proxies == null) {
-            System.out.println("Proxies is null.");
-            response.sendError(response.SC_METHOD_NOT_ALLOWED,
-                               "Proxies is null.");
-            return;
-        }
-
         MeandreProxy proxy = null;
         ServletFileUpload sfu = null;
         List fparts = new ArrayList();
         String url = null;
+        String method = null;
+        String sid = null;
         try {
             sfu = new ServletFileUpload(new DiskFileItemFactory());
 
@@ -229,17 +207,17 @@ public class WBHttpProxyServlet extends HttpServlet {
                 fparts.add(fi);
                 System.out.println("Key: " + fi.getFieldName());
 
-                if (fi.getFieldName().equals("sid")) {
-                    String sid = fi.getString();
+                if (fi.getFieldName().equals(Controller.s_GET_PARAM_SID_KEY)) {
+                    sid = fi.getString();
                     if (sid == null) {
                         System.out.println("SID is null!");
                         response.sendError(response.SC_METHOD_NOT_ALLOWED,
                                            "SID is null!");
                         return;
                     }
-                    proxy = (MeandreProxy) proxies.get(sid);
+                    proxy = (MeandreProxy) WBRepositoryQueryImpl.getProxy(sid);
                 }
-                if (fi.getFieldName().equals("url")) {
+                if (fi.getFieldName().equals(Controller.s_PROXY_TARGET_KEY)) {
                     String s = fi.getString();
                     if (s == null) {
                         System.out.println("URL is null!");
@@ -249,6 +227,18 @@ public class WBHttpProxyServlet extends HttpServlet {
                     }
                     url = s;
                 }
+
+                if (fi.getFieldName().equals(Controller.s_PROXY_POST_METHOD_KEY)) {
+                    String s = fi.getString();
+                    if (s == null) {
+                        System.out.println("Post method is null!");
+                        response.sendError(response.SC_METHOD_NOT_ALLOWED,
+                                           "Post method is null!");
+                        return;
+                    }
+                    method = s;
+                }
+
             }
 
         } catch (Exception e) {
@@ -256,10 +246,22 @@ public class WBHttpProxyServlet extends HttpServlet {
             e.printStackTrace();
         }
 
+        if (method == null) {
+            response.sendError(response.SC_METHOD_NOT_ALLOWED,
+                               "Post method not found");
+        }
+        if (sid == null) {
+            response.sendError(response.SC_METHOD_NOT_ALLOWED,
+                               "SID not found");
+        }
         if (proxy == null) {
             response.sendError(response.SC_METHOD_NOT_ALLOWED,
                                "Session ID is no longer valid.");
-        } else {
+        }
+
+        /* BRANCH ON METHOD */
+
+        if (method.equals(Controller.s_PROXY_POST_METHOD_REPO_UPLOAD)) {
 
             String sbuff = "";
 
@@ -281,8 +283,8 @@ public class WBHttpProxyServlet extends HttpServlet {
                     System.out.println("Key: " + key + " Store: " +
                                        fi.getStoreLocation() + " Name: " +
                                        fi.getName());
-                    if (key.trim().equals("jar") ||
-                        key.trim().equals("repository")) {
+                    if (key.trim().equals(Controller.s_PROXY_POST_JAR_FIELDS_KEY) ||
+                        key.trim().equals(Controller.s_PROXY_POST_REPO_FIELDS_KEY)) {
                         if (fi.getSize() > 0) {
                             if (fi.isInMemory()) {
                                 fi.write(fi.getStoreLocation());
@@ -290,7 +292,15 @@ public class WBHttpProxyServlet extends HttpServlet {
                             FilePartSource fps = new FilePartSource(fi.
                                     getStoreLocation());
                             System.out.println("Length: " + fps.getLength());
-                            lparts.add(new FilePart(key, fps));
+
+                            String addval = null;
+                            if (key.trim().equals(Controller.s_PROXY_POST_JAR_FIELDS_KEY)){
+                                addval = "jar";
+                            }
+                            if (key.trim().equals(Controller.s_PROXY_POST_REPO_FIELDS_KEY)) {
+                                addval = "repository";
+                            }
+                            lparts.add(new FilePart(addval, fps));
                         }
                     }
                 }
@@ -320,6 +330,14 @@ public class WBHttpProxyServlet extends HttpServlet {
             response.getOutputStream().write(resp.getBytes());
             response.getOutputStream().flush();
             response.getOutputStream().close();
+
+        } else if (method.equals(Controller.s_PROXY_POST_METHOD_PEAR_UPLOAD)) {
+
+
+
+        } else {
+            response.sendError(response.SC_METHOD_NOT_ALLOWED,
+                               "Unknown proxy post method.");
         }
 
     }
