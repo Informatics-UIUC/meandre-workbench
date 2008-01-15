@@ -1,4 +1,4 @@
-<project name="basic" default="run">
+<project name="Meandre-Workbench" default="run">
 
    <property name="WORKBENCH_CLASSES" value="./classes" />
    <property name="WEBAPP_WAR" value="./webapp/war" />
