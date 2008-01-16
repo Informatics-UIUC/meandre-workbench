@@ -64,6 +64,7 @@ public class RepositoryImpl implements QueryableRepository {
 
 		// Format
 		setFormat.add("java/class");
+		setFormat.add("java/osgi");
 
 		// Firing policy
 		setFiringPolicy.add("any");
