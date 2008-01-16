@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <name>Meandre-Workbench</name>
+        </general-data>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
+            <!-- Do not use Project Properties customizer when editing this file manually. -->
+            <name>Meandre-Workbench</name>
+            <properties/>
+            <folders>
+                <source-folder>
+                    <label>Meandre-Workbench</label>
+                    <location>.</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>src\bootstrap</label>
+                    <type>java</type>
+                    <location>src/bootstrap</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>src\workbench</label>
+                    <type>java</type>
+                    <location>src/workbench</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>src-test</label>
+                    <type>java</type>
+                    <location>src-test</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <target>build</target>
+                </action>
+                <action name="clean">
+                    <target>clean</target>
+                </action>
+                <action name="run">
+                    <target>run</target>
+                </action>
+                <action name="rebuild">
+                    <target>clean</target>
+                    <target>build</target>
+                </action>
+            </ide-actions>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>src\bootstrap</label>
+                        <location>src/bootstrap</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>src\workbench</label>
+                        <location>src/workbench</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>src-test</label>
+                        <location>src-test</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="clean"/>
+                    <ide-action name="run"/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/2">
+            <compilation-unit>
+                <package-root>src/bootstrap</package-root>
+                <classpath mode="compile">lib/commons-httpclient/commons-codec-1.3.jar;lib/commons-httpclient/commons-fileupload-1.2.jar;lib/commons-httpclient/commons-httpclient-3.1.jar;lib/commons-httpclient/commons-io-1.3.2.jar;lib/gwt/gwt-benchmark-viewer.jar;lib/gwt/gwt-dev-windows.jar;lib/gwt/gwt-servlet.jar;lib/gwt/gwt-user.jar;lib/gwt_dnd/gwt-dnd.jar;lib/gwt_widgets/gwt-widgets-0.1.5.jar;lib/JENA/antlr-2.7.5.jar;lib/JENA/arq-extra.jar;lib/JENA/arq.jar;lib/JENA/commons-logging-1.1.jar;lib/JENA/concurrent.jar;lib/JENA/icu4j_3_4.jar;lib/JENA/iri.jar;lib/JENA/jena.jar;lib/JENA/jenatest.jar;lib/JENA/json.jar;lib/JENA/junit.jar;lib/JENA/log4j-1.2.12.jar;lib/JENA/lucene-core-2.0.0.jar;lib/JENA/stax-api-1.0.jar;lib/JENA/wstx-asl-3.0.0.jar;lib/JENA/xercesImpl.jar;lib/JENA/xml-apis.jar;lib/JENA/antlr-2.7.5.jar;lib/JENA/arq-extra.jar;lib/JENA/arq.jar;lib/JENA/commons-logging-1.1.jar;lib/JENA/concurrent.jar;lib/JENA/icu4j_3_4.jar;lib/JENA/iri.jar;lib/JENA/jena.jar;lib/JENA/jenatest.jar;lib/JENA/json.jar;lib/JENA/junit.jar;lib/JENA/log4j-1.2.12.jar;lib/JENA/lucene-core-2.0.0.jar;lib/JENA/stax-api-1.0.jar;lib/JENA/wstx-asl-3.0.0.jar;lib/JENA/xercesImpl.jar;lib/JENA/xml-apis.jar;lib/Jetty/ant-1.6.5.jar;lib/Jetty/core-3.1.1.jar;lib/Jetty/jetty-6.1.5.jar;lib/Jetty/jetty-util-6.1.5.jar;lib/Jetty/jsp-2.1.jar;lib/Jetty/jsp-api-2.1.jar;lib/Jetty/servlet-api-2.5-6.1.5.jar</classpath>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>src/workbench</package-root>
+                <classpath mode="compile">lib/commons-httpclient/commons-codec-1.3.jar;lib/commons-httpclient/commons-fileupload-1.2.jar;lib/commons-httpclient/commons-httpclient-3.1.jar;lib/commons-httpclient/commons-io-1.3.2.jar;lib/gwt/gwt-benchmark-viewer.jar;lib/gwt/gwt-dev-windows.jar;lib/gwt/gwt-servlet.jar;lib/gwt/gwt-user.jar;lib/gwt_dnd/gwt-dnd.jar;lib/gwt_widgets/gwt-widgets-0.1.5.jar;lib/JENA/antlr-2.7.5.jar;lib/JENA/arq-extra.jar;lib/JENA/arq.jar;lib/JENA/commons-logging-1.1.jar;lib/JENA/concurrent.jar;lib/JENA/icu4j_3_4.jar;lib/JENA/iri.jar;lib/JENA/jena.jar;lib/JENA/jenatest.jar;lib/JENA/json.jar;lib/JENA/junit.jar;lib/JENA/log4j-1.2.12.jar;lib/JENA/lucene-core-2.0.0.jar;lib/JENA/stax-api-1.0.jar;lib/JENA/wstx-asl-3.0.0.jar;lib/JENA/xercesImpl.jar;lib/JENA/xml-apis.jar;lib/JENA/antlr-2.7.5.jar;lib/JENA/arq-extra.jar;lib/JENA/arq.jar;lib/JENA/commons-logging-1.1.jar;lib/JENA/concurrent.jar;lib/JENA/icu4j_3_4.jar;lib/JENA/iri.jar;lib/JENA/jena.jar;lib/JENA/jenatest.jar;lib/JENA/json.jar;lib/JENA/junit.jar;lib/JENA/log4j-1.2.12.jar;lib/JENA/lucene-core-2.0.0.jar;lib/JENA/stax-api-1.0.jar;lib/JENA/wstx-asl-3.0.0.jar;lib/JENA/xercesImpl.jar;lib/JENA/xml-apis.jar;lib/Jetty/ant-1.6.5.jar;lib/Jetty/core-3.1.1.jar;lib/Jetty/jetty-6.1.5.jar;lib/Jetty/jetty-util-6.1.5.jar;lib/Jetty/jsp-2.1.jar;lib/Jetty/jsp-api-2.1.jar;lib/Jetty/servlet-api-2.5-6.1.5.jar</classpath>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>src-test</package-root>
+                <unit-tests/>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+        </java-data>
+    </configuration>
+</project>
