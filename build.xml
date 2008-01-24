@@ -168,7 +168,7 @@
             fork="yes"
             maxmemory="1024m">
             <classpath refid="run.classpath"/>
-            <jvmarg value="-Duser.dir=.."/>
+            <!-- <jvmarg value="-Duser.dir=.."/> -->
         </java>
     </target>
 

@@ -34,8 +34,10 @@ public class Bootstrapper {
     /** The base Meandre port */
     public static final int BASE_PORT = 1712;
 
-    /** The base directory for Jetty */
-    public static final String JETTY_HOME = ".";
+    /** The base directory for Jetty
+     *  (by default use the current working directory)
+     */
+    public static final String JETTY_HOME = System.getProperty("user.dir");
 
     /** The logger for the bootstrapper */
     private static Logger log = null;
@@ -92,14 +94,11 @@ public class Bootstrapper {
         connector.setPort(Integer.getInteger("jetty.port", BASE_PORT).intValue());
         server.setConnectors(new Connector[] {connector});
 
-        String jetty_home = System.getProperty("user.dir");
-        //String jetty_home = "c:/algsource/SEASR/TestEngine/Meandre";
-
         WebAppContext webapp = new WebAppContext();
         webapp.setContextPath("/");
-        webapp.setWar(JETTY_HOME + "/trunk/webapp/war");
+        webapp.setWar(JETTY_HOME + "/webapp/war");
         webapp.setDefaultsDescriptor(JETTY_HOME +
-                                     "/trunk/webapp/bootstrap/meandre-web.xml");
+                                     "/webapp/bootstrap/meandre-web.xml");
         server.setHandler(webapp);
         server.start();
         server.join();
