@@ -5,6 +5,7 @@
     <property name="src-test.dir" value="${basedir}/src-test" />
     <property name="build.dir" value="${basedir}/bin" />
     <property name="lib.dir" value="${basedir}/lib" />
+    <property name="doc.dir" value="${basedir}/doc" />
     <property name="www.dir" value="${basedir}/www" />
     <property name="classes.dir" value="${basedir}/classes" />
     <property name="webapp.dir" value="${basedir}/webapp" />
@@ -194,5 +195,30 @@
         <delete dir="${web-inf.classes.dir}"/>
         <delete dir="${web-inf.lib.dir}"/>
         <delete dir="${webapp.bootstrap.dir}" />
+        <delete dir="${doc.dir}" />
     </target>
+
+
+	
+		<!---        Documentation (Javadocs)       -->
+	<target name="javadoc"
+		description="build the documentation. (expect lots of warnings when run - don't worry about them)" >
+
+		<javadoc 
+			sourcepath="${src.dir}/bootstrap/Jetty"
+			maxmemory="512m" 
+			access="private"
+			windowtitle="Meandre Workbench (Jetty Bootstrap) API"
+			author="true" 
+			use="true"
+			destdir="${doc.dir}/bootstrap"/>
+		<javadoc 
+			sourcepath="${src.dir}/workbench"
+			maxmemory="512m" 
+			access="private"
+			windowtitle="Meandre Workbench API"
+			author="true" 
+			use="true"
+			destdir="${doc.dir}/workbench"/>		
+	</target>
 </project>
