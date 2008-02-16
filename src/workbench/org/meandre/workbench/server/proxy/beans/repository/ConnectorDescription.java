@@ -130,22 +130,22 @@ public class ConnectorDescription {
 	public Resource getTargetIntaceDataPort () {
 		return resInstanceDataPortTarget;
 	}
-
+	
 	/** Check if two connectors are equal.
-	 *
+	 * 
 	 * @param o The other connector to check
 	 */
 	public boolean equals ( Object o ) {
 		ConnectorDescription cdOther = (ConnectorDescription) o;
 		boolean bRes = false;
-
-		if ( resInstanceDataPortSource.equals(cdOther.resInstanceDataPortSource) &&
+		
+		if ( resInstanceDataPortSource.equals(cdOther.resInstanceDataPortSource) && 
 			 resInstanceDataPortTarget.equals(cdOther.resInstanceDataPortTarget) &&
 			 resInstanceSource.equals(cdOther.resInstanceSource) &&
 			 resInstanceTarget.equals(cdOther.resInstanceTarget)
 		   )
 			bRes = true;
-
+		
 		return bRes;
 	}
 }

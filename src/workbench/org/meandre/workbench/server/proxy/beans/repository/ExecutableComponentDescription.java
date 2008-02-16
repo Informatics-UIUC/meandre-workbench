@@ -5,14 +5,19 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Set;
 
+
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 /** This class wraps the basic description of an executable component.
- *
+ * 
  * @author Xavier Llor&agrave;
  *
  */
@@ -20,40 +25,40 @@ public class ExecutableComponentDescription {
 
 	/** The resource for the executable component */
 	private Resource resExecutableComponent = null;
-
+	
 	/** The name of the executable component */
 	private String sName = null;
-
+	
 	/** The description of the executable component */
 	private String sDescription = null;
-
+	
 	/** The rights of the executable component */
 	private String sRights = null;
-
+	
 	/** The creator of the executable component */
 	private String sCreator = null;
-
+	
 	/** The date of the executable component */
 	private Date dateCreation = null;
-
+	
 	/** What kind of runnable component is being described */
 	private String sRunnable = null;
-
+	
 	/** What is the firing policy */
 	private String sFiringPolicy = null;
-
+	
 	/** What executable format does the runnable component take */
 	private String sFormat = null;
 
 	/** The set of contexts required for execution */
-	private Set<Resource> setContext = null;
-
+	private Set<RDFNode> setContext = null;
+	
 	/** The resource pointing to the executable component implementation */
 	private Resource resLocation = null;
-
+	
 	/** The set of input data ports */
 	private Set<DataPortDescription> setInputs = null;
-
+	
 	/** The hash table for input resource mapping */
 	private Hashtable<Resource,DataPortDescription> htInputsMap = null;
 
@@ -68,9 +73,9 @@ public class ExecutableComponentDescription {
 
 	/** The tag description */
 	private TagsDescription tagDesc = null;
-
+	
 	/** Describes an executable component.
-	 *
+	 * 
 	 * @param resExecutableComponent The resource for the wrapped executable component
 	 * @param sName The name of the component
 	 * @param sDescription The description of the component
@@ -84,8 +89,8 @@ public class ExecutableComponentDescription {
 	 * @param resLocation The location of the implementation of the component
 	 * @param setInputs The set of input data ports
 	 * @param setOutputs The set of output data ports
-	 * @param pddProperties
-	 * @param tagDesc
+	 * @param pddProperties 
+	 * @param tagDesc 
 	 * @throws CorruptedDescriptionException Either the wrong runnable, format, or firing policy are incorrect
 	 */
 	public ExecutableComponentDescription (
@@ -98,23 +103,23 @@ public class ExecutableComponentDescription {
 			String sRunnable,
 			String sFiringPolicy,
 			String sFormat,
-			Set<Resource> setContext,
+			Set<RDFNode> setContext,
 			Resource resLocation,
 			Set<DataPortDescription> setInputs,
-			Set<DataPortDescription> setOutputs,
-			PropertiesDescriptionDefinition pddProperties,
+			Set<DataPortDescription> setOutputs, 
+			PropertiesDescriptionDefinition pddProperties, 
 			TagsDescription tagDesc
 		) throws CorruptedDescriptionException{
 		// Sanity checks
 		if ( !RepositoryImpl.setRunnable.contains(sRunnable) )
 			throw new CorruptedDescriptionException(sRunnable+" is not a valid type: "+RepositoryImpl.setRunnable);
-
+		
 		if ( !RepositoryImpl.setFormat.contains(sFormat) )
 			throw new CorruptedDescriptionException(sFormat+" is not a valid type: "+RepositoryImpl.setFormat);
-
+		
 		if ( !RepositoryImpl.setFiringPolicy.contains(sFiringPolicy) )
 			throw new CorruptedDescriptionException(sFiringPolicy+" is not a valid type: "+RepositoryImpl.setFiringPolicy);
-
+		
 		// Initialization
 		this.resExecutableComponent = resExecutableComponent;
 		this.sName = sName;
@@ -128,7 +133,7 @@ public class ExecutableComponentDescription {
 		this.setContext = setContext;
 		this.resLocation = resLocation;
 		this.setInputs = setInputs;
-		this.setOutputs = setOutputs;
+		this.setOutputs = setOutputs;	
 		this.pddProperties = pddProperties;
 		this.tagDesc  = tagDesc;
 		// Update the mappings
@@ -141,7 +146,7 @@ public class ExecutableComponentDescription {
 	}
 
 	/** Returns the executable component resource.
-	 *
+	 * 
 	 * @return The resource
 	 */
 	public Resource getExecutableComponent() {
@@ -149,113 +154,113 @@ public class ExecutableComponentDescription {
 	}
 
 	/** Returns the executable component resource as a string.
-	 *
+	 * 
 	 * @return The resource
 	 */
 	public String getExecutableComponentAsString() {
 		return resExecutableComponent.toString();
 	}
-
+	
 	/** Returns the components name.
-	 *
+	 * 
 	 * @return The name
 	 */
 	public String getName() {
 		return sName;
 	}
-
+	
 	/** Returns the executable component description.
-	 *
+	 * 
 	 * @return The description
 	 */
 	public String getDescription () {
 		return sDescription;
 	}
-
+	
 	/** Returns the rights of the component.
-	 *
+	 * 
 	 * @return The rights
 	 */
 	public String getRights () {
 		return sRights;
 	}
-
+	
 	/** Returns the creator of the component.
-	 *
+	 * 
 	 * @return The creator
 	 */
 	public String getCreator () {
 		return sCreator;
 	}
-
+	
 	/** Returns the creation date of the component.
-	 *
+	 * 
 	 * @return The date
 	 */
 	public Date getCreationDate () {
 		return dateCreation;
 	}
-
+	
 	/** Returns the runnable type.
-	 *
+	 * 
 	 * @return The runnable type
 	 */
 	public String getRunnable () {
 		return sRunnable;
 	}
-
+	
 	/** Returns the firing policy.
-	 *
+	 * 
 	 * @return The firing policy
 	 */
 	public String getFiringPolicy () {
 		return sFiringPolicy;
 	}
-
+	
 	/** Returns the format of the executable component implementations.
-	 *
+	 * 
 	 * @return The format of the executable component
 	 */
 	public String getFormat () {
 		return sFormat;
 	}
-
+	
 	/** The set of contextes associated to the context.
-	 *
+	 * 
 	 * @return The context set
 	 */
-	public Set<Resource> getContext () {
+	public Set<RDFNode> getContext () {
 		return setContext;
 	}
-
+	
 	/** The location of the executable component.
-	 *
+	 * 
 	 * @return The location of the executable component
 	 */
 	public Resource getLocation () {
 		return resLocation;
 	}
-
+	
 	/** The set of data ports that define the inputs of the executable component.
-	 *
+	 * 
 	 * @return The set of data ports
 	 */
 	public Set<DataPortDescription> getInputs () {
 		return setInputs;
 	}
-
+	
 	/** Returns the input data port description linked to the provided resource.
-	 *
+	 * 
 	 * @param res The resource
 	 * @return The data port description
 	 */
 	public DataPortDescription getInput ( Resource res ) {
 		return htInputsMap.get(res);
 	}
-
-
+	
+	
 	/** The set of data ports that define the outputs of the executable component.
-	 *
+	 * 
 	 * @return The set of data ports
 	 */
 	public Set<DataPortDescription> getOutputs () {
@@ -263,7 +268,7 @@ public class ExecutableComponentDescription {
 	}
 
 	/** Returns the output data port description linked to the provided resource.
-	 *
+	 * 
 	 * @param res The resource
 	 * @return The data port description
 	 */
@@ -271,15 +276,15 @@ public class ExecutableComponentDescription {
 		return htOutputsMap.get(res);
 	}
 	/** Returns the property descriptions for the descripbed executable component.
-	 *
+	 * 
 	 * @return The property definitions
 	 */
 	public PropertiesDescriptionDefinition getProperties () {
 		return pddProperties;
 	}
-
+	
 	/** Return the tags linked to the executable component.
-	 *
+	 * 
 	 * @return The tag set
 	 */
 	public TagsDescription getTags () {
@@ -287,90 +292,90 @@ public class ExecutableComponentDescription {
 	}
 
 	/** Returns the model describing this executable component.
-	*
+	* 
 	 * @return The model
 	 */
 	public Model getModel() {
 		Model model = ModelFactory.createDefaultModel();
-
+		
 		// Setting the name spaces
-		model.setNsPrefix("", "http://www.meandre.org/ontology/");
-		model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-		model.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-		model.setNsPrefix("rdfs","http://www.w3.org/2000/01/rdf-schema#");
-		model.setNsPrefix("dc","http://purl.org/dc/elements/1.1/");
+		model.setNsPrefix("", RepositoryVocabulary.NS);
+		model.setNsPrefix("xsd", XSD.getURI());
+		model.setNsPrefix("rdf", RDF.getURI());
+		model.setNsPrefix("rdfs",RDFS.getURI());
+		model.setNsPrefix("dc",DC.getURI());
 
 		Resource res = model.createResource(resExecutableComponent.toString());
-
+		
 		// Plain properties
-		res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/name"),model.createTypedLiteral(sName))
-		   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/description"),model.createTypedLiteral(sDescription))
-		   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/rights"),model.createTypedLiteral(sRights))
-		   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/creator"),model.createTypedLiteral(sCreator))
-		   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/date"),model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dateCreation),XSDDatatype.XSDdate))
-		   .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/format"),model.createTypedLiteral(sFormat))
-		   .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/runnable"),model.createTypedLiteral(sRunnable))
-		   .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/firing_policy"),model.createTypedLiteral(sFiringPolicy))
-		   .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/resource_location"),model.createResource(resLocation.toString()))
-		   .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),model.createResource("http://www.meandre.org/ontology/executable_component"))
+		res.addProperty(RepositoryVocabulary.name,model.createTypedLiteral(sName))
+		   .addProperty(DC.description,model.createTypedLiteral(sDescription))
+		   .addProperty(DC.rights,model.createTypedLiteral(sRights))
+		   .addProperty(DC.creator,model.createTypedLiteral(sCreator))
+		   .addProperty(DC.date,model.createTypedLiteral(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dateCreation),XSDDatatype.XSDdate))
+		   .addProperty(DC.format,model.createTypedLiteral(sFormat))
+		   .addProperty(RepositoryVocabulary.runnable,model.createTypedLiteral(sRunnable))
+		   .addProperty(RepositoryVocabulary.firing_policy,model.createTypedLiteral(sFiringPolicy))
+		   .addProperty(RepositoryVocabulary.resource_location,model.createResource(resLocation.toString()))
+		   .addProperty(RDF.type,RepositoryVocabulary.executable_component)
 		   ;
-
+		
 		// Adding tags
 		for ( String sTag:tagDesc.getTags() )
-			res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/tag"),model.createTypedLiteral(sTag));
-
+			res.addProperty(RepositoryVocabulary.tag,model.createTypedLiteral(sTag));
+			   
 		// Adding execution contexts
-		for ( Resource resContext:setContext )
-			res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/execution_context"),model.createResource(resContext.toString()));
-
+		for ( RDFNode rdfNode:setContext )
+			res.addProperty(RepositoryVocabulary.execution_context,rdfNode);
+		
 		// Adding properties
 		for ( String sKey:pddProperties.getKeys()) {
 			String sValue = pddProperties.getValue(sKey);
 			String  sDesc = pddProperties.getDescription(sKey);
-			res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/property_set"),
+			res.addProperty(RepositoryVocabulary.property_set,
 					model.createResource(resExecutableComponent.toString()+"/property/"+sKey)
-						 .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),model.createResource("http://www.meandre.org/ontology/property"))
-					     .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/key"),model.createTypedLiteral(sKey))
-					     .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/value"),model.createTypedLiteral(sValue))
-					     .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/description"),model.createTypedLiteral(sDesc))
+						 .addProperty(RDF.type,RepositoryVocabulary.property)
+					     .addProperty(RepositoryVocabulary.key,model.createTypedLiteral(sKey))
+					     .addProperty(RepositoryVocabulary.value,model.createTypedLiteral(sValue))
+					     .addProperty(DC.description,model.createTypedLiteral(sDesc))
 				);
 		}
-
+		
 		// Adding inputs
 		for ( DataPortDescription dpd:setInputs) {
 			String sID = dpd.getIdentifier();
 			String sName = dpd.getName();
 			Resource resdpd = dpd.getResource();
 			String sDesc = dpd.getDescription();
-			res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/input_data_port"),
+			res.addProperty(RepositoryVocabulary.input_data_port,
 					model.createResource(resdpd.toString())
-						 .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),model.createResource("http://www.meandre.org/ontology/data_port"))
-					     .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/identifier"),model.createTypedLiteral(sID))
-					     .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/name"),model.createTypedLiteral(sName))
-					     .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/description"),model.createTypedLiteral(sDesc))
+						 .addProperty(RDF.type,RepositoryVocabulary.data_port)
+					     .addProperty(DC.identifier,model.createTypedLiteral(sID))
+					     .addProperty(RepositoryVocabulary.name,model.createTypedLiteral(sName))
+					     .addProperty(DC.description,model.createTypedLiteral(sDesc))
 				);
 		}
-
+		
 		// Adding outputs
 		for ( DataPortDescription dpd:setOutputs) {
 			String sID = dpd.getIdentifier();
 			String sName = dpd.getName();
 			Resource resdpd = dpd.getResource();
 			String sDesc = dpd.getDescription();
-			res.addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/output_data_port"),
+			res.addProperty(RepositoryVocabulary.output_data_port,
 					model.createResource(resdpd.toString())
-					     .addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),model.createResource("http://www.meandre.org/ontology/data_port"))
-					     .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/identifier"),model.createTypedLiteral(sID))
-					     .addProperty(ResourceFactory.createProperty("http://www.meandre.org/ontology/name"),model.createTypedLiteral(sName))
-					     .addProperty(ResourceFactory.createProperty("http://purl.org/dc/elements/1.1/description"),model.createTypedLiteral(sDesc))
+					     .addProperty(RDF.type,RepositoryVocabulary.data_port)
+					     .addProperty(DC.identifier,model.createTypedLiteral(sID))
+					     .addProperty(RepositoryVocabulary.name,model.createTypedLiteral(sName))
+					     .addProperty(DC.description,model.createTypedLiteral(sDesc))
 				);
 		}
-
+		
 		return model;
 	}
-
+	
 	/** Returns the name of the component as description of the executable component description.
-	 *
+	 * 
 	 * @return The name of the executable component
 	 */
 	public String toString() {
