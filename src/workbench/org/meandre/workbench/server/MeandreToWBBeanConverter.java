@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.meandre.workbench.client.beans.*;
 import org.meandre.workbench.server.proxy.beans.repository.*;
-import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import org.meandre.workbench.client.Controller;
 import org.meandre.workbench.server.proxy.beans.location.LocationBean;
 import org.meandre.workbench.server.proxy.beans.execute.RunningFlow;
@@ -138,7 +138,7 @@ public class MeandreToWBBeanConverter {
         Set outputs = ecd.getOutputs();
 
         for (Iterator itty = context.iterator(); itty.hasNext(); ) {
-            setContext.add(((Resource) itty.next()).getURI());
+            setContext.add(((RDFNode) itty.next()).toString());
         }
 
         /* pre-process for tree display. Saves work at the client and allows
