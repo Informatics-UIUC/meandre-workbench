@@ -138,7 +138,12 @@ public class MeandreToWBBeanConverter {
         Set outputs = ecd.getOutputs();
 
         for (Iterator itty = context.iterator(); itty.hasNext(); ) {
-            setContext.add(((RDFNode) itty.next()).toString());
+            RDFNode rdfNode = (RDFNode) itty.next();
+            if (rdfNode.isURIResource()){
+                setContext.add(rdfNode.toString());
+            } else {
+                setContext.add("Literal");
+            }
         }
 
         /* pre-process for tree display. Saves work at the client and allows
