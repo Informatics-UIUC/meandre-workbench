@@ -21,7 +21,7 @@
     <property name="gwt.widgets.dir" value="${lib.dir}/gwt_widgets" />
     <property name="httpclient.dir" value="${lib.dir}/commons-httpclient" />
     <property name="jetty.dir" value="${lib.dir}/Jetty" />
-    <property name="jena.dir" value="${lib.dir}/jena-trial" />
+    <property name="jena.dir" value="${lib.dir}/JENA" />
     <property name="workbench.src.dir" value="${src.dir}/workbench" />
 
     <!-- User settable -->
