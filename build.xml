@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Meandre-Workbench" basedir="." default="compile">
+    <!-- Check whether Java 1.5 is being used -->
+    <condition property="using.java.1.5">
+        <or>
+            <contains string="${java.version}" substring="1.5"/>
+        </or>
+    </condition>
+
+    <!-- Check whether Ant 1.7 is being used -->
+    <condition property="using.ant.1.7">
+        <contains string="${ant.version}" substring="1.7"/>
+    </condition>
+
+    <!-- Make sure we're running under the correct environment -->
+    <fail message="This package requires Ant 1.7." unless="using.ant.1.7"/>
+    <fail message="This package requires Java 5. Please set JAVA_HOME to point to where JDK 1.5 is installed."
+          unless="using.java.1.5"/>
+
     <!-- Global properties -->
     <property name="src.dir" value="${basedir}/src"/>
     <property name="src-test.dir" value="${basedir}/src-test"/>
@@ -110,6 +127,7 @@
     <target name="gwt_compile" description="-> compiles the GWT classes">
         <java classname="com.google.gwt.dev.GWTCompiler" fork="yes" maxmemory="512m">
             <classpath refid="gwt_compile.classpath"/>
+            <jvmarg value="-showversion"/>
             <arg value="-out"/>
             <arg value="${www.dir}"/>
             <arg value="org.meandre.workbench.Main"/>
@@ -169,7 +187,7 @@
               fork="yes"
               maxmemory="1024m">
             <classpath refid="run.classpath"/>
-            <!-- <jvmarg value="-Duser.dir=.."/> -->
+            <jvmarg value="-showversion"/>
         </java>
     </target>
 
@@ -181,7 +199,7 @@
               maxmemory="1024m"
               spawn="true">
             <classpath refid="run.classpath"/>
-            <!-- <jvmarg value="-Duser.dir=.."/> -->
+            <jvmarg value="-showversion"/>
         </java>
     </target>
 
@@ -189,6 +207,7 @@
     <target name="gwt_shell" depends="bootstrap_compile, server_compile">
         <java classname="com.google.gwt.dev.GWTShell" fork="yes" maxmemory="512m">
             <classpath refid="gwt_compile.classpath"/>
+            <jvmarg value="-showversion"/>
             <arg value="-out"/>
             <arg value="${www.dir}"/>
             <arg value="%*"/>
@@ -233,6 +252,6 @@
     </target>
 </project>
 
-<!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
-<!-- vim:sw=4:softtabstop=4:expandtab
--->
+        <!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
+        <!-- vim:sw=4:softtabstop=4:expandtab
+        -->
