@@ -208,9 +208,9 @@ public class MeandreProxy {
         if (this.qrCached == null) {
             // Caches the repository
             byte[] baResponse = executeGetRequestBytes(sBaseURL +
-                    "services/repository/dump.ttl");
+                    "services/repository/dump.nt");
             Model model = ModelFactory.createDefaultModel();
-            model.read(new ByteArrayInputStream(baResponse), null, "TTL");
+            model.read(new ByteArrayInputStream(baResponse), null, "N-TRIPLE");
             this.qrCached = new RepositoryImpl(model);
         }
 
@@ -225,9 +225,9 @@ public class MeandreProxy {
     public QueryableRepository getPublicRepository() {
         // The public repository
         byte[] baResponse = executeGetRequestBytes(sBaseURL +
-                "public/services/repository.ttl");
+                "public/services/repository.nt");
         Model model = ModelFactory.createDefaultModel();
-        model.read(new ByteArrayInputStream(baResponse), null, "TTL");
+        model.read(new ByteArrayInputStream(baResponse), null, "N-TRIPLE");
         return new RepositoryImpl(model);
     }
 
