@@ -2609,8 +2609,8 @@ public class Controller {
 
 			WBTreeItem ti = null;
 
-			String imgFname = (getPublicComponentsMap().get(ecd.getID()) == null) ? "flow-tree-leaf.png"
-					: "flow-tree-leaf-pub.png";
+			String imgFname = (getPublicComponentsMap().get(ecd.getID()) == null) ? "comp-tree-folder-leaf.png"
+					: "comp-tree-folder-leaf-pub.png";
 
 			String leafHTML = "<table><tr><td>"
   				    + "<img src=\"images/"
@@ -2712,8 +2712,8 @@ public class Controller {
 
 				WBTreeItem newItem = null;
 
-				String imgFname = (getPublicComponentsMap().get(((WBComponent) val).getID()) == null) ? "flow-tree-leaf.png"
-						: "flow-tree-leaf-pub.png";
+				String imgFname = (getPublicComponentsMap().get(((WBComponent) val).getID()) == null) ? "comp-tree-folder-leaf.png"
+						: "comp-tree-folder-leaf-pub.png";
 
 				String leafHTML = "<table><tr><td>"
 					    + "<img src=\"images/"
