@@ -178,12 +178,20 @@ public class WBComponent implements IsSerializable {
         return sName;
     }
 
+    public void setName(String s){
+        sName = s;
+    }
+
     /** Returns the executable component description.
      *
      * @return The description
      */
     public String getDescription() {
         return sDescription;
+    }
+
+    public void setDescription(String s){
+        sDescription = s;
     }
 
     /** Returns the rights of the component.
@@ -194,12 +202,19 @@ public class WBComponent implements IsSerializable {
         return sRights;
     }
 
+    public void setRights(String s){
+        sRights = s;
+    }
+
     /** Returns the creator of the component.
      *
      * @return The creator
      */
     public String getCreator() {
         return sCreator;
+    }
+    public void setCreator(String s){
+        sCreator = s;
     }
 
     /** Returns the creation date of the component.
@@ -209,6 +224,9 @@ public class WBComponent implements IsSerializable {
     public Date getCreationDate() {
         return dateCreation;
     }
+    public void setCreationDate(Date d){
+       dateCreation = d;
+   }
 
     /** Returns the runnable type.
      *
@@ -216,6 +234,9 @@ public class WBComponent implements IsSerializable {
      */
     public String getRunnable() {
         return sRunnable;
+    }
+    public void setRunnable(String s){
+        sRunnable = s;
     }
 
     /** Returns the firing policy.
@@ -225,6 +246,9 @@ public class WBComponent implements IsSerializable {
     public String getFiringPolicy() {
         return sFiringPolicy;
     }
+    public void setFiringPolicy(String s){
+        sFiringPolicy = s;
+    }
 
     /** Returns the format of the executable component implementations.
      *
@@ -232,6 +256,9 @@ public class WBComponent implements IsSerializable {
      */
     public String getFormat() {
         return sFormat;
+    }
+    public void setFormat(String s){
+        sFormat = s;
     }
 
     /** The location of the executable component.
@@ -241,6 +268,9 @@ public class WBComponent implements IsSerializable {
     public String getLocation () {
         return resLocation;
     }
+    public void setLocation(String s){
+        resLocation = s;
+    }
 
     /** The set of contextes associated to the context.
      *
@@ -248,6 +278,9 @@ public class WBComponent implements IsSerializable {
      */
     public Set getContext () {
         return setContext;
+    }
+    public void addContext(String s){
+        setContext.add(s);
     }
 
     /** The set of data ports that define the inputs of the executable component.
