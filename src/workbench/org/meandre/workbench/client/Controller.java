@@ -97,6 +97,7 @@ public class Controller {
     static public final String s_PROXY_TARGET_KEY = "TARG01";
     static public final String s_PROXY_POST_JAR_FIELDS_KEY = "PPJAR01";
     static public final String s_PROXY_POST_REPO_FIELDS_KEY = "PPREPO01";
+    static public final String s_PROXY_POST_PEAR_FIELDS_KEY = "PPPEAR01";
 
     /* HTTP Paths */
     static public final String s_PROXY_SERVLET_PATH = "/meandre_core_proxy";
@@ -1037,13 +1038,22 @@ public class Controller {
         MenuBar execMenu = new MenuBar(true);
         execMenu.addItem("Run Interactive", executeInteractiveCmd);
 
+        //Import
+        MenuBar impMenu = new MenuBar(true);
+        impMenu.addItem("UIMA PEAR", cmd);
+        impMenu.addItem("OSGi Bundle", cmd);
+
         //Repository
         MenuBar repoMenu = new MenuBar(true);
         repoMenu.addItem("Regenerate", regenerateRepositoryCmd);
         repoMenu.addItem("Upload", uploadRepositoryCmd);
         repoMenu.addItem("Add Location", addLocationCmd);
         repoMenu.addItem("Remove Location", removeLocationCmd);
+        repoMenu.addItem("Dump User", cmd);
+        repoMenu.addItem("Dump Local", cmd);
+        repoMenu.addItem("Import  >", impMenu);
 
+        //Admin
         MenuBar adminMenu = new MenuBar(true);
         adminMenu.addItem("See Roles", cmd);
         adminMenu.addItem("Manage Users", cmd);
