@@ -1,0 +1,4 @@
+* 4/4/08 Added new tree leaf icons for flows and components to show publication status.  Removed the text messages for publication status.
+
+* 4/4/08 Rolled back UIMA functionality.
+
