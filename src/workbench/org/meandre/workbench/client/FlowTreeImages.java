@@ -35,9 +35,4 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
      */
     AbstractImagePrototype treeClosed();
 
-    /**
-     * @gwt.resource flow-tree-leaf.png
-     */
-    AbstractImagePrototype treeLeaf();
-
   }
