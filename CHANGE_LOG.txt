@@ -1,4 +1,9 @@
 
+* In WBHttpProxyServlet:  I only process multipart file or mixed as "uploadable to repo". 
+Everything else gets routed as a get.  Also, responses from gets will not have their 
+urls rewritten unless the return mime type is text/html.  These are not perfect fixes 
+and will likely need to be revisited at a later time.
+
 * Fixed typo in description tab of property dialog: Nane -> Name .
 
 * Removed canvas and execute menu options because that functionality is redundant with the canvas buttons.
