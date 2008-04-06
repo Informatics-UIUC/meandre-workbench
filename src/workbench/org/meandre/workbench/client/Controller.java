@@ -35,8 +35,10 @@ import com.allen_sauer.gwt.dragdrop.client.DragHandlerAdapter;
 import com.allen_sauer.gwt.dragdrop.client.DragEndEvent;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -808,6 +810,24 @@ public class Controller {
 		_statusBar.setText("");
 	}
 
+	private Button _button_save = null;
+	private CanvasButtonPopUp _button_popup_save = null;	
+	
+	private Button _button_save_as = null;
+	private CanvasButtonPopUp _button_popup_save_as = null;
+
+	private Button _button_remove = null;
+	private CanvasButtonPopUp _button_popup_remove = null;
+
+	private Button _button_clear = null;
+	private CanvasButtonPopUp _button_popup_clear = null;
+
+	private Button _button_run = null;
+	private CanvasButtonPopUp _button_popup_run = null;
+
+	private Button _button_layout = null;
+	private CanvasButtonPopUp _button_popup_layout = null;
+	
 	/**
 	 * Builds the button panel that appears at the top of the work bench
 	 * application.
@@ -834,26 +854,9 @@ public class Controller {
 		_canvasLabel.setWidth("100%");
 		outerButtPan.add(canvasLabelPanel);
 
-		Grid gPan = new Grid(2, 6);
-		gPan.getColumnFormatter().setWidth(0, "52px");
-		gPan.getColumnFormatter().setWidth(1, "52px");
-		gPan.getColumnFormatter().setWidth(2, "52px");
-		gPan.getColumnFormatter().setWidth(3, "52px");
-		gPan.getColumnFormatter().setWidth(4, "52px");
-		gPan.getColumnFormatter().setWidth(5, "52px");
-
-		gPan.getCellFormatter().setHorizontalAlignment(0, 0,
-				HasHorizontalAlignment.ALIGN_CENTER);
-		gPan.getCellFormatter().setHorizontalAlignment(0, 1,
-				HasHorizontalAlignment.ALIGN_CENTER);
-		gPan.getCellFormatter().setHorizontalAlignment(0, 2,
-				HasHorizontalAlignment.ALIGN_CENTER);
-		gPan.getCellFormatter().setHorizontalAlignment(0, 3,
-				HasHorizontalAlignment.ALIGN_CENTER);
-		gPan.getCellFormatter().setHorizontalAlignment(0, 4,
-				HasHorizontalAlignment.ALIGN_CENTER);
-		gPan.getCellFormatter().setHorizontalAlignment(0, 5,
-				HasHorizontalAlignment.ALIGN_CENTER);
+		Grid gPan = new Grid(1, 6);
+		gPan.setCellSpacing(4);
+		gPan.setCellPadding(0);
 
 		outerButtPan.add(gPan);
 
@@ -861,104 +864,175 @@ public class Controller {
 		outerButtPan.setCellHorizontalAlignment(gPan, outerButtPan.ALIGN_RIGHT);
 		outerButtPan.setCellVerticalAlignment(gPan, outerButtPan.ALIGN_MIDDLE);
 
-		Button button = new Button("<IMG SRC='images/gnome-save-22.png'>",
-				new ClickListener() {
-					public void onClick(Widget sender) {
-						saveFlow(false);
+		//SAVE
+		_button_popup_save = new CanvasButtonPopUp("Save");
+		_button_popup_save.addStyleName("port-popup");
+		_button_save = new Button("<IMG SRC='images/btn_save.gif'>") {
+			public void onBrowserEvent(Event event) {
+				switch (DOM.eventGetType(event)) {
+				case Event.ONMOUSEOVER:
+					
+					_button_save.setHTML("<IMG SRC='images/btn_save_on.gif'>");
+					_button_popup_save.setPopupPosition(_button_save.getAbsoluteLeft(),_button_save.getAbsoluteTop()+34);
+					_button_popup_save.show();
+					break;
+				case Event.ONMOUSEOUT:
+					_button_save.setHTML("<IMG SRC='images/btn_save.gif'>");
+					_button_popup_save.hide();
+					break;
+				case Event.ONCLICK:
+					saveFlow(false);
+					break;
 					}
-				});
-		button.setHeight("32px");
-		button.setWidth("32px");
-		button.addStyleName("menu-button");
-		gPan.setWidget(0, 0, button);
-		Label lab = new Label("Save");
-		lab.addStyleName("menu-button-text");
-		gPan.setWidget(1, 0, lab);
+				}
+		};
+		_button_save.setWidth("34");
+		_button_save.setHeight("35");
+		_button_save.addStyleName("menu-button");
+		_button_save.sinkEvents(Event.MOUSEEVENTS);
+		gPan.setWidget(0, 0, _button_save);
 
-		button = new Button("<IMG SRC='images/gnome-save-22.png'>",
-				new ClickListener() {
-					public void onClick(Widget sender) {
-						saveFlow(true);
+		//SAVE AS
+		_button_popup_save_as = new CanvasButtonPopUp("Save As");
+		_button_popup_save_as.addStyleName("port-popup");
+		_button_save_as = new Button("<IMG SRC='images/btn_save_as.gif'>") {
+			public void onBrowserEvent(Event event) {
+				switch (DOM.eventGetType(event)) {
+				case Event.ONMOUSEOVER:
+					
+					_button_save_as.setHTML("<IMG SRC='images/btn_save_as_on.gif'>");
+					_button_popup_save_as.setPopupPosition(_button_save_as.getAbsoluteLeft(),_button_save_as.getAbsoluteTop()+34);
+					_button_popup_save_as.show();
+					break;
+				case Event.ONMOUSEOUT:
+					_button_save_as.setHTML("<IMG SRC='images/btn_save_as.gif'>");
+					_button_popup_save_as.hide();
+					break;
+				case Event.ONCLICK:
+					saveFlow(true);
+					break;
 					}
-				});
-		button.setHeight("32px");
-		button.setWidth("32px");
-		button.addStyleName("menu-button");
-		gPan.setWidget(0, 1, button);
-		lab = new Label("Save As");
-		lab.addStyleName("menu-button-text");
-		gPan.setWidget(1, 1, lab);
+				}
+		};		
+		_button_save_as.setWidth("34");
+		_button_save_as.setHeight("35");
+		_button_save_as.addStyleName("menu-button");
+		_button_save_as.sinkEvents(Event.MOUSEEVENTS);
+		gPan.setWidget(0, 1, _button_save_as);
 
-		button = new Button("<IMG SRC='images/gnome-quit-22.png'>",
-				new ClickListener() {
-					public void onClick(Widget sender) {
-						removeSelectedComponent();
+		//REMOVE
+		_button_popup_remove = new CanvasButtonPopUp("Remove");
+		_button_popup_remove.addStyleName("port-popup");
+		_button_remove = new Button("<IMG SRC='images/btn_delete.gif'>") {
+			public void onBrowserEvent(Event event) {
+				switch (DOM.eventGetType(event)) {
+				case Event.ONMOUSEOVER:
+					
+					_button_remove.setHTML("<IMG SRC='images/btn_delete_on.gif'>");
+					_button_popup_remove.setPopupPosition(_button_remove.getAbsoluteLeft(),_button_remove.getAbsoluteTop()+34);
+					_button_popup_remove.show();
+					break;
+				case Event.ONMOUSEOUT:
+					_button_remove.setHTML("<IMG SRC='images/btn_delete.gif'>");
+					_button_popup_remove.hide();
+					break;
+				case Event.ONCLICK:
+					removeSelectedComponent();
+					break;
 					}
-				});
-		button.setHeight("32px");
-		button.setWidth("32px");
-		button.addStyleName("menu-button");
-		gPan.setWidget(0, 2, button);
-		lab = new Label("Remove");
-		lab.addStyleName("menu-button-text");
-		gPan.setWidget(1, 2, lab);
-
-		button = new Button("<IMG SRC='images/gnome-clear-22.png'>",
-				new ClickListener() {
-					public void onClick(Widget sender) {
-						clearCanvas();
+				}
+		};		
+		_button_remove.setWidth("34");
+		_button_remove.setHeight("35");
+		_button_remove.addStyleName("menu-button");
+		_button_remove.sinkEvents(Event.MOUSEEVENTS);
+		gPan.setWidget(0, 2, _button_remove);
+		
+		//CLEAR
+		_button_popup_clear = new CanvasButtonPopUp("Clear");
+		_button_popup_clear.addStyleName("port-popup");
+		_button_clear = new Button("<IMG SRC='images/btn_blank.gif'>") {
+			public void onBrowserEvent(Event event) {
+				switch (DOM.eventGetType(event)) {
+				case Event.ONMOUSEOVER:
+					
+					_button_clear.setHTML("<IMG SRC='images/btn_blank_on.gif'>");
+					_button_popup_clear.setPopupPosition(_button_clear.getAbsoluteLeft(),_button_clear.getAbsoluteTop()+34);
+					_button_popup_clear.show();
+					break;
+				case Event.ONMOUSEOUT:
+					_button_clear.setHTML("<IMG SRC='images/btn_blank.gif'>");
+					_button_popup_clear.hide();
+					break;
+				case Event.ONCLICK:
+					clearCanvas();
+					break;
 					}
-				});
-		button.setHeight("32px");
-		button.setWidth("32px");
-		button.addStyleName("menu-button");
-		gPan.setWidget(0, 3, button);
-		lab = new Label("Clear");
-		lab.addStyleName("menu-button-text");
-		gPan.setWidget(1, 3, lab);
+				}
+		};		
+		_button_clear.setWidth("34");
+		_button_clear.setHeight("35");
+		_button_clear.addStyleName("menu-button");
+		_button_clear.sinkEvents(Event.MOUSEEVENTS);
+		gPan.setWidget(0, 3, _button_clear);
 
-		button = new Button("<IMG SRC='images/gnome-reboot-22.png'>",
-				new ClickListener() {
-					public void onClick(Widget sender) {
-						saveFlowAndExecute();
+		//RUN
+		_button_popup_run = new CanvasButtonPopUp("Run");
+		_button_popup_run.addStyleName("port-popup");
+		_button_run = new Button("<IMG SRC='images/btn_run.gif'>") {
+			public void onBrowserEvent(Event event) {
+				switch (DOM.eventGetType(event)) {
+				case Event.ONMOUSEOVER:
+					
+					_button_run.setHTML("<IMG SRC='images/btn_run_on.gif'>");
+					_button_popup_run.setPopupPosition(_button_run.getAbsoluteLeft(),_button_run.getAbsoluteTop()+34);
+					_button_popup_run.show();
+					break;
+				case Event.ONMOUSEOUT:
+					_button_run.setHTML("<IMG SRC='images/btn_run.gif'>");
+					_button_popup_run.hide();
+					break;
+				case Event.ONCLICK:
+					saveFlowAndExecute();
+					break;
 					}
-				});
-		button.setHeight("32px");
-		button.setWidth("32px");
-		button.addStyleName("menu-button");
-		gPan.setWidget(0, 4, button);
-		lab = new Label("Run");
-		lab.addStyleName("menu-button-text");
-		gPan.setWidget(1, 4, lab);
+				}
+		};		
+		_button_run.setWidth("34");
+		_button_run.setHeight("35");
+		_button_run.addStyleName("menu-button");
+		_button_run.sinkEvents(Event.MOUSEEVENTS);
+		gPan.setWidget(0, 4, _button_run);
 
-		button = new Button("<IMG SRC='images/gnome-format-22.png'>",
-				new ClickListener() {
-					public void onClick(Widget sender) {
-						formatFlow();
+		// LAYOUT
+		_button_popup_layout = new CanvasButtonPopUp("Layout");
+		_button_popup_layout.addStyleName("port-popup");
+		_button_layout = new Button("<IMG SRC='images/btn_layout.gif'>") {
+			public void onBrowserEvent(Event event) {
+				switch (DOM.eventGetType(event)) {
+				case Event.ONMOUSEOVER:
+					
+					_button_layout.setHTML("<IMG SRC='images/btn_layout_on.gif'>");
+					_button_popup_layout.setPopupPosition(_button_layout.getAbsoluteLeft(),_button_layout.getAbsoluteTop()+34);
+					_button_popup_layout.show();
+					break;
+				case Event.ONMOUSEOUT:
+					_button_layout.setHTML("<IMG SRC='images/btn_layout.gif'>");
+					_button_popup_layout.hide();
+					break;
+				case Event.ONCLICK:
+					formatFlow();
+					break;
 					}
-				});
-		button.setHeight("32px");
-		button.setWidth("32px");
-		button.addStyleName("menu-button");
-		gPan.setWidget(0, 5, button);
-		lab = new Label("Layout");
-		lab.addStyleName("menu-button-text");
-		gPan.setWidget(1, 5, lab);
+				}
+		};		
+		_button_layout.setWidth("34");
+		_button_layout.setHeight("35");
+		_button_layout.addStyleName("menu-button");
+		_button_layout.sinkEvents(Event.MOUSEEVENTS);
+		gPan.setWidget(0, 5, _button_layout);
 
-		button = new Button("<IMG SRC='images/gnome-properties-22.png'>",
-				new ClickListener() {
-					public void onClick(Widget sender) {
-						Window.alert("Not implermented yet.");
-					}
-				});
-		button.setHeight("32px");
-		button.setWidth("32px");
-		button.addStyleName("menu-button");
-		// gPan.setWidget(0, 6, button);
-		lab = new Label("Props");
-		lab.addStyleName("menu-button-text");
-		// gPan.setWidget(1, 6, lab);
-
+		
 		return outerButtPan;
 	}
 
@@ -2612,14 +2686,11 @@ public class Controller {
 			String imgFname = (getPublicComponentsMap().get(ecd.getID()) == null) ? "comp-tree-folder-leaf.png"
 					: "comp-tree-folder-leaf-pub.png";
 
-			String leafHTML = "<table><tr><td>"
-  				    + "<img src=\"images/"
-					+ imgFname
-					+ "\">"
-					+ "</td>"
+			String leafHTML = "<table><tr><td>" + "<img src=\"images/"
+					+ imgFname + "\">" + "</td>"
 					+ "<td align=\"left\" valign=\"middle\" cellpadding=\"4\">"
-					+ "<b><font size=\"-2\">" + ecd.getName()
-					+ "</font></b>" + "</td></tr></table>";
+					+ "<b><font size=\"-2\">" + ecd.getName() + "</font></b>"
+					+ "</td></tr></table>";
 
 			ti = new WBTreeItem(leafHTML, putxt);
 			ti.setUserObject(ecd);
@@ -2712,20 +2783,22 @@ public class Controller {
 
 				WBTreeItem newItem = null;
 
-				String imgFname = (getPublicComponentsMap().get(((WBComponent) val).getID()) == null) ? "comp-tree-folder-leaf.png"
+				String imgFname = (getPublicComponentsMap().get(
+						((WBComponent) val).getID()) == null) ? "comp-tree-folder-leaf.png"
 						: "comp-tree-folder-leaf-pub.png";
 
 				String leafHTML = "<table><tr><td>"
-					    + "<img src=\"images/"
+						+ "<img src=\"images/"
 						+ imgFname
 						+ "\">"
 						+ "</td>"
 						+ "<td align=\"left\" valign=\"middle\" cellpadding=\"4\">"
-						+ "<b><font size=\"-2\">" + key
-						+ "</font></b>" + "</td></tr></table>";
+						+ "<b><font size=\"-2\">" + key + "</font></b>"
+						+ "</td></tr></table>";
 
-				newItem = new WBTreeItem(leafHTML, getCompTreeItemPopUpText((WBComponent) val));
-				
+				newItem = new WBTreeItem(leafHTML,
+						getCompTreeItemPopUpText((WBComponent) val));
+
 				newItem.setUserObject(val);
 				newND.setNodeItem(newItem);
 				rootNode.addChild(newND);

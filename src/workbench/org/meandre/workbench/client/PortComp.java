@@ -118,12 +118,7 @@ public class PortComp extends Image implements EventPreview {
             int left = -1;
             int top = -1;
             top = this.getAbsoluteTop() - 15;
-            if (_port_type == this.s_OUTPUT_PORT_TYPE) {
-                left = this.getAbsoluteLeft() + 15;
-            } else {
-                left = this.getAbsoluteLeft() + 15 /*-
-                       (_dp.getName().length() * 7)*/;
-            }
+            left = this.getAbsoluteLeft() + 15;
             _ppp.setPopupPosition(left, top);
             _ppp.show();
 
