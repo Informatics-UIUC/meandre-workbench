@@ -113,7 +113,7 @@ public class ComponentPanel extends DockPanel implements SourcesClickEvents,
         if (comp.getExecutableComponent().getProperties().getKeys().isEmpty()) {
             _cg = new Image("images/gnome-reboot-48.png");
         } else {
-            _cg = new Image("images/gnome-reboot-48-props.png");
+            _cg = new Image("images/gnome-reboot-48-props-chad.png");
         }
         _cg.addClickListener(new ClickListener() {
             public void onClick(Widget w) {
