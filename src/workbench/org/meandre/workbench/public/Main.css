@@ -149,6 +149,11 @@ SPLIT PANELS *****************************************************
   font-size: 70%;
 }
 
+.canvas-button-popup {
+  background: #ffffcc;
+  font-size: 70%;
+  font-weight: bold;
+}
 
 /*
   APP STATUS/MSG BAR *****************************************************

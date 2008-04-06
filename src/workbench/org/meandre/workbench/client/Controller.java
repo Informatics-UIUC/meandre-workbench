@@ -866,14 +866,14 @@ public class Controller {
 
 		//SAVE
 		_button_popup_save = new CanvasButtonPopUp("Save");
-		_button_popup_save.addStyleName("port-popup");
+		_button_popup_save.addStyleName("canvas-button-popup");
 		_button_save = new Button("<IMG SRC='images/btn_save.gif'>") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
 					
 					_button_save.setHTML("<IMG SRC='images/btn_save_on.gif'>");
-					_button_popup_save.setPopupPosition(_button_save.getAbsoluteLeft(),_button_save.getAbsoluteTop()+34);
+					_button_popup_save.setPopupPosition(_button_save.getAbsoluteLeft(),_button_save.getAbsoluteTop()+36);
 					_button_popup_save.show();
 					break;
 				case Event.ONMOUSEOUT:
@@ -894,14 +894,14 @@ public class Controller {
 
 		//SAVE AS
 		_button_popup_save_as = new CanvasButtonPopUp("Save As");
-		_button_popup_save_as.addStyleName("port-popup");
+		_button_popup_save_as.addStyleName("canvas-button-popup");
 		_button_save_as = new Button("<IMG SRC='images/btn_save_as.gif'>") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
 					
 					_button_save_as.setHTML("<IMG SRC='images/btn_save_as_on.gif'>");
-					_button_popup_save_as.setPopupPosition(_button_save_as.getAbsoluteLeft(),_button_save_as.getAbsoluteTop()+34);
+					_button_popup_save_as.setPopupPosition(_button_save_as.getAbsoluteLeft(),_button_save_as.getAbsoluteTop()+36);
 					_button_popup_save_as.show();
 					break;
 				case Event.ONMOUSEOUT:
@@ -922,14 +922,14 @@ public class Controller {
 
 		//REMOVE
 		_button_popup_remove = new CanvasButtonPopUp("Remove");
-		_button_popup_remove.addStyleName("port-popup");
+		_button_popup_remove.addStyleName("canvas-button-popup");
 		_button_remove = new Button("<IMG SRC='images/btn_delete.gif'>") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
 					
 					_button_remove.setHTML("<IMG SRC='images/btn_delete_on.gif'>");
-					_button_popup_remove.setPopupPosition(_button_remove.getAbsoluteLeft(),_button_remove.getAbsoluteTop()+34);
+					_button_popup_remove.setPopupPosition(_button_remove.getAbsoluteLeft(),_button_remove.getAbsoluteTop()+36);
 					_button_popup_remove.show();
 					break;
 				case Event.ONMOUSEOUT:
@@ -950,14 +950,14 @@ public class Controller {
 		
 		//CLEAR
 		_button_popup_clear = new CanvasButtonPopUp("Clear");
-		_button_popup_clear.addStyleName("port-popup");
+		_button_popup_clear.addStyleName("canvas-button-popup");
 		_button_clear = new Button("<IMG SRC='images/btn_blank.gif'>") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
 					
 					_button_clear.setHTML("<IMG SRC='images/btn_blank_on.gif'>");
-					_button_popup_clear.setPopupPosition(_button_clear.getAbsoluteLeft(),_button_clear.getAbsoluteTop()+34);
+					_button_popup_clear.setPopupPosition(_button_clear.getAbsoluteLeft(),_button_clear.getAbsoluteTop()+36);
 					_button_popup_clear.show();
 					break;
 				case Event.ONMOUSEOUT:
@@ -978,14 +978,14 @@ public class Controller {
 
 		//RUN
 		_button_popup_run = new CanvasButtonPopUp("Run");
-		_button_popup_run.addStyleName("port-popup");
+		_button_popup_run.addStyleName("canvas-button-popup");
 		_button_run = new Button("<IMG SRC='images/btn_run.gif'>") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
 					
 					_button_run.setHTML("<IMG SRC='images/btn_run_on.gif'>");
-					_button_popup_run.setPopupPosition(_button_run.getAbsoluteLeft(),_button_run.getAbsoluteTop()+34);
+					_button_popup_run.setPopupPosition(_button_run.getAbsoluteLeft(),_button_run.getAbsoluteTop()+36);
 					_button_popup_run.show();
 					break;
 				case Event.ONMOUSEOUT:
@@ -1006,14 +1006,14 @@ public class Controller {
 
 		// LAYOUT
 		_button_popup_layout = new CanvasButtonPopUp("Layout");
-		_button_popup_layout.addStyleName("port-popup");
+		_button_popup_layout.addStyleName("canvas-button-popup");
 		_button_layout = new Button("<IMG SRC='images/btn_layout.gif'>") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
 					
 					_button_layout.setHTML("<IMG SRC='images/btn_layout_on.gif'>");
-					_button_popup_layout.setPopupPosition(_button_layout.getAbsoluteLeft(),_button_layout.getAbsoluteTop()+34);
+					_button_popup_layout.setPopupPosition(_button_layout.getAbsoluteLeft(),_button_layout.getAbsoluteTop()+36);
 					_button_popup_layout.show();
 					break;
 				case Event.ONMOUSEOUT:
