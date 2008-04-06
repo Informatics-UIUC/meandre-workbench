@@ -1331,7 +1331,7 @@ public class Controller {
 						+ "</td></tr>";
 				s += "<tr><td>Identifier:</td><td>" + dpd.getIdentifier()
 						+ "</td></tr>";
-				s += "<tr><td>Nane:</td><td>" + dpd.getName() + "</td></tr>";
+				s += "<tr><td>Name:</td><td>" + dpd.getName() + "</td></tr>";
 				s += "<tr><td>Description:</td><td>" + dpd.getDescription()
 						+ "</td></tr>";
 				s += "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
@@ -1348,7 +1348,7 @@ public class Controller {
 						+ "</td></tr>";
 				s += "<tr><td>Identifier:</td><td>" + dpd.getIdentifier()
 						+ "</td></tr>";
-				s += "<tr><td>Nane:</td><td>" + dpd.getName() + "</td></tr>";
+				s += "<tr><td>Name:</td><td>" + dpd.getName() + "</td></tr>";
 				s += "<tr><td>Description:</td><td>" + dpd.getDescription()
 						+ "</td></tr>";
 				s += "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
