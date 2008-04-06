@@ -1064,31 +1064,6 @@ public class Controller {
 			}
 		};
 
-		Command saveCmd = new Command() {
-			public void execute() {
-				saveFlow(false);
-			}
-		};
-		Command saveAsCmd = new Command() {
-			public void execute() {
-				saveFlow(true);
-			}
-		};
-		Command newFlowCmd = new Command() {
-			public void execute() {
-				clearCanvas();
-			}
-		};
-		Command removeCompCmd = new Command() {
-			public void execute() {
-				removeSelectedComponent();
-			}
-		};
-		Command layoutFlowCmd = new Command() {
-			public void execute() {
-				Controller.this.formatFlow();
-			}
-		};
 		Command exitAppCmd = new Command() {
 			public void execute() {
 				Controller.this.getMain().closeApp();
@@ -1098,11 +1073,6 @@ public class Controller {
 			public void execute() {
 				Controller.this.logout();
 				Controller.this.getMain().closeApp();
-			}
-		};
-		Command executeInteractiveCmd = new Command() {
-			public void execute() {
-				Controller.this.saveFlowAndExecute();
 			}
 		};
 		Command deleteFlowCmd = new Command() {
@@ -1164,14 +1134,6 @@ public class Controller {
 		flowMenu.addItem("Unpublish", unpublishFlowCmd);
 		flowMenu.addItem("Delete", deleteFlowCmd);
 
-		// canvas commands
-		MenuBar canvasMenu = new MenuBar(true);
-		canvasMenu.addItem("Save", saveCmd);
-		canvasMenu.addItem("Save As ...", saveAsCmd);
-		canvasMenu.addItem("New", newFlowCmd);
-		canvasMenu.addItem("Layout", layoutFlowCmd);
-		canvasMenu.addItem("Remove Component", removeCompCmd);
-
 		// component commands
 		MenuBar compMenu = new MenuBar(true);
 		compMenu.addItem("Create", cmd);
@@ -1180,24 +1142,12 @@ public class Controller {
 		compMenu.addItem("Properties", cmd);
 		compMenu.addItem("Delete", cmd);
 
-		// exec commands
-		MenuBar execMenu = new MenuBar(true);
-		execMenu.addItem("Run Interactive", executeInteractiveCmd);
-
-		// //Import
-		// MenuBar impMenu = new MenuBar(true);
-		// impMenu.addItem("UIMA PEAR", cmd);
-		// impMenu.addItem("OSGi Bundle", cmd);
-
 		// Repository
 		MenuBar repoMenu = new MenuBar(true);
 		repoMenu.addItem("Regenerate", regenerateRepositoryCmd);
 		repoMenu.addItem("Upload", uploadRepositoryCmd);
 		repoMenu.addItem("Add Location", addLocationCmd);
 		repoMenu.addItem("Remove Location", removeLocationCmd);
-		// repoMenu.addItem("Dump User", cmd);
-		// repoMenu.addItem("Dump Local", cmd);
-		// repoMenu.addItem("Import >", impMenu);
 
 		// Admin
 		MenuBar adminMenu = new MenuBar(true);
@@ -1211,10 +1161,8 @@ public class Controller {
 		// Make a new menu bar, adding a few cascading menus to it.
 		MenuBar menu = new MenuBar();
 		menu.addItem("Application", appMenu);
-		menu.addItem("Canvas", canvasMenu);
 		menu.addItem("Flow", flowMenu);
 		menu.addItem("Component", compMenu);
-		menu.addItem("Execute", execMenu);
 		menu.addItem("Repository", repoMenu);
 		menu.addItem("Admin", adminMenu);
 		menu.addItem("Help", helpMenu);
@@ -1225,8 +1173,6 @@ public class Controller {
 		flowMenu.setStyleName("gwt-MenuBar");
 		repoMenu.setStyleName("gwt-MenuBar");
 		compMenu.setStyleName("gwt-MenuBar");
-		execMenu.setStyleName("gwt-MenuBar");
-		canvasMenu.setStyleName("gwt-MenuBar");
 		return menu;
 	}
 
