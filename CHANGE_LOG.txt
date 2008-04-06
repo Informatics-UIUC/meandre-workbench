@@ -1,4 +1,6 @@
 
+* Fixed typo in description tab of property dialog: Nane -> Name .
+
 * Removed canvas and execute menu options because that functionality is redundant with the canvas buttons.
 
 * Added Chad's button images to the canvas button panel.  Removed the label text under those buttons and added it back as tooltip text.
