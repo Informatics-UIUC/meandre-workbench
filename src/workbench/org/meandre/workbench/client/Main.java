@@ -239,24 +239,11 @@ public class Main implements EntryPoint, WindowResizeListener,
         _canvasPan.add(_boundPan);
         _canvasPan.setCellHeight(_canvasButtPan, "70px");
         _boundPan.addStyleName("auto-scroll");
+        
         _hsp.setRightWidget(_canvasPan);
         _canvasPan.addStyleName("no-scroll");
 
         _vsp.setTopWidget(_hsp);
-
-//        VerticalPanel fptmsg = new VerticalPanel();
-//        HorizontalPanel hptmsg = new HorizontalPanel();
-//        HTML msgtit = new HTML("<span CLASS=\"leftalign\"><font color=\"#ffffff\">OUTPUT</font></span>");
-//        hptmsg.add(msgtit);
-//        hptmsg.setWidth("100%");
-//        msgtit.setWidth("100%");
-//        hptmsg.addStyleName("canvas-label-bar");
-//        msgtit.addStyleName("canvas-label-bar-flow-title");
-//        fptmsg.add(hptmsg);
-//        fptmsg.setStyleName("no-scroll");
-//        fptmsg.setCellHeight(hptmsg, "15px");
-//        fptmsg.setCellVerticalAlignment(hptmsg, HasVerticalAlignment.ALIGN_TOP);
-//        fptmsg.add(_vscroll);
 
 
         _vsp.setBottomWidget(_vscroll);
