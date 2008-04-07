@@ -20,10 +20,8 @@ import java.util.Collections;
 
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.core.client.GWT;
-import com.allen_sauer.gwt.dragdrop.client.DragController;
-import com.allen_sauer.gwt.dragdrop.client.PickupDragController;
-import com.allen_sauer.gwt.dragdrop.client.drop.DropController;
-import com.allen_sauer.gwt.dragdrop.client.drop.BoundaryDropController;
+import com.allen_sauer.gwt.dnd.client.*;
+import com.allen_sauer.gwt.dnd.client.drop.*;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,8 +31,6 @@ import org.meandre.workbench.client.beans.WBComponentInstance;
 import org.meandre.workbench.client.beans.WBProperties;
 import org.meandre.workbench.client.beans.WBComponentConnection;
 import org.gwtwidgets.client.wrap.JsGraphicsPanel;
-import com.allen_sauer.gwt.dragdrop.client.DragHandlerAdapter;
-import com.allen_sauer.gwt.dragdrop.client.DragEndEvent;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.DOM;
@@ -815,23 +811,29 @@ public class Controller {
 	}
 
 	private Button _button_save = null;
-	private CanvasButtonPopUp _button_popup_save = null;	
-	
+
+	private CanvasButtonPopUp _button_popup_save = null;
+
 	private Button _button_save_as = null;
+
 	private CanvasButtonPopUp _button_popup_save_as = null;
 
 	private Button _button_remove = null;
+
 	private CanvasButtonPopUp _button_popup_remove = null;
 
 	private Button _button_clear = null;
+
 	private CanvasButtonPopUp _button_popup_clear = null;
 
 	private Button _button_run = null;
+
 	private CanvasButtonPopUp _button_popup_run = null;
 
 	private Button _button_layout = null;
+
 	private CanvasButtonPopUp _button_popup_layout = null;
-	
+
 	/**
 	 * Builds the button panel that appears at the top of the work bench
 	 * application.
@@ -868,16 +870,18 @@ public class Controller {
 		outerButtPan.setCellHorizontalAlignment(gPan, outerButtPan.ALIGN_RIGHT);
 		outerButtPan.setCellVerticalAlignment(gPan, outerButtPan.ALIGN_MIDDLE);
 
-		//SAVE
+		// SAVE
 		_button_popup_save = new CanvasButtonPopUp("Save");
 		_button_popup_save.addStyleName("canvas-button-popup");
 		_button_save = new Button("<IMG SRC='images/btn_save.gif'>") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
-					
+
 					_button_save.setHTML("<IMG SRC='images/btn_save_on.gif'>");
-					_button_popup_save.setPopupPosition(_button_save.getAbsoluteLeft(),_button_save.getAbsoluteTop()+36);
+					_button_popup_save.setPopupPosition(_button_save
+							.getAbsoluteLeft(),
+							_button_save.getAbsoluteTop() + 36);
 					_button_popup_save.show();
 					break;
 				case Event.ONMOUSEOUT:
@@ -887,8 +891,8 @@ public class Controller {
 				case Event.ONCLICK:
 					saveFlow(false);
 					break;
-					}
 				}
+			}
 		};
 		_button_save.setWidth("34");
 		_button_save.setHeight("35");
@@ -896,44 +900,51 @@ public class Controller {
 		_button_save.sinkEvents(Event.MOUSEEVENTS);
 		gPan.setWidget(0, 0, _button_save);
 
-		//SAVE AS
+		// SAVE AS
 		_button_popup_save_as = new CanvasButtonPopUp("Save As");
 		_button_popup_save_as.addStyleName("canvas-button-popup");
 		_button_save_as = new Button("<IMG SRC='images/btn_save_as.gif'>") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
-					
-					_button_save_as.setHTML("<IMG SRC='images/btn_save_as_on.gif'>");
-					_button_popup_save_as.setPopupPosition(_button_save_as.getAbsoluteLeft(),_button_save_as.getAbsoluteTop()+36);
+
+					_button_save_as
+							.setHTML("<IMG SRC='images/btn_save_as_on.gif'>");
+					_button_popup_save_as.setPopupPosition(_button_save_as
+							.getAbsoluteLeft(), _button_save_as
+							.getAbsoluteTop() + 36);
 					_button_popup_save_as.show();
 					break;
 				case Event.ONMOUSEOUT:
-					_button_save_as.setHTML("<IMG SRC='images/btn_save_as.gif'>");
+					_button_save_as
+							.setHTML("<IMG SRC='images/btn_save_as.gif'>");
 					_button_popup_save_as.hide();
 					break;
 				case Event.ONCLICK:
 					saveFlow(true);
 					break;
-					}
 				}
-		};		
+			}
+		};
 		_button_save_as.setWidth("34");
 		_button_save_as.setHeight("35");
 		_button_save_as.addStyleName("menu-button");
 		_button_save_as.sinkEvents(Event.MOUSEEVENTS);
 		gPan.setWidget(0, 1, _button_save_as);
 
-		//REMOVE
+		// REMOVE
 		_button_popup_remove = new CanvasButtonPopUp("Remove");
 		_button_popup_remove.addStyleName("canvas-button-popup");
 		_button_remove = new Button("<IMG SRC='images/btn_delete.gif'>") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
-					
-					_button_remove.setHTML("<IMG SRC='images/btn_delete_on.gif'>");
-					_button_popup_remove.setPopupPosition(_button_remove.getAbsoluteLeft(),_button_remove.getAbsoluteTop()+36);
+
+					_button_remove
+							.setHTML("<IMG SRC='images/btn_delete_on.gif'>");
+					_button_popup_remove.setPopupPosition(_button_remove
+							.getAbsoluteLeft(),
+							_button_remove.getAbsoluteTop() + 36);
 					_button_popup_remove.show();
 					break;
 				case Event.ONMOUSEOUT:
@@ -943,25 +954,28 @@ public class Controller {
 				case Event.ONCLICK:
 					removeSelectedComponent();
 					break;
-					}
 				}
-		};		
+			}
+		};
 		_button_remove.setWidth("34");
 		_button_remove.setHeight("35");
 		_button_remove.addStyleName("menu-button");
 		_button_remove.sinkEvents(Event.MOUSEEVENTS);
 		gPan.setWidget(0, 2, _button_remove);
-		
-		//CLEAR
+
+		// CLEAR
 		_button_popup_clear = new CanvasButtonPopUp("Clear");
 		_button_popup_clear.addStyleName("canvas-button-popup");
 		_button_clear = new Button("<IMG SRC='images/btn_blank.gif'>") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
-					
-					_button_clear.setHTML("<IMG SRC='images/btn_blank_on.gif'>");
-					_button_popup_clear.setPopupPosition(_button_clear.getAbsoluteLeft(),_button_clear.getAbsoluteTop()+36);
+
+					_button_clear
+							.setHTML("<IMG SRC='images/btn_blank_on.gif'>");
+					_button_popup_clear.setPopupPosition(_button_clear
+							.getAbsoluteLeft(),
+							_button_clear.getAbsoluteTop() + 36);
 					_button_popup_clear.show();
 					break;
 				case Event.ONMOUSEOUT:
@@ -971,25 +985,27 @@ public class Controller {
 				case Event.ONCLICK:
 					clearCanvas();
 					break;
-					}
 				}
-		};		
+			}
+		};
 		_button_clear.setWidth("34");
 		_button_clear.setHeight("35");
 		_button_clear.addStyleName("menu-button");
 		_button_clear.sinkEvents(Event.MOUSEEVENTS);
 		gPan.setWidget(0, 3, _button_clear);
 
-		//RUN
+		// RUN
 		_button_popup_run = new CanvasButtonPopUp("Run");
 		_button_popup_run.addStyleName("canvas-button-popup");
 		_button_run = new Button("<IMG SRC='images/btn_run.gif'>") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
-					
+
 					_button_run.setHTML("<IMG SRC='images/btn_run_on.gif'>");
-					_button_popup_run.setPopupPosition(_button_run.getAbsoluteLeft(),_button_run.getAbsoluteTop()+36);
+					_button_popup_run.setPopupPosition(_button_run
+							.getAbsoluteLeft(),
+							_button_run.getAbsoluteTop() + 36);
 					_button_popup_run.show();
 					break;
 				case Event.ONMOUSEOUT:
@@ -999,9 +1015,9 @@ public class Controller {
 				case Event.ONCLICK:
 					saveFlowAndExecute();
 					break;
-					}
 				}
-		};		
+			}
+		};
 		_button_run.setWidth("34");
 		_button_run.setHeight("35");
 		_button_run.addStyleName("menu-button");
@@ -1015,9 +1031,12 @@ public class Controller {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
-					
-					_button_layout.setHTML("<IMG SRC='images/btn_layout_on.gif'>");
-					_button_popup_layout.setPopupPosition(_button_layout.getAbsoluteLeft(),_button_layout.getAbsoluteTop()+36);
+
+					_button_layout
+							.setHTML("<IMG SRC='images/btn_layout_on.gif'>");
+					_button_popup_layout.setPopupPosition(_button_layout
+							.getAbsoluteLeft(),
+							_button_layout.getAbsoluteTop() + 36);
 					_button_popup_layout.show();
 					break;
 				case Event.ONMOUSEOUT:
@@ -1027,16 +1046,15 @@ public class Controller {
 				case Event.ONCLICK:
 					formatFlow();
 					break;
-					}
 				}
-		};		
+			}
+		};
 		_button_layout.setWidth("34");
 		_button_layout.setHeight("35");
 		_button_layout.addStyleName("menu-button");
 		_button_layout.sinkEvents(Event.MOUSEEVENTS);
 		gPan.setWidget(0, 5, _button_layout);
 
-		
 		return outerButtPan;
 	}
 
@@ -2618,12 +2636,15 @@ public class Controller {
 	}
 
 	/**
-	 * Constructs a tree of tags where each tag node has as children all of the 
+	 * Constructs a tree of tags where each tag node has as children all of the
 	 * components that bear that tag.
-	 * @param items Active components.
-	 * @param compTreeRoot Root of the tree.
+	 * 
+	 * @param items
+	 *            Active components.
+	 * @param compTreeRoot
+	 *            Root of the tree.
 	 */
-	private void buildCompTreeAsTagGroups(Set items, TreeItem compTreeRoot){
+	private void buildCompTreeAsTagGroups(Set items, TreeItem compTreeRoot) {
 		WBTreeNode root = new WBTreeNode();
 		HashMap tagGrps = new HashMap();
 		Iterator itty = items.iterator();
@@ -2631,10 +2652,10 @@ public class Controller {
 			WBComponent ecd = (WBComponent) itty.next();
 			Set tags = ecd.getTags().getTags();
 			Iterator itty2 = tags.iterator();
-			while(itty2.hasNext()){
-				String tag =  (String)itty2.next();
-				Set tagged = (Set)tagGrps.get(tag);
-				if (tagged == null){
+			while (itty2.hasNext()) {
+				String tag = (String) itty2.next();
+				Set tagged = (Set) tagGrps.get(tag);
+				if (tagged == null) {
 					HashSet newTagged = new HashSet();
 					newTagged.add(ecd);
 					tagGrps.put(tag, newTagged);
@@ -2645,16 +2666,15 @@ public class Controller {
 		}
 		List tags = new ArrayList(tagGrps.keySet());
 		Collections.sort(tags);
-		for (int i = 0, n = tags.size(); i < n; i++){
-			String tag = (String)tags.get(i);
+		for (int i = 0, n = tags.size(); i < n; i++) {
+			String tag = (String) tags.get(i);
 			WBTreeItem tagNode = new WBTreeItem(tag, null);
-			Set comps = (Set)tagGrps.get(tag);
+			Set comps = (Set) tagGrps.get(tag);
 			buildCompTreeAsFlatListAlpha(comps, tagNode);
 			compTreeRoot.addItem(tagNode);
 		}
 	}
-	
-	
+
 	/**
 	 * Add component nodes to this tree root in node name alpha order.
 	 * 
@@ -3120,21 +3140,26 @@ public class Controller {
 		// another.
 		_compDragController = new PickupDragController(
 				_main.getBoundaryPanel(), true) {
-			// public Widget maybeNewDraggableProxy(){
-			// Image img = new
-			// Image(".\\images\\CfG-Crystal-SVG-1.2.0\\48x48\\apps\\gnome-reboot.png");
-			// makeDraggable(img);
-			// return img;
-			// }
+			public Widget newDragProxy() {
+				Image img = new Image("images/gnome-reboot-48.png");
+				makeDraggable(img);
+				return img;
+			}
+
+//			public void dragMove() {
+//				
+//			}
 		};
-		// ((PickupDragController)_compDragController).setDragProxyEnabled(true);
+
+		((PickupDragController) _compDragController).setBehaviorDragProxy(true);
 
 		// Create a DropController for each drop target on which draggable
 		// widgets can be dropped
 		DropController dropController = new BoundaryDropController(_main
 				.getDropPanel(), true);
 		// Don't forget to register each DropController with a DragController
-		_compDragController.registerDropController(dropController);
+		((PickupDragController) _compDragController)
+				.registerDropController(dropController);
 
 		_mdh = new DragHandlerAdapter() {
 			public void onDragEnd(DragEndEvent w) {

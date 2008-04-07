@@ -4,8 +4,8 @@
 	<inherits name='com.google.gwt.http.HTTP'/>
 	<inherits name='com.google.gwt.user.User'/>
         <inherits name='org.gwtwidgets.WidgetLibrary'/>
-        <!-- Inherit gwt-dnd support                            -->
-        <inherits name='com.allen_sauer.gwt.dragdrop.DragAndDrop'/>
+	<!-- Inherit gwt-dnd 2.x support               -->
+        <inherits name='com.allen_sauer.gwt.dnd.gwt-dnd'/>        
         <inherits name='com.gwt.components.Effects'/>
 	<!-- Specify the app entry point class.                   -->
 	<entry-point class='org.meandre.workbench.client.Main'/>
