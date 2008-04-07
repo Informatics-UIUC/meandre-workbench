@@ -4,6 +4,7 @@ package org.meandre.workbench.client;
 // Java Imports
 //==============
 
+import java.util.List;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Date;
+import java.util.Collections;
 
 //===============
 // Other Imports
@@ -136,6 +138,8 @@ public class Controller {
 	public static final int s_COMP_TREE_SORT_ALPHA = 1;
 
 	public static final int s_COMP_TREE_SORT_TYPE = 2;
+
+	public static final int s_COMP_TREE_SORT_BY_TAG = 3;
 
 	private boolean _dirty = false;
 
@@ -1537,7 +1541,7 @@ public class Controller {
 
 	void regenerateTabbedPanel(boolean b) {
 		buildCompTree(getCompTreeHandle(), getCompTreeRoot(), "Available",
-				Controller.s_COMP_TREE_SORT_TYPE);
+				Controller.s_COMP_TREE_SORT_BY_TAG);
 		buildFlowTree(getFlowTreeHandle(), getFlowTreeRoot(), "Available");
 		buildLocationTree(getLocationTreeHandle(), getLocationTreeRoot(),
 				"Available");
@@ -2592,6 +2596,8 @@ public class Controller {
 					buildCompTreeAsFlatListAlpha(items, _compRootTemp);
 				} else if (_ctSort == s_COMP_TREE_SORT_TYPE) {
 					buildCompTreeAsTypeTree(items, _compRootTemp);
+				} else if (_ctSort == s_COMP_TREE_SORT_BY_TAG) {
+					buildCompTreeAsTagGroups(items, _compRootTemp);
 				} else {
 					buildCompTreeAsFlatListAlpha(items, _compRootTemp);
 				}
@@ -2611,6 +2617,44 @@ public class Controller {
 		return compTree;
 	}
 
+	/**
+	 * Constructs a tree of tags where each tag node has as children all of the 
+	 * components that bear that tag.
+	 * @param items Active components.
+	 * @param compTreeRoot Root of the tree.
+	 */
+	private void buildCompTreeAsTagGroups(Set items, TreeItem compTreeRoot){
+		WBTreeNode root = new WBTreeNode();
+		HashMap tagGrps = new HashMap();
+		Iterator itty = items.iterator();
+		while (itty.hasNext()) {
+			WBComponent ecd = (WBComponent) itty.next();
+			Set tags = ecd.getTags().getTags();
+			Iterator itty2 = tags.iterator();
+			while(itty2.hasNext()){
+				String tag =  (String)itty2.next();
+				Set tagged = (Set)tagGrps.get(tag);
+				if (tagged == null){
+					HashSet newTagged = new HashSet();
+					newTagged.add(ecd);
+					tagGrps.put(tag, newTagged);
+				} else {
+					tagged.add(ecd);
+				}
+			}
+		}
+		List tags = new ArrayList(tagGrps.keySet());
+		Collections.sort(tags);
+		for (int i = 0, n = tags.size(); i < n; i++){
+			String tag = (String)tags.get(i);
+			WBTreeItem tagNode = new WBTreeItem(tag, null);
+			Set comps = (Set)tagGrps.get(tag);
+			buildCompTreeAsFlatListAlpha(comps, tagNode);
+			compTreeRoot.addItem(tagNode);
+		}
+	}
+	
+	
 	/**
 	 * Add component nodes to this tree root in node name alpha order.
 	 * 

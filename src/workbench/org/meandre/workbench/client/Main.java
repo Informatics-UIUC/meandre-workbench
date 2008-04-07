@@ -23,6 +23,9 @@ import com.google.gwt.user.client.ui.VerticalSplitPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.WindowCloseListener;
+import com.google.gwt.user.client.ui.ChangeListener;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Button;
@@ -123,12 +126,53 @@ public class Main implements EntryPoint, WindowResizeListener,
         //Get the component Tree
         FlowPanel ctvp = new FlowPanel();
         HorizontalPanel cthp = new HorizontalPanel();
+        HorizontalPanel cthp1 = new HorizontalPanel();
+        HorizontalPanel cthp2 = new HorizontalPanel();
+        
+        ListBox lb = new ListBox();
+        lb.setVisibleItemCount(1);
+        lb.addItem("By Tag");
+        lb.addItem("By Name");
+        lb.addItem("By Type");
+        lb.setSelectedIndex(0);
+        lb.addChangeListener(new ChangeListener(){
+        	public void onChange(Widget sender){
+        		int i = ((ListBox)sender).getSelectedIndex();
+        		switch(i){
+        		case 0:
+            		_controller.buildCompTree(_controller.getCompTreeHandle(), _controller.getCompTreeRoot(), "Available",
+            				Controller.s_COMP_TREE_SORT_BY_TAG);
+            		break;
+        		case 1:
+            		_controller.buildCompTree(_controller.getCompTreeHandle(), _controller.getCompTreeRoot(), "Available",
+            				Controller.s_COMP_TREE_SORT_ALPHA);
+            		break;
+        		case 2:
+            		_controller.buildCompTree(_controller.getCompTreeHandle(), _controller.getCompTreeRoot(), "Available",
+            				Controller.s_COMP_TREE_SORT_TYPE);
+            		break;        			
+        		}
+        	}
+        });
+        
+        Label lab = new Label("Sort:");
+        lab.addStyleName("gwt-ListBox");
+        
         Button expand = new Button("+");
         Button collapse = new Button("-");
         expand.addStyleName("tree-button");
         collapse.addStyleName("tree-button");
-        cthp.add(expand);
-        cthp.add(collapse);
+        cthp1.add(expand);
+        cthp1.add(collapse);
+        cthp2.add(lab);
+        cthp2.add(lb);
+        cthp2.setCellVerticalAlignment(lab, cthp2.ALIGN_MIDDLE);
+        cthp2.setCellVerticalAlignment(lb, cthp2.ALIGN_MIDDLE);
+        cthp.add(cthp1);
+        cthp.add(cthp2);
+        cthp.setCellHorizontalAlignment(cthp1, cthp.ALIGN_LEFT);
+        cthp.setCellHorizontalAlignment(cthp2, cthp.ALIGN_RIGHT);
+        cthp.setWidth("100%");
         expand.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
                 _controller.expandAllTreeItems(_controller.getCompTreeHandle());
@@ -143,7 +187,7 @@ public class Main implements EntryPoint, WindowResizeListener,
         ctvp.add(_controller.buildCompTree(_controller.getCompTreeHandle(),
                                            _controller.getCompTreeRoot(),
                                            "Available",
-                                           Controller.s_COMP_TREE_SORT_TYPE));
+                                           Controller.s_COMP_TREE_SORT_BY_TAG));
         _tabPan.add(ctvp, "COMPONENTS");
 
         _tabPan.add(_controller.buildFlowTree(_controller.getFlowTreeHandle(),
