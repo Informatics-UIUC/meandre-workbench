@@ -1,4 +1,10 @@
 
+* Added a drop down list box above the component tree which enables choosing the 
+sort order for component display.  Three choices are available: by Tag (default); 
+by name, alpha; and by type (package).
+
+* Added the ability to display components by tag.
+
 * The "P" in the lower left of component image has been replaced with Chad's version of "four dots".
 
 * In WBHttpProxyServlet:  I only process multipart file or mixed as "uploadable to repo". 
