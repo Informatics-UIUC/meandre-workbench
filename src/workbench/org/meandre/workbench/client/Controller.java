@@ -1841,13 +1841,13 @@ public class Controller {
 		this._canvasComps.remove(cp);
 		this.removeComponentNameFromLookup(cp.getComponent().getName());
 
-		Effects.Effect("Fade", cp, "{ duration: 1.0 }").addEffectListener(
-				new EffectListenerAdapter() {
-					public void onAfterFinish(Effect sender) {
+//		Effects.Effect("Fade", cp, "{ duration: 1.0 }").addEffectListener(
+//				new EffectListenerAdapter() {
+//					public void onAfterFinish(Effect sender) {
 						_main.getBoundaryPanel().remove(_tempremoveComponentCP);
 						_tempremoveComponentCP.free();
-					}
-				});
+//					}
+//				});
 	}
 
 	/**
@@ -2086,7 +2086,7 @@ public class Controller {
 			checkAssignNewName(cinew);
 
 			ComponentPanel cp = new ComponentPanel(this, cinew);
-			cp.setVisible(false);
+			//cp.setVisible(false);
 
 			String x = (String) cinew.getProperties().getValue(this.s_LeftKey);
 			String y = (String) cinew.getProperties().getValue(this.s_TopKey);
@@ -2098,7 +2098,7 @@ public class Controller {
 				// set with saved x, y positions
 				setComponent(cp, Integer.parseInt(x), Integer.parseInt(y));
 			}
-			Effects.Effect("Appear", cp, "{duration: 1.0}");
+			//Effects.Effect("Appear", cp, "{duration: 1.0}");
 
 			// Make individual widgets draggable
 			makeComponentDraggable(cp, cp.getImage());
@@ -2112,16 +2112,17 @@ public class Controller {
 					.getSourceIntanceDataPort(), conn.getSourceInstance());
 			PortComp pcompTo = findPortCompForIDComponentID(conn
 					.getTargetIntanceDataPort(), conn.getTargetInstance());
-			makeConnection(pcompFrom, pcompTo);
+			makeConnection(pcompFrom, pcompTo, false);
 			flownew.addComponentConnection(new WBComponentConnection(conn
 					.getConnector(), conn.getSourceInstance(), conn
 					.getSourceIntanceDataPort(), conn.getTargetInstance(), conn
 					.getTargetIntanceDataPort()));
 		}
+		//drawConnections();
 		if (defFormat) {
 			formatFlow();
 		} else {
-			drawConnections();
+			//drawConnections();
 		}
 		flownew.setCreator(flow.getCreator());
 		flownew.setDescription(flow.getDescription());
@@ -2136,20 +2137,20 @@ public class Controller {
 
 		// attemp to fix drawing canvas initialization bug ===
 		// if (formatFirstTime) {
-		DeferredCommand.addPause();
-		if (defFormat) {
-			DeferredCommand.addCommand(new Command() {
-				public void execute() {
-					formatFlow();
-				}
-			});
-		} else {
+//		DeferredCommand.addPause();
+//		if (defFormat) {
+//			DeferredCommand.addCommand(new Command() {
+//				public void execute() {
+//					formatFlow();
+//				}
+//			});
+//		} else {
 			DeferredCommand.addCommand(new Command() {
 				public void execute() {
 					drawConnections();
 				}
 			});
-		}
+//		}
 		// }
 		// ====================================================
 	}
@@ -2200,9 +2201,9 @@ public class Controller {
 		ComponentPanel cp = new ComponentPanel(this, ci);
 		_canvasComps.add(cp);
 		_dirty = true;
-		cp.setVisible(false);
+		//cp.setVisible(false);
 		setComponent(cp);
-		Effects.Effect("Appear", cp, "{ duration: 1.0 }");
+		//Effects.Effect("Appear", cp, "{ duration: 1.0 }");
 		// Make individual widgets draggable
 		makeComponentDraggable(cp, cp.getImage());
 
@@ -2278,12 +2279,14 @@ public class Controller {
 	 * @param to
 	 *            PortComp Component connecting to.
 	 */
-	PortConn makeConnection(PortComp from, PortComp to) {
+	PortConn makeConnection(PortComp from, PortComp to, boolean draw) {
 		from.setConnected(true, to);
 		to.setConnected(true, from);
 		PortConn pc = new PortConn(from, to);
 		_connections.add(pc);
-		drawConnections();
+		if (draw){
+			drawConnections();
+		}
 		_dirty = true;
 		return pc;
 	}

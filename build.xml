@@ -128,6 +128,8 @@
         <java classname="com.google.gwt.dev.GWTCompiler" fork="yes" maxmemory="512m">
             <classpath refid="gwt_compile.classpath"/>
             <jvmarg value="-showversion"/>
+            <!-- <arg value="-style"/>
+            <arg value="DETAILED"/> -->
             <arg value="-out"/>
             <arg value="${www.dir}"/>
             <arg value="org.meandre.workbench.Main"/>

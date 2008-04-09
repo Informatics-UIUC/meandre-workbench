@@ -162,7 +162,7 @@ public class PortComp extends Image implements EventPreview {
               }
               // If click over an input port make a connection
               if (pc != null){
-                  _cont.makeConnection(this, pc);
+                  _cont.makeConnection(this, pc, true);
               } else {
                   // Else, set image back to port out.
                   this.setUrl(_mouseOutImgURL);

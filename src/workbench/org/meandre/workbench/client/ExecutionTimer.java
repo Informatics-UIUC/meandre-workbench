@@ -3,6 +3,8 @@ package org.meandre.workbench.client;
 //==============
 // Java Imports
 //==============
+import java.util.Set;
+import java.util.Iterator;
 
 //===============
 // Other Imports
@@ -13,8 +15,6 @@ import org.meandre.workbench.client.beans.WBExecBean;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.TextArea;
-import java.util.Set;
-import java.util.Iterator;
 import org.meandre.workbench.client.beans.WBRunningFlow;
 
 
