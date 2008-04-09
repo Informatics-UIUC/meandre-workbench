@@ -126,7 +126,7 @@ public class WBHttpProxyServlet extends HttpServlet {
 					sbuf.append(new String(readbytes));
 				}
 
-				if (uc.getContentType().equals("text/html")) {
+				if (true)/*(uc.getContentType().equals("text/html"))*/ {
 					// make replacement(s) but only if this is html
 					int pos = -1;
 					int ptr = 0;
