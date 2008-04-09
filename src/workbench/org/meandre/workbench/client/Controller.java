@@ -3140,18 +3140,18 @@ public class Controller {
 		// another.
 		_compDragController = new PickupDragController(
 				_main.getBoundaryPanel(), true) {
-			public Widget newDragProxy() {
-				Image img = new Image("images/gnome-reboot-48.png");
-				makeDraggable(img);
-				return img;
-			}
+//			public Widget newDragProxy() {
+//				Image img = new Image("images/gnome-reboot-48.png");
+//				makeDraggable(img);
+//				return img;
+//			}
 
 //			public void dragMove() {
 //				
 //			}
 		};
 
-		((PickupDragController) _compDragController).setBehaviorDragProxy(true);
+		//((PickupDragController) _compDragController).setBehaviorDragProxy(true);
 
 		// Create a DropController for each drop target on which draggable
 		// widgets can be dropped
