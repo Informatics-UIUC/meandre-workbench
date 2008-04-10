@@ -4,6 +4,8 @@ package org.meandre.workbench.client;
 // Java Imports
 //==============
 
+import java.util.*;
+
 //===============
 // Other Imports
 //===============
@@ -44,11 +46,10 @@ public class PortComp extends Image implements EventPreview {
     private Controller _cont = null;
 
     private boolean _drawing = false;
-    private boolean _connected = false;
 
     private ComponentPanel _parentComp = null;
 
-    private PortComp _connectedTo = null;
+    private Set _connectedTo = new HashSet();
 
 //==============
 // Constructors
@@ -80,23 +81,43 @@ public class PortComp extends Image implements EventPreview {
         return _port_type;
     }
 
-    public void setConnected(boolean b, PortComp conn){
-        _connected = b;
+    public void setConnected(boolean b, PortConn conn){
         if (b){
-            _connectedTo = conn;
-            this.setUrl(_mouseOverImgURL);
+            _connectedTo.add(conn);
+            setUrl(_mouseOverImgURL);
         } else {
-            this.setUrl(_mouseOutImgURL);
-            _connectedTo = null;
+            setUrl(_mouseOutImgURL);
+            _connectedTo.remove(conn);
         }
     }
-
-    public PortComp getConnectedTo(){
-        return this._connectedTo;
+    
+    /**
+     * Return the PortComp objects that this port is connected to.
+     * @return Set of PortComp objects or an empty set if there are no connections.
+     */
+    public Set getConnectedTo(){
+    	Set ports = new HashSet();
+    	Iterator itty = _connectedTo.iterator();
+    	while (itty.hasNext()){
+    		if (this.getPortOrientation() == this.s_INPUT_PORT_TYPE){
+    			ports.add(((PortConn)itty.next()).getFrom());
+    		} else {
+    			ports.add(((PortConn)itty.next()).getTo());	
+    		}
+    	}
+        return ports;
+    }
+    
+    /**
+     * Return set of connections for this object.
+     * @return
+     */
+    public Set getConnections(){
+    	return _connectedTo;
     }
 
     public boolean isConnected(){
-        return _connected;
+        return !_connectedTo.isEmpty();
     }
 
     public void onBrowserEvent(Event event) {
@@ -112,7 +133,7 @@ public class PortComp extends Image implements EventPreview {
             }
             break;
         case Event.ONMOUSEOVER:
-            if ((!_drawing) && (!_connected)) {
+            if ((!_drawing) && (!isConnected())) {
                 this.setUrl(_mouseOverImgURL);
             }
             int left = -1;
@@ -124,7 +145,7 @@ public class PortComp extends Image implements EventPreview {
 
             break;
         case Event.ONMOUSEOUT:
-            if ((!_drawing) && (!_connected)) {
+            if ((!_drawing) && (!isConnected())) {
                 this.setUrl(_mouseOutImgURL);
             }
             _ppp.hide();
@@ -157,12 +178,12 @@ public class PortComp extends Image implements EventPreview {
               PortComp pc = _cont.findInputPortOver(x, y);
               //Window.alert("" + pc.getPortOrientation());
               // If connected remove connections regardless.
-              if (_connected){
+              if (isConnected()){
                   _cont.removeConnection(this);
               }
               // If click over an input port make a connection
               if (pc != null){
-                  _cont.makeConnection(this, pc, true);
+                  _cont.makeConnection(this, pc);
               } else {
                   // Else, set image back to port out.
                   this.setUrl(_mouseOutImgURL);
