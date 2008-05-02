@@ -202,6 +202,7 @@ public class ExecutionTimer extends Timer {
         _ta = new TextArea();
         _ta.setCharacterWidth(120);
         _ta.setText("");
+        _ta.setReadOnly(true);
         _main.getCompDescScrollPanel().add(_ta);
         _ta.setHeight("100%");
         _ta.setWidth("100%");
