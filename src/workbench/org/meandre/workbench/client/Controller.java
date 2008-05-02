@@ -2384,13 +2384,13 @@ public class Controller {
 
 	void showWebUI(String webUI, String flowID) {
 
-		webUI = "." + this.s_PROXY_SERVLET_PATH + "?" + s_GET_PARAM_SID_KEY
-				+ "=" + URL.encodeComponent(getSessionID()) + "&"
-				+ s_PROXY_GET_METHOD_KEY + "=" + s_PROXY_GET_METHOD_WEBUI + "&"
-				+ s_PROXY_TARGET_KEY + "=" + URL.encodeComponent(webUI);
+//		webUI = "." + this.s_PROXY_SERVLET_PATH + "?" + s_GET_PARAM_SID_KEY
+//				+ "=" + URL.encodeComponent(getSessionID()) + "&"
+//				+ s_PROXY_GET_METHOD_KEY + "=" + s_PROXY_GET_METHOD_WEBUI + "&"
+//				+ s_PROXY_TARGET_KEY + "=" + URL.encodeComponent(webUI);
 
 		Window.open(webUI, "Web UI for flow: " + flowID,
-				"resizable=yes,scrollbars=yes,status=yes");
+		"resizable=yes,scrollbars=yes,status=yes");
 	}
 
 	/**
