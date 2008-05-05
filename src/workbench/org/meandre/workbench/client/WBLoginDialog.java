@@ -13,6 +13,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.TextBoxBase;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.TextBox;
@@ -87,37 +88,41 @@ public class WBLoginDialog extends DialogBox {
 
         _tbUserId = new TextBox();
         _tbUserId.addKeyboardListener(new KeyboardListenerAdapter() {
-            public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+            public void onKeyUp(Widget sender, char keyCode, int modifiers) {
                 ifKeycodeEnterSubmit(keyCode, sender);
-                checkEnableSubmit();            }
+                checkEnableSubmit();
+            }
         });
 
         _ptbPassword = new PasswordTextBox();
         _ptbPassword.addKeyboardListener(new KeyboardListenerAdapter() {
-            public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+            public void onKeyUp(Widget sender, char keyCode, int modifiers) {
                 ifKeycodeEnterSubmit(keyCode, sender);
-                checkEnableSubmit();            }
+                checkEnableSubmit();
+            }
         });
 
         _tbServer = new TextBox();
         _tbServer.addKeyboardListener(new KeyboardListenerAdapter() {
-            public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+            public void onKeyUp(Widget sender, char keyCode, int modifiers) {
                 ifKeycodeEnterSubmit(keyCode, sender);
-                checkEnableSubmit();           }
+                checkEnableSubmit();
+            }
         });
 
         _tbPort = new TextBox();
         _tbPort.addKeyboardListener(new KeyboardListenerAdapter() {
-            public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+            public void onKeyUp(Widget sender, char keyCode, int modifiers) {
                 ifKeycodeEnterSubmit(keyCode, sender);
-                if (!Character.isDigit(keyCode)){
+                if (!Character.isDigit(keyCode)) {
                     ((TextBox) sender).cancelKey();
                     return;
                 }
-                checkEnableSubmit();            }
+                checkEnableSubmit();
+            }
         });
 
-        /* Add click listener for cancel button.*/
+        /* Add click listener for cancel button. */
         btnCancel.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
                 closeForm();
@@ -125,48 +130,49 @@ public class WBLoginDialog extends DialogBox {
             }
         });
 
-        /* Add click listener for submit button.*/
+        /* Add click listener for submit button. */
         _btnLogin.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
 
-                if (!_btnLogin.isEnabled()){
+                if (!_btnLogin.isEnabled()) {
                     return;
                 }
 
                 _busy.setVisible(true);
                 String prt = "";
-                if (_tbPort.getText().trim().length() > 0){
+                if (_tbPort.getText().trim().length() > 0) {
                     prt = ":" + _tbPort.getText().trim();
                 }
-                if (_tbServer.getText().toLowerCase().equals("localhost")){
+                if (_tbServer.getText().toLowerCase().equals("localhost")) {
                     _tbServer.setText("127.0.0.1");
                 }
-                _cont.login(_tbUserId.getText(), _ptbPassword.getText(), "http://"
-                            + _tbServer.getText() + prt + "/",
-                            new AsyncCallback() {
-                    public void onSuccess(Object result) {
-                        _busy.setVisible(false);
-                        WBLoginBean lbean = (WBLoginBean)result;
-                        if (lbean.getSuccess()){
-                            _cont.loginSuccess(lbean.getUserName(),
-                                               lbean.getSessionID(),
-                                               lbean.getBaseURL());
-                            closeForm();
-                        } else {
-                            Window.alert(lbean.getFailureMessage());
-                            resetForm();                        }
-                    }
-
-                    public void onFailure(Throwable caught) {
-                        _busy.setVisible(false);
-                        // do some UI stuff to show failure
-                        Window.alert(
-                                "AsyncCallBack Failure -- login():  " +
-                                caught.getMessage());
+                _cont.login(_tbUserId.getText(), _ptbPassword.getText(),
+                        "http://" + _tbServer.getText() + prt + "/",
+                        new AsyncCallback() {
+                            public void onSuccess(Object result) {
+                                _busy.setVisible(false);
+                                WBLoginBean lbean = (WBLoginBean) result;
+                                if (lbean.getSuccess()) {
+                                    _cont.loginSuccess(lbean.getUserName(),
+                                            lbean.getSessionID(), lbean
+                                                    .getBaseURL());
                                     closeForm();
-                                    _main.closeApp();
-                   }
-                });
+                                } else {
+                                    Window.alert(lbean.getFailureMessage());
+                                    resetForm();
+                                }
+                            }
+
+                            public void onFailure(Throwable caught) {
+                                _busy.setVisible(false);
+                                // do some UI stuff to show failure
+                                Window
+                                        .alert("AsyncCallBack Failure -- login():  "
+                                                + caught.getMessage());
+                                closeForm();
+                                _main.closeApp();
+                            }
+                        });
 
             }
         });
@@ -184,9 +190,7 @@ public class WBLoginDialog extends DialogBox {
 
         // FOR DEV ONLY
         _tbUserId.setText("admin");
-        //_pbox.setText("admin");
-
-
+        // _pbox.setText("admin");
 
         Image logo = new Image("images/meandre-logo.jpg");
         logo.setPixelSize(200, 36);
@@ -204,8 +208,8 @@ public class WBLoginDialog extends DialogBox {
         vp.add(gp);
         vp.add(hpan);
 
-        vp.setCellHorizontalAlignment(hpan,vp.ALIGN_RIGHT);
-        vp.setCellHorizontalAlignment(logo,vp.ALIGN_CENTER);
+        vp.setCellHorizontalAlignment(hpan, vp.ALIGN_RIGHT);
+        vp.setCellHorizontalAlignment(logo, vp.ALIGN_CENTER);
 
         return vp;
     }
@@ -233,11 +237,7 @@ public class WBLoginDialog extends DialogBox {
 
     private void ifKeycodeEnterSubmit(char keyCode, Widget sender){
         if (keyCode == '\r') {
-            if (sender instanceof TextBox){
-                ((TextBox) sender).cancelKey();
-            } else {
-                ((PasswordTextBox) sender).cancelKey();
-            }
+            ((TextBoxBase)sender).cancelKey();
             _btnLogin.click();
         }
     }
