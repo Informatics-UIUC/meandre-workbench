@@ -466,10 +466,10 @@ public class Controller {
 		if (sessionID != null) {
 			checkSessionID(sessionID, new AsyncCallback() {
 				public void onSuccess(Object result) {
-					WBLoginBean lbean = (WBLoginBean) result;
-					if (lbean.getSuccess()) {
-						loginSuccess(lbean.getUserName(), lbean.getSessionID(),
-								lbean.getBaseURL());
+					WBLoginBean loginBean = (WBLoginBean) result;
+					if (loginBean.getSuccess()) {
+						loginSuccess(loginBean.getUserName(), loginBean.getSessionID(),
+								loginBean.getBaseURL());
 					} else {
 						new WBLoginDialog(_main, Controller.this);
 					}

@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.ChangeListener;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBoxBase;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -46,21 +47,21 @@ public class WBLoginDialog extends DialogBox {
     // Data Members
     //==============
 
-    private Controller _cont = null;
+    private Controller _controller = null;
     private Main _main = null;
     private Button _btnLogin = null;
     private TextBox _tbUserId = null;
     private PasswordTextBox _ptbPassword = null;
     private TextBox _tbServer = null;
     private TextBox _tbPort = null;
-    private Image _busy = null;
+    private Image _imgBusy = null;
 
 
     public WBLoginDialog(Main main, Controller cont) {
         super(false, true);
         _main = main;
-        _cont = cont;
-        setWidget(buildPanel());
+        _controller = cont;
+        setWidget(createLoginPanel());
         setText("Meandre Workbench Login");
         this.setVisible(false);
         show();
@@ -73,9 +74,9 @@ public class WBLoginDialog extends DialogBox {
         _tbUserId.setFocus(true);
     }
 
-    private Panel buildPanel() {
-        VerticalPanel vp = new VerticalPanel();
-        Grid gp = new Grid(4, 2);
+    private Panel createLoginPanel() {
+        VerticalPanel vpLoginMain = new VerticalPanel();
+        Grid gpLoginDetails = new Grid(4, 2);
 
         _btnLogin = new Button("Login");
         _btnLogin.setEnabled(false);
@@ -126,7 +127,7 @@ public class WBLoginDialog extends DialogBox {
         btnCancel.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
                 closeForm();
-                _cont.getMain().closeApp();
+                _controller.getMain().closeApp();
             }
         });
 
@@ -138,55 +139,54 @@ public class WBLoginDialog extends DialogBox {
                     return;
                 }
 
-                _busy.setVisible(true);
-                String prt = "";
+                _imgBusy.setVisible(true);
+                String sPort = "";
                 if (_tbPort.getText().trim().length() > 0) {
-                    prt = ":" + _tbPort.getText().trim();
+                    sPort = ":" + _tbPort.getText().trim();
                 }
                 if (_tbServer.getText().toLowerCase().equals("localhost")) {
                     _tbServer.setText("127.0.0.1");
                 }
-                _cont.login(_tbUserId.getText(), _ptbPassword.getText(),
-                        "http://" + _tbServer.getText() + prt + "/",
+                _controller.login(_tbUserId.getText(), _ptbPassword.getText(),
+                        "http://" + _tbServer.getText() + sPort + "/",
                         new AsyncCallback() {
                             public void onSuccess(Object result) {
-                                _busy.setVisible(false);
-                                WBLoginBean lbean = (WBLoginBean) result;
-                                if (lbean.getSuccess()) {
-                                    _cont.loginSuccess(lbean.getUserName(),
-                                            lbean.getSessionID(), lbean
-                                                    .getBaseURL());
+                                _imgBusy.setVisible(false);
+                                WBLoginBean loginBean = (WBLoginBean) result;
+                                if (loginBean.getSuccess()) {
+                                    _controller.loginSuccess(loginBean.getUserName(),
+                                            loginBean.getSessionID(), loginBean.getBaseURL());
                                     closeForm();
                                 } else {
-                                    Window.alert(lbean.getFailureMessage());
+                                    Window.alert(loginBean.getFailureMessage());
                                     resetForm();
                                 }
                             }
 
                             public void onFailure(Throwable caught) {
-                                _busy.setVisible(false);
+                                _imgBusy.setVisible(false);
                                 // do some UI stuff to show failure
                                 Window
                                         .alert("AsyncCallBack Failure -- login():  "
                                                 + caught.getMessage());
-                                closeForm();
-                                _main.closeApp();
+                                //closeForm();
+                                //_main.closeApp();
                             }
                         });
 
             }
         });
 
-        gp.setWidget(0, 0, lblUserId);
-        gp.setWidget(0, 1, _tbUserId);
-        gp.setWidget(1, 0, lblPassword);
-        gp.setWidget(1, 1, _ptbPassword);
-        gp.setWidget(2, 0, lblServer);
+        gpLoginDetails.setWidget(0, 0, lblUserId);
+        gpLoginDetails.setWidget(0, 1, _tbUserId);
+        gpLoginDetails.setWidget(1, 0, lblPassword);
+        gpLoginDetails.setWidget(1, 1, _ptbPassword);
+        gpLoginDetails.setWidget(2, 0, lblServer);
         _tbServer.setText("127.0.0.1");
-        gp.setWidget(2, 1, _tbServer);
-        gp.setWidget(3, 0, lblPort);
+        gpLoginDetails.setWidget(2, 1, _tbServer);
+        gpLoginDetails.setWidget(3, 0, lblPort);
         _tbPort.setText("1714");
-        gp.setWidget(3, 1, _tbPort);
+        gpLoginDetails.setWidget(3, 1, _tbPort);
 
         // FOR DEV ONLY
         _tbUserId.setText("admin");
@@ -194,24 +194,25 @@ public class WBLoginDialog extends DialogBox {
 
         Image logo = new Image("images/meandre-logo.jpg");
         logo.setPixelSize(200, 36);
-        _busy = new Image("images/wait-14x14.gif");
-        _busy.setVisible(false);
-        HorizontalPanel hpan = new HorizontalPanel();
-        hpan.add(_busy);
-        hpan.add(btnCancel);
-        hpan.add(_btnLogin);
-        hpan.setSpacing(20);
-        hpan.setCellWidth(_busy, "20px");
-        hpan.setHorizontalAlignment(hpan.ALIGN_RIGHT);
+        _imgBusy = new Image("images/wait-14x14.gif");
+        _imgBusy.setVisible(false);
 
-        vp.add(logo);
-        vp.add(gp);
-        vp.add(hpan);
+        HorizontalPanel hpButtons = new HorizontalPanel();
+        hpButtons.add(_imgBusy);
+        hpButtons.add(btnCancel);
+        hpButtons.add(_btnLogin);
+        hpButtons.setSpacing(20);
+        hpButtons.setCellWidth(_imgBusy, "20px");
+        hpButtons.setHorizontalAlignment(HorizontalPanel.ALIGN_RIGHT);
 
-        vp.setCellHorizontalAlignment(hpan, vp.ALIGN_RIGHT);
-        vp.setCellHorizontalAlignment(logo, vp.ALIGN_CENTER);
+        vpLoginMain.add(logo);
+        vpLoginMain.add(gpLoginDetails);
+        vpLoginMain.add(hpButtons);
 
-        return vp;
+        vpLoginMain.setCellHorizontalAlignment(hpButtons, VerticalPanel.ALIGN_RIGHT);
+        vpLoginMain.setCellHorizontalAlignment(logo, VerticalPanel.ALIGN_CENTER);
+
+        return vpLoginMain;
     }
 
     private void closeForm(){
