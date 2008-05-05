@@ -11,6 +11,7 @@ package org.meandre.workbench.client;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Grid;
@@ -46,11 +47,11 @@ public class WBLoginDialog extends DialogBox {
 
     private Controller _cont = null;
     private Main _main = null;
-    private Button _butt = null;
-    private TextBox _tbox = null;
-    private PasswordTextBox _pbox = null;
-    private TextBox _ubox = null;
-    private TextBox _prtbox = null;
+    private Button _btnLogin = null;
+    private TextBox _tbUserId = null;
+    private PasswordTextBox _ptbPassword = null;
+    private TextBox _tbServer = null;
+    private TextBox _tbPort = null;
     private Image _busy = null;
 
 
@@ -68,42 +69,45 @@ public class WBLoginDialog extends DialogBox {
                          (this.getOffsetHeight() / 2));
         this.setVisible(true);
         checkEnableSubmit();
-        _tbox.setFocus(true);
+        _tbUserId.setFocus(true);
     }
 
     private Panel buildPanel() {
         VerticalPanel vp = new VerticalPanel();
         Grid gp = new Grid(4, 2);
 
-        _butt = new Button("Login");
-        _butt.setEnabled(false);
-        Button cancel = new Button("Cancel");
+        _btnLogin = new Button("Login");
+        _btnLogin.setEnabled(false);
+        Button btnCancel = new Button("Cancel");
 
-        HTML tLab = new HTML("<strong>User ID:</strong>");
-        HTML pLab = new HTML("<strong>Password:</strong>");
-        HTML uLab = new HTML("<strong>Domain:</strong>");
-        HTML prtLab = new HTML("<strong>Port:</strong>");
-        _tbox = new TextBox();
-        _tbox.addKeyboardListener(new KeyboardListenerAdapter() {
+        HTML lblUserId = new HTML("<strong>User ID:</strong>");
+        HTML lblPassword = new HTML("<strong>Password:</strong>");
+        HTML lblServer = new HTML("<strong>Server:</strong>");
+        HTML lblPort = new HTML("<strong>Port:</strong>");
+
+        _tbUserId = new TextBox();
+        _tbUserId.addKeyboardListener(new KeyboardListenerAdapter() {
             public void onKeyPress(Widget sender, char keyCode, int modifiers) {
                 ifKeycodeEnterSubmit(keyCode, sender);
                 checkEnableSubmit();            }
         });
-        _pbox = new PasswordTextBox();
-        _pbox.addKeyboardListener(new KeyboardListenerAdapter() {
+
+        _ptbPassword = new PasswordTextBox();
+        _ptbPassword.addKeyboardListener(new KeyboardListenerAdapter() {
             public void onKeyPress(Widget sender, char keyCode, int modifiers) {
                 ifKeycodeEnterSubmit(keyCode, sender);
                 checkEnableSubmit();            }
         });
-        _ubox = new TextBox();
-        _ubox.addKeyboardListener(new KeyboardListenerAdapter() {
+
+        _tbServer = new TextBox();
+        _tbServer.addKeyboardListener(new KeyboardListenerAdapter() {
             public void onKeyPress(Widget sender, char keyCode, int modifiers) {
                 ifKeycodeEnterSubmit(keyCode, sender);
                 checkEnableSubmit();           }
         });
 
-        _prtbox = new TextBox();
-        _prtbox.addKeyboardListener(new KeyboardListenerAdapter() {
+        _tbPort = new TextBox();
+        _tbPort.addKeyboardListener(new KeyboardListenerAdapter() {
             public void onKeyPress(Widget sender, char keyCode, int modifiers) {
                 ifKeycodeEnterSubmit(keyCode, sender);
                 if (!Character.isDigit(keyCode)){
@@ -114,7 +118,7 @@ public class WBLoginDialog extends DialogBox {
         });
 
         /* Add click listener for cancel button.*/
-        cancel.addClickListener(new ClickListener() {
+        btnCancel.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
                 closeForm();
                 _cont.getMain().closeApp();
@@ -122,23 +126,23 @@ public class WBLoginDialog extends DialogBox {
         });
 
         /* Add click listener for submit button.*/
-        _butt.addClickListener(new ClickListener() {
+        _btnLogin.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
 
-                if (!_butt.isEnabled()){
+                if (!_btnLogin.isEnabled()){
                     return;
                 }
 
                 _busy.setVisible(true);
                 String prt = "";
-                if (_prtbox.getText().trim().length() > 0){
-                    prt = ":" + _prtbox.getText().trim();
+                if (_tbPort.getText().trim().length() > 0){
+                    prt = ":" + _tbPort.getText().trim();
                 }
-                if (_ubox.getText().toLowerCase().equals("localhost")){
-                    _ubox.setText("127.0.0.1");
+                if (_tbServer.getText().toLowerCase().equals("localhost")){
+                    _tbServer.setText("127.0.0.1");
                 }
-                _cont.login(_tbox.getText(), _pbox.getText(), "http://"
-                            + _ubox.getText() + prt + "/",
+                _cont.login(_tbUserId.getText(), _ptbPassword.getText(), "http://"
+                            + _tbServer.getText() + prt + "/",
                             new AsyncCallback() {
                     public void onSuccess(Object result) {
                         _busy.setVisible(false);
@@ -167,19 +171,19 @@ public class WBLoginDialog extends DialogBox {
             }
         });
 
-        gp.setWidget(0, 0, tLab);
-        gp.setWidget(0, 1, _tbox);
-        gp.setWidget(1, 0, pLab);
-        gp.setWidget(1, 1, _pbox);
-        gp.setWidget(2, 0, uLab);
-        _ubox.setText("127.0.0.1");
-        gp.setWidget(2, 1, _ubox);
-        gp.setWidget(3, 0, prtLab);
-        _prtbox.setText("1714");
-        gp.setWidget(3, 1, _prtbox);
+        gp.setWidget(0, 0, lblUserId);
+        gp.setWidget(0, 1, _tbUserId);
+        gp.setWidget(1, 0, lblPassword);
+        gp.setWidget(1, 1, _ptbPassword);
+        gp.setWidget(2, 0, lblServer);
+        _tbServer.setText("127.0.0.1");
+        gp.setWidget(2, 1, _tbServer);
+        gp.setWidget(3, 0, lblPort);
+        _tbPort.setText("1714");
+        gp.setWidget(3, 1, _tbPort);
 
         // FOR DEV ONLY
-        _tbox.setText("admin");
+        _tbUserId.setText("admin");
         //_pbox.setText("admin");
 
 
@@ -190,8 +194,8 @@ public class WBLoginDialog extends DialogBox {
         _busy.setVisible(false);
         HorizontalPanel hpan = new HorizontalPanel();
         hpan.add(_busy);
-        hpan.add(cancel);
-        hpan.add(_butt);
+        hpan.add(btnCancel);
+        hpan.add(_btnLogin);
         hpan.setSpacing(20);
         hpan.setCellWidth(_busy, "20px");
         hpan.setHorizontalAlignment(hpan.ALIGN_RIGHT);
@@ -212,19 +216,18 @@ public class WBLoginDialog extends DialogBox {
     }
 
     private void resetForm(){
-        _tbox.setText("");
-        _pbox.setText("");
-        _butt.setEnabled(false);
+        _tbUserId.setText("");
+        _ptbPassword.setText("");
+        _btnLogin.setEnabled(false);
     }
 
     private void checkEnableSubmit(){
-        if ((_tbox.getText().trim().length() > 0)
-            && (_tbox.getText().trim().length() > 0)
-            && (_ubox.getText().trim().length() > 0)
-            && (_prtbox.getText().trim().length() > 0)) {
-            _butt.setEnabled(true);
+        if ((_tbUserId.getText().trim().length() > 0)
+            && (_tbServer.getText().trim().length() > 0)
+            && (_tbPort.getText().trim().length() > 0)) {
+            _btnLogin.setEnabled(true);
         } else {
-            _butt.setEnabled(false);
+            _btnLogin.setEnabled(false);
         }
     }
 
@@ -235,7 +238,7 @@ public class WBLoginDialog extends DialogBox {
             } else {
                 ((PasswordTextBox) sender).cancelKey();
             }
-            _butt.click();
+            _btnLogin.click();
         }
     }
 }
