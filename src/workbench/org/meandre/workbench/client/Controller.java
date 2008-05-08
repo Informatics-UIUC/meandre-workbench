@@ -1958,6 +1958,8 @@ public class Controller {
 			return;
 		}
 
+		this.clearCanvas();
+
 		int row = 0;
 		int col = 0;
 		HashSet comps = new HashSet(_canvasComps);
@@ -2083,9 +2085,6 @@ public class Controller {
 		// ===================================================
 
 		this.clearCanvas();
-		_main.getBoundaryPanel().setSize("100%", "100%");
-		int maxWidth = 0;
-		int maxHeight = 0;
 
 		boolean defFormat = true;
 
@@ -2111,20 +2110,9 @@ public class Controller {
 				// set with default positions
 				setComponent(cp);
 			} else {
-			    int xValue = Integer.parseInt(x);
-                int yValue = Integer.parseInt(y);
-
-                maxWidth = Math.max(maxWidth, xValue + cp.getOffsetWidth());
-                maxHeight = Math.max(maxHeight, yValue + cp.getOffsetHeight());
-
-                int bpWidth = _main.getBoundaryPanel().getOffsetWidth();
-                int bpHeight = _main.getBoundaryPanel().getOffsetHeight();
-
-                _main.getBoundaryPanel().setSize(Math.max(maxWidth+120, bpWidth)+"px",
-                        Math.max(maxHeight+120, bpHeight)+"px");
-				defFormat = false;
+			    defFormat = false;
 				// set with saved x, y positions
-				setComponent(cp, xValue, yValue);
+				setComponent(cp, Integer.parseInt(x), Integer.parseInt(y));
 			}
 			// Effects.Effect("Appear", cp, "{duration: 1.0}");
 
@@ -3221,8 +3209,7 @@ public class Controller {
 		ci.getProperties().add(this.s_TopKey, "" + this.s_TopVal);
 		ci.getProperties().add(this.s_LeftKey, "" + this.s_LeftVal);
 		_main.getBoundaryPanel().add(cp, this.s_LeftVal, this.s_TopVal);
-//		System.out.println("setComponent(ComponentPanel): boundaryPanel=" + _main.getBoundaryPanel().getOffsetWidth()
-//                + "," + _main.getBoundaryPanel().getOffsetHeight());
+		adjustCanvasSize(cp);
 	}
 
 	private void setComponent(ComponentPanel cp, int x, int y) {
@@ -3230,7 +3217,20 @@ public class Controller {
 		ci.getProperties().add(this.s_TopKey, "" + y);
 		ci.getProperties().add(this.s_LeftKey, "" + x);
 		_main.getBoundaryPanel().add(cp, x, y);
-//        System.out.println("setComponent(ComponentPanel,x,y): boundaryPanel=" + _main.getBoundaryPanel().getOffsetWidth()
-//                + "," + _main.getBoundaryPanel().getOffsetHeight());
+        adjustCanvasSize(cp);
 	}
+
+    private void adjustCanvasSize(ComponentPanel cp) {
+        int canvasWidth = _main.getBoundaryPanel().getOffsetWidth();
+        int canvasHeight = _main.getBoundaryPanel().getOffsetHeight();
+
+        WBProperties componentProperties = cp.getComponent().getProperties();
+        int x = Integer.parseInt(componentProperties.getValue(this.s_LeftKey));
+        int y = Integer.parseInt(componentProperties.getValue(this.s_TopKey));
+
+        canvasWidth = Math.max(canvasWidth, x + cp.getOffsetWidth());
+        canvasHeight = Math.max(canvasHeight, y + cp.getOffsetHeight());
+
+        _main.getBoundaryPanel().setSize(canvasWidth + "px", canvasHeight + "px");
+    }
 }

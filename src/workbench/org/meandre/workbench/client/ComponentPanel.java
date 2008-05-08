@@ -98,8 +98,8 @@ public class ComponentPanel extends DockPanel implements SourcesClickEvents,
 
         Collections.sort(lstPorts, new Comparator() {
             public int compare(Object o1, Object o2) {
-                String name1 = ((PortComp)o1).getDataportObj().getName();
-                String name2 = ((PortComp)o2).getDataportObj().getName();
+                String name1 = ((PortComp)o1).getDataportObj().getName().toLowerCase();
+                String name2 = ((PortComp)o2).getDataportObj().getName().toLowerCase();
 
                 return name1.compareTo(name2);
             }
@@ -120,8 +120,8 @@ public class ComponentPanel extends DockPanel implements SourcesClickEvents,
 
         Collections.sort(lstPorts, new Comparator() {
             public int compare(Object o1, Object o2) {
-                String name1 = ((PortComp)o1).getDataportObj().getName();
-                String name2 = ((PortComp)o2).getDataportObj().getName();
+                String name1 = ((PortComp)o1).getDataportObj().getName().toLowerCase();
+                String name2 = ((PortComp)o2).getDataportObj().getName().toLowerCase();
 
                 return name1.compareTo(name2);
             }
@@ -141,9 +141,9 @@ public class ComponentPanel extends DockPanel implements SourcesClickEvents,
 //        hpan.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 //        hpan.add(leftVP);
 //        if (comp.getExecutableComponent().getProperties().getKeys().isEmpty()) {
-//            _compImg = new Image("images/gnome-reboot-48-boris.png");
+//            _compImg = new Image("images/gnome-reboot-48.png");
 //        } else {
-//            _compImg = new Image("images/gnome-reboot-48-props-boris.png");
+//            _compImg = new Image("images/gnome-reboot-48-props-chad.png");
 //        }
 //        _compImg.addClickListener(new ClickListener() {
 //            public void onClick(Widget w) {
