@@ -113,12 +113,20 @@ public class WBLoginDialog extends DialogBox {
 
         _tbPort = new TextBox();
         _tbPort.addKeyboardListener(new KeyboardListenerAdapter() {
-            public void onKeyUp(Widget sender, char keyCode, int modifiers) {
-                ifKeycodeEnterSubmit(keyCode, sender);
-                if (!Character.isDigit(keyCode)) {
-                    ((TextBox) sender).cancelKey();
+            public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+                if (!(Character.isDigit(keyCode)
+                        || (int)keyCode == 8        /* BACKSPACE */
+                        || (int)keyCode == 46       /* DELETE    */
+                        || (int)keyCode == 35       /* HOME      */
+                        || (int)keyCode == 36       /* END       */
+                        || (int)keyCode == 37       /* LEFT      */
+                        || (int)keyCode == 39)) {   /* RIGHT     */
+                    ((TextBox)sender).cancelKey();
                     return;
                 }
+            }
+            public void onKeyUp(Widget sender, char keyCode, int modifiers) {
+                ifKeycodeEnterSubmit(keyCode, sender);
                 checkEnableSubmit();
             }
         });

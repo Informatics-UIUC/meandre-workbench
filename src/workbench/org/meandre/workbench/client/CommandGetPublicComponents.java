@@ -37,14 +37,14 @@ class CommandGetPublicComponents implements WBCommand {
     //==============
 
     private WBCommand _cmd = null;
-    private Controller _cont = null;
+    private Controller _controller = null;
 
     //==============
     // Constructors
     //==============
 
     CommandGetPublicComponents(Controller cont, WBCommand cmd) {
-        _cont = cont;
+        _controller = cont;
         _cmd = cmd;
     }
 
@@ -59,7 +59,7 @@ class CommandGetPublicComponents implements WBCommand {
                 // do some UI stuff to show success
                 Set items = (Set) result;
 
-                Map pcs = _cont.getPublicComponentsMap();
+                Map pcs = _controller.getPublicComponentsMap();
                 pcs.clear();
                 if ((items != null) && (!items.isEmpty())){
                     for (Iterator itty = items.iterator(); itty.hasNext();){
@@ -81,7 +81,7 @@ class CommandGetPublicComponents implements WBCommand {
                         caught.getMessage());
             }
         };
-        _cont.getPublicRepositoryComponents(callback);
+        _controller.getPublicRepositoryComponents(callback);
 
     }
 

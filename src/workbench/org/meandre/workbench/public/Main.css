@@ -45,9 +45,6 @@ MENU *****************************************************
 SPLIT PANELS *****************************************************
 */
 
-.gwt-VerticalSplitPanel {
-}
-
 .gwt-HorizontalSplitPanel .hsplitter {
   cursor: e-resize;
   background-color: #9f9f9f;
@@ -70,14 +67,13 @@ SPLIT PANELS *****************************************************
 
 .gwt-Tree .gwt-TreeItem {
   cursor: pointer;
-  cursor: hand;
   font-size: 70%;
   font-weight: bold;
-  width: 100%;
+  /* width: 100%; */
 }
 
 .gwt-Tree .gwt-TreeItem-selected {
-  background: #ffffcc;
+  background: #C3D9FF;
 }
 
 /*
@@ -90,21 +86,50 @@ SPLIT PANELS *****************************************************
   cursor: text;
 }
 
+.comp-content-top {
+	height: 9px;
+	width: 48px;
+	background: #c3c4ff;
+}
+
+.comp-content-bottom {
+	height: 9px;
+	width: 48px;
+	padding-left: 2px;
+	padding-top: 2px;
+}
+
+.comp-content-vp {
+	background: #b6b7ee;
+	width: 48px;
+	height: 48px;
+}
+
+.comp-content-vp-border-normal {
+	border: 3px solid #a4a5d6;
+}
+
+.comp-content-vp-border-selected {
+    border: 3px solid red;
+}
+
 .comp-panel-image {
   border-style: solid;
-  border-width: thin;
-  border-color: #000000;
+  border-width: 1px;
+  border-color: #a4a5d6;
+  background: white;
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
 .comp-panel-image-selected{
   border-style: solid;
-  border-width: thin;
+  border-width: 3px;
   border-color: red;
 }
 
 .comp-ports {
   cursor: pointer;
-  cursor: hand;
   margin-top: 2px;
   margin-bottom: 2px;
 }
@@ -127,11 +152,18 @@ SPLIT PANELS *****************************************************
   padding: 4px;
   font-size: 80%;
   font-weight: bold;
+  color: white;
 }
 
 /*
   CANVAS BUTTONS *********************************************************
   */
+
+.canvas-tools-label {
+	font-size: 80%;
+	color: gray;
+	margin-right: 5px;
+}
 
 .menu-panel {
   background: #ffffff;
@@ -139,7 +171,6 @@ SPLIT PANELS *****************************************************
 
 .menu-button {
   cursor: pointer;
-  cursor: hand;
   background-color: #ffffff;
   }
 
@@ -187,7 +218,6 @@ SPLIT PANELS *****************************************************
 
 .top-menu-button {
   cursor: pointer;
-  cursor: hand;
   background-color: #ffffff;
   margin-left: auto;
   margin-right: auto;
@@ -226,7 +256,6 @@ div#componentshow {
 .gwt-TabBar .gwt-TabBarItem {
   padding: 4px;
   cursor: pointer;
-  cursor: hand;
   background-color: #eab87b;
   margin-right: 2px;
  font-size: 60%;
@@ -304,7 +333,6 @@ div#componentshow {
   font-size: 90%;
   font-weight: bold;
   cursor: pointer;
-  cursor: hand;
   overflow: scroll;
 }
 
@@ -340,6 +368,18 @@ div#componentshow {
 
 .leftalign {
   text-align:left;
+}
+
+.debug {
+	border-style: solid;
+	border-width: medium;
+	border-color: #FF0000;
+}
+
+.debug-green {
+	border-style: solid;
+	border-width: small;
+	border-color: #00FF00;
 }
 
 

@@ -30,6 +30,7 @@ import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.SourcesTabEvents;
@@ -62,10 +63,10 @@ public class Main implements EntryPoint, WindowResizeListener,
     //==============
 
     /* The highest level panel in the work bench application */
-    private VerticalPanel _dockPan = new VerticalPanel();
+    private VerticalPanel _vpRoot = new VerticalPanel();
 
     /* Panel that partitions the tree view and canvas views.*/
-    private HorizontalSplitPanel _hsp = new HorizontalSplitPanel();
+    private HorizontalSplitPanel _hspMain = new HorizontalSplitPanel();
 
     /* Graphics panel for drawinf functions (component connections)*/
     private JsGraphicsPanel _jsgPan = new JsGraphicsPanel("g");
@@ -87,17 +88,21 @@ public class Main implements EntryPoint, WindowResizeListener,
      */
     private HorizontalPanel _buttPan = null;
 
-    private VerticalPanel _canvasPan = null;
+    private VerticalPanel _vpFlowMain = null;
 
     private Panel _canvasButtPan = null;
 
     /** The vertical split panel that partitions the canvas from the
      * lower detail window.
      */
-    private VerticalSplitPanel _vsp = new VerticalSplitPanel();
+    private VerticalSplitPanel _vspCanvas = new VerticalSplitPanel();
 
     /* Scroll panel that wraps the lower detail window.*/
-    private ScrollPanel _vscroll = new ScrollPanel();
+    private ScrollPanel _spInfo = new ScrollPanel();
+
+    private ScrollPanel _spTree;
+
+    private ScrollPanel _spCanvas;
 
     //================
     // Public Methods
@@ -124,11 +129,11 @@ public class Main implements EntryPoint, WindowResizeListener,
         GWT.setUncaughtExceptionHandler(new MyUncaughtExceptionHandler());
 
         //Get the component Tree
-        FlowPanel ctvp = new FlowPanel();
-        HorizontalPanel cthp = new HorizontalPanel();
-        HorizontalPanel cthp1 = new HorizontalPanel();
-        HorizontalPanel cthp2 = new HorizontalPanel();
-        
+        VerticalPanel vpComponentsTab = new VerticalPanel();
+        HorizontalPanel hpCompHeader = new HorizontalPanel();
+        HorizontalPanel hpCompTreeButtons = new HorizontalPanel();
+        HorizontalPanel hpCompTreeSort = new HorizontalPanel();
+
         ListBox lb = new ListBox();
         lb.setVisibleItemCount(1);
         lb.addItem("By Tag");
@@ -150,29 +155,29 @@ public class Main implements EntryPoint, WindowResizeListener,
         		case 2:
             		_controller.buildCompTree(_controller.getCompTreeHandle(), _controller.getCompTreeRoot(), "Available",
             				Controller.s_COMP_TREE_SORT_TYPE);
-            		break;        			
+            		break;
         		}
         	}
         });
-        
+
         Label lab = new Label("Sort:");
         lab.addStyleName("gwt-ListBox");
-        
+
         Button expand = new Button("+");
         Button collapse = new Button("-");
         expand.addStyleName("tree-button");
         collapse.addStyleName("tree-button");
-        cthp1.add(expand);
-        cthp1.add(collapse);
-        cthp2.add(lab);
-        cthp2.add(lb);
-        cthp2.setCellVerticalAlignment(lab, cthp2.ALIGN_MIDDLE);
-        cthp2.setCellVerticalAlignment(lb, cthp2.ALIGN_MIDDLE);
-        cthp.add(cthp1);
-        cthp.add(cthp2);
-        cthp.setCellHorizontalAlignment(cthp1, cthp.ALIGN_LEFT);
-        cthp.setCellHorizontalAlignment(cthp2, cthp.ALIGN_RIGHT);
-        cthp.setWidth("100%");
+        hpCompTreeButtons.add(expand);
+        hpCompTreeButtons.add(collapse);
+        hpCompTreeSort.add(lab);
+        hpCompTreeSort.add(lb);
+        hpCompTreeSort.setCellVerticalAlignment(lab, HorizontalPanel.ALIGN_MIDDLE);
+        hpCompTreeSort.setCellVerticalAlignment(lb, HorizontalPanel.ALIGN_MIDDLE);
+        hpCompHeader.add(hpCompTreeButtons);
+        hpCompHeader.add(hpCompTreeSort);
+        hpCompHeader.setCellHorizontalAlignment(hpCompTreeButtons, HorizontalPanel.ALIGN_LEFT);
+        hpCompHeader.setCellHorizontalAlignment(hpCompTreeSort, HorizontalPanel.ALIGN_RIGHT);
+        hpCompHeader.setWidth("100%");
         expand.addClickListener(new ClickListener() {
             public void onClick(Widget sender) {
                 _controller.expandAllTreeItems(_controller.getCompTreeHandle());
@@ -183,22 +188,30 @@ public class Main implements EntryPoint, WindowResizeListener,
                 _controller.collapseAllTreeItems(_controller.getCompTreeHandle());
             }
         });
-        ctvp.add(cthp);
-        ctvp.add(_controller.buildCompTree(_controller.getCompTreeHandle(),
+
+
+        Tree treeComponents = _controller.buildCompTree(_controller.getCompTreeHandle(),
                                            _controller.getCompTreeRoot(),
                                            "Available",
-                                           Controller.s_COMP_TREE_SORT_BY_TAG));
-        _tabPan.add(ctvp, "COMPONENTS");
+                                           Controller.s_COMP_TREE_SORT_BY_TAG);
+        _spTree = new ScrollPanel(treeComponents);
+        _spTree.setHeight("100%");
+        vpComponentsTab.add(hpCompHeader);
+        vpComponentsTab.add(_spTree);
+        vpComponentsTab.setHeight("100%");
+        vpComponentsTab.setCellHeight(_spTree, "100%");
+
+        _tabPan.add(vpComponentsTab, "COMPONENTS");
 
         _tabPan.add(_controller.buildFlowTree(_controller.getFlowTreeHandle(),
                                               _controller.getFlowTreeRoot(),
                                               "Available"), "FLOWS");
-        _tabPan.add(_controller.buildLocationTree(_controller.
-                                                  getLocationTreeHandle(),
-                                                  _controller.
-                                                  getLocationTreeRoot(),
-                                                  "Available"), "LOCATIONS");
-        _tabPan.add(_controller.buildSearchPanel(), "SEARCH");
+//        _tabPan.add(_controller.buildLocationTree(_controller.
+//                                                  getLocationTreeHandle(),
+//                                                  _controller.
+//                                                  getLocationTreeRoot(),
+//                                                  "Available"), "LOCATIONS");
+//        _tabPan.add(_controller.buildSearchPanel(), "SEARCH");
         _tabPan.selectTab(0);
 
         _tabPan.addTabListener(new TabListener() {
@@ -215,62 +228,71 @@ public class Main implements EntryPoint, WindowResizeListener,
 
         });
 
-        FlowPanel fpt = new FlowPanel();
-        HorizontalPanel hpt = new HorizontalPanel();
-        HTML tptit = new HTML("<span CLASS=\"leftalign\"><font color=\"#ffffff\">REPOSITORY</font></span>");
-        hpt.add(tptit);
-        hpt.setWidth("100%");
-        hpt.addStyleName("canvas-label-bar");
-        tptit.addStyleName("canvas-label-bar-flow-title");
-        fpt.add(hpt);
-        fpt.add(_tabPan);
+        VerticalPanel vpRepositoryMain = new VerticalPanel();
+        vpRepositoryMain.setWidth("100%");
+        vpRepositoryMain.setHeight("100%");
+        Label lblRepoTitle = new Label("REPOSITORY");
+        lblRepoTitle.addStyleName("canvas-label-bar");
+        lblRepoTitle.addStyleName("canvas-label-bar-flow-title");
+        vpRepositoryMain.add(lblRepoTitle);
+        vpRepositoryMain.add(_tabPan);
+        vpRepositoryMain.setCellHeight(_tabPan, "100%");
 
-        _hsp.setLeftWidget(fpt);
+        _tabPan.setHeight("99%");
+        _tabPan.getDeckPanel().setHeight("100%");
 
-
-        _vscroll = new ScrollPanel();
+        _spInfo = new ScrollPanel();
 
         _boundPan.add(_absPan);
         _absPan.add(_jsgPan);
 
-        _canvasPan = new VerticalPanel();
+        _vpFlowMain = new VerticalPanel();
+        _vpFlowMain.setWidth("100%");
+        _vpFlowMain.setHeight("100%");
         _canvasButtPan = _controller.buildCanvasButtPan();
-        _canvasPan.add( _canvasButtPan);
-        _canvasPan.add(_boundPan);
-        _canvasPan.setCellHeight(_canvasButtPan, "70px");
-        _boundPan.addStyleName("auto-scroll");
-        
-        _hsp.setRightWidget(_canvasPan);
-        _canvasPan.addStyleName("no-scroll");
+        _vpFlowMain.add( _canvasButtPan);
 
-        _vsp.setTopWidget(_hsp);
+        _vpFlowMain.add(_vspCanvas);
+        //_vpFlowMain.setCellHeight(_canvasButtPan, "70px");
+        _vpFlowMain.setCellHeight(_vspCanvas, "100%");
+        //_boundPan.addStyleName("auto-scroll");
 
+        _hspMain.setLeftWidget(vpRepositoryMain);
+        //ORIG _hspMain.setRightWidget(_vspMain);
+        _hspMain.setRightWidget(_vpFlowMain);
+        //_vpFlowMain.addStyleName("no-scroll");
 
-        _vsp.setBottomWidget(_vscroll);
+        //_boundPan.addStyleName("debug-green");
+        _spCanvas = new ScrollPanel(_boundPan);
+
+        _vspCanvas.setTopWidget(_spCanvas);
+        _vspCanvas.setBottomWidget(_spInfo);
 
 
 
 
 
         // Hook the window resize event, so that we can adjust the UI.
-        Window.addWindowResizeListener(this);
+        //Window.addWindowResizeListener(this);
         Window.addWindowCloseListener(this);
-        RootPanel.get().add(_dockPan);
+        RootPanel.get().add(_vpRoot);
 
-        FlowPanel fp = new FlowPanel();
-        MenuBar _mb = _controller.buildMenu();
+        //FlowPanel fp = new FlowPanel();
+        //MenuBar _mb = _controller.buildMenu();
         _buttPan = _controller.buildButtPan();
-        fp.add(_mb);
-        fp.add(_buttPan);
+        //fp.add(_mb);
+        //fp.add(_buttPan);
 
-        _dockPan.add(fp);
-        _dockPan.add(_vsp);
-        _dockPan.add(_controller.buildStatusPanel());
+        _vpRoot.add(_buttPan);
+        _vpRoot.add(_hspMain);
+        _vpRoot.add(_controller.buildStatusPanel());
+        _vpRoot.setSize(Window.getClientWidth() - 20 + "px",
+                Window.getClientHeight() - 20 + "px");
 
         resizeApp();
 
-        _hsp.setSplitPosition("280px");
-        _vsp.setSplitPosition("80%");
+        _hspMain.setSplitPosition("280px");
+        _vspCanvas.setSplitPosition("80%");
 
         _controller.setStatusMessage("User " +
                                      _controller.getUserName() +
@@ -286,7 +308,7 @@ public class Main implements EntryPoint, WindowResizeListener,
             }
         });
 
-        onWindowResized(Window.getClientWidth(), Window.getClientHeight());
+        //onWindowResized(Window.getClientWidth(), Window.getClientHeight());
 
     }
 
@@ -360,7 +382,7 @@ public class Main implements EntryPoint, WindowResizeListener,
      * @return ScrollPanel The scroll panel that contains detail information.
      */
     ScrollPanel getCompDescScrollPanel() {
-        return _vscroll;
+        return _spInfo;
     }
 
     /**
@@ -385,31 +407,30 @@ public class Main implements EntryPoint, WindowResizeListener,
     //=================
 
     private void resizeApp() {
-        _dockPan.setSize("100%", "100%");
-        _dockPan.setCellWidth(_buttPan, "100%");
-        _dockPan.setCellWidth(_vsp, "100%");
-        _dockPan.setCellHeight(_vsp, "100%");
-        _vsp.setWidth("100%");
-        _vsp.setHeight("100%");
-        _hsp.setWidth("100%");
-        _hsp.setHeight("100%");
+       // _vpRoot.setSize("100%", "100%");
+        _vpRoot.setCellWidth(_buttPan, "100%");
+        _vpRoot.setCellWidth(_hspMain, "100%");
+        _vpRoot.setCellHeight(_hspMain, "100%");
+        _vspCanvas.setWidth("100%");
+        _vspCanvas.setHeight("100%");
+        _hspMain.setWidth("100%");
+        _hspMain.setHeight("100%");
         _controller.getStatusBar().setWidth("100%");
         _buttPan.setWidth("100%");
-        _tabPan.setHeight("100%");
+        //_tabPan.setHeight("100%");
         _tabPan.setWidth("100%");
         _controller.getCompTreeHandle().setHeight("100%");
         _controller.getCompTreeHandle().setWidth("100%");
         _controller.getFlowTreeHandle().setHeight("100%");
         _controller.getFlowTreeHandle().setWidth("100%");
-        _canvasPan.setWidth("100%");
-        _canvasPan.setHeight("100%");
-        _boundPan.setWidth("100%");
         _canvasButtPan.setWidth("100%");
-        _boundPan.setHeight("100%");
-        _vscroll.setWidth("100%");
-        _vscroll.setHeight("100%");
+        _spInfo.setWidth("100%");
+        _spInfo.setHeight("100%");
+        _spCanvas.setSize("100%", "100%");
+        _boundPan.setSize("100%", "100%");
         _absPan.setSize("100%", "100%");
         _jsgPan.setSize("100%", "100%");
+        _spTree.setHeight(_spTree.getOffsetHeight()  + "px");
 
     }
 

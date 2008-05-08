@@ -69,19 +69,19 @@ import com.google.gwt.http.client.URL;
  * <p>
  * Title: Controller
  * </p>
- * 
+ *
  * <p>
  * Description: This is the controller for the Meandre Workbench GUI
  * </p>
- * 
+ *
  * <p>
  * Copyright: UIUC Copyright (c) 2007
  * </p>
- * 
+ *
  * <p>
  * Company: Automated Learning Group at NCSA, UIUC
  * </p>
- * 
+ *
  * @author Duane Searsmith
  * @version 1.0
  */
@@ -142,7 +142,7 @@ public class Controller {
 	private WBFlow _workingFlow = null;
 
 	/* GUI status bar */
-	private Label _statusBar = null;
+	private Label _lblStatusText = null;
 
 	/* Repository remote interface */
 	private WBRepositoryQueryAsync _repquery = null;
@@ -258,7 +258,7 @@ public class Controller {
 	private String _activeDomain = "";
 
 	/* the status bar image */
-	private Image _statusIcon = null;
+	private Image _imgStatusIcon = null;
 
 	/* Component ID's from the public repository. */
 	private Map _publicComponents = null;
@@ -266,10 +266,10 @@ public class Controller {
 	/* Flow ID's from the public repository. */
 	private Map _publicFlows = null;
 
-	private HTML _canvasLabel = new HTML(
+	private HTML _lblFlowTitle = new HTML(
 			"<left><font color=\"#ffffff\">FLOW:&nbsp;</font><font color=\"#000000\">Untitled</font></left>");
 
-	private HTML _canvasLabelID = new HTML("");
+	private HTML _lblFlowID = new HTML("");
 
 	/**
 	 * A flag that indicates no painting operations are permitted while true.
@@ -342,7 +342,7 @@ public class Controller {
 
 	/**
 	 * Get the user name.
-	 * 
+	 *
 	 * @return String User name for current session.
 	 */
 	String getUserName() {
@@ -351,7 +351,7 @@ public class Controller {
 
 	/**
 	 * Set the user name.
-	 * 
+	 *
 	 * @param name
 	 *            String the user name.
 	 */
@@ -361,7 +361,7 @@ public class Controller {
 
 	/**
 	 * Get a handle to the Maion class.
-	 * 
+	 *
 	 * @return Main
 	 */
 	Main getMain() {
@@ -370,7 +370,7 @@ public class Controller {
 
 	/**
 	 * Get the root tree item for the location tree.
-	 * 
+	 *
 	 * @return TreeItem Flow tree's root tree item.
 	 */
 	TreeItem getLocationTreeRoot() {
@@ -379,7 +379,7 @@ public class Controller {
 
 	/**
 	 * Get a handle to the location tree.
-	 * 
+	 *
 	 * @return Tree The flow tree.
 	 */
 	Tree getLocationTreeHandle() {
@@ -388,7 +388,7 @@ public class Controller {
 
 	/**
 	 * Get the root tree item for the flow tree.
-	 * 
+	 *
 	 * @return TreeItem Flow tree's root tree item.
 	 */
 	TreeItem getFlowTreeRoot() {
@@ -397,7 +397,7 @@ public class Controller {
 
 	/**
 	 * Get a handle to the flow tree.
-	 * 
+	 *
 	 * @return Tree The flow tree.
 	 */
 	Tree getFlowTreeHandle() {
@@ -406,7 +406,7 @@ public class Controller {
 
 	/**
 	 * Get the root tree item for the component tree.
-	 * 
+	 *
 	 * @return TreeItem Component tree's root tree item.
 	 */
 	TreeItem getCompTreeRoot() {
@@ -415,7 +415,7 @@ public class Controller {
 
 	/**
 	 * Get a handle to the component tree.
-	 * 
+	 *
 	 * @return Tree The flow tree.
 	 */
 	Tree getCompTreeHandle() {
@@ -424,7 +424,7 @@ public class Controller {
 
 	/**
 	 * Set the working flow in this controller.
-	 * 
+	 *
 	 * @param flow
 	 *            WBFlow The flow to set into this controller.
 	 */
@@ -434,7 +434,7 @@ public class Controller {
 
 	/**
 	 * Get the working flow in thisa controller.
-	 * 
+	 *
 	 * @return WBFlow The working flow in this controller.
 	 */
 	WBFlow getWorkingFlow() {
@@ -449,7 +449,7 @@ public class Controller {
 	 * A chained sequence of commands that retrieve public repository components
 	 * and then flows and popuylate the map objects in the controller and then
 	 * execute the follow on command.
-	 * 
+	 *
 	 * @param followOnCMD
 	 *            WBCommand Command to be executed at end of command sequence.
 	 */
@@ -493,8 +493,7 @@ public class Controller {
 		_sessionID = sid;
 		_activeDomain = dom;
 
-		final long DURATION = 1000 * 60 * 60; // duration remembering login. 2
-		// weeks in this example.
+		final long DURATION = 1000 * 60 * 60; // duration remembering login. 2 weeks in this example.
 		Date expires = new Date(System.currentTimeMillis() + DURATION);
 		Cookies.setCookie(this._sidKey, sid, expires, null, "/", false);
 		buildPublicRepoMaps(new WBCommand() {
@@ -524,7 +523,7 @@ public class Controller {
 
 	/**
 	 * Get a list of all running flows and their webui url's.
-	 * 
+	 *
 	 * @param sid
 	 *            String session id
 	 * @param cb
@@ -536,7 +535,7 @@ public class Controller {
 
 	/**
 	 * Unpublish a compnent or flow.
-	 * 
+	 *
 	 * @param sid
 	 *            String session ID.
 	 * @param uri
@@ -549,7 +548,7 @@ public class Controller {
 
 	/**
 	 * Publish a component or flow.
-	 * 
+	 *
 	 * @param sid
 	 *            String session ID.
 	 * @param uri
@@ -562,7 +561,7 @@ public class Controller {
 
 	/**
 	 * Get the active components in the public repository.
-	 * 
+	 *
 	 * @param cb
 	 *            AsyncCallback Callback object returned from the server.
 	 */
@@ -572,7 +571,7 @@ public class Controller {
 
 	/**
 	 * Get the active flows in the public repository.
-	 * 
+	 *
 	 * @param cb
 	 *            AsyncCallback Callback object returned from the server.
 	 */
@@ -582,7 +581,7 @@ public class Controller {
 
 	/**
 	 * Removes a location from the repository.
-	 * 
+	 *
 	 * @param cb
 	 *            AsyncCallback Callback object returned from the server.
 	 */
@@ -592,7 +591,7 @@ public class Controller {
 
 	/**
 	 * Adds a location to the repository.
-	 * 
+	 *
 	 * @param cb
 	 *            AsyncCallback Callback object returned from the server.
 	 */
@@ -602,7 +601,7 @@ public class Controller {
 
 	/**
 	 * Fetches the locations for the current user repository.
-	 * 
+	 *
 	 * @param cb
 	 *            AsyncCallback Callback object returned from the server.
 	 */
@@ -612,7 +611,7 @@ public class Controller {
 
 	/**
 	 * Fetches the locations for the current user repository.
-	 * 
+	 *
 	 * @param cb
 	 *            AsyncCallback Callback object returned from the server.
 	 */
@@ -622,7 +621,7 @@ public class Controller {
 
 	/**
 	 * Starts execution of a flow in interactive mode.
-	 * 
+	 *
 	 * @param sid
 	 *            String session ID.
 	 * @param flowid
@@ -637,7 +636,7 @@ public class Controller {
 
 	/**
 	 * Starts execution of a flow in interactive mode.
-	 * 
+	 *
 	 * @param sid
 	 *            String session ID.
 	 * @param execid
@@ -654,7 +653,7 @@ public class Controller {
 
 	/**
 	 * Updates status of execution of a flow in interactive mode.
-	 * 
+	 *
 	 * @param sid
 	 *            String session ID.
 	 * @param execid
@@ -669,7 +668,7 @@ public class Controller {
 
 	/**
 	 * Log the user into the application.
-	 * 
+	 *
 	 * @param sid
 	 *            String session id
 	 * @param cb
@@ -681,7 +680,7 @@ public class Controller {
 
 	/**
 	 * Log the user into the application.
-	 * 
+	 *
 	 * @param userid
 	 *            String user's id
 	 * @param password
@@ -697,7 +696,7 @@ public class Controller {
 
 	/**
 	 * Get the active components in the current user's repository.
-	 * 
+	 *
 	 * @param cb
 	 *            AsyncCallback Callback object returned from the server.
 	 */
@@ -707,7 +706,7 @@ public class Controller {
 
 	/**
 	 * Get the active flows in the current user's repository.
-	 * 
+	 *
 	 * @param cb
 	 *            AsyncCallback Callback object returned from the server.
 	 */
@@ -718,7 +717,7 @@ public class Controller {
 	/**
 	 * Get the active components in the current user's repository that match the
 	 * search criteria.
-	 * 
+	 *
 	 * @param search
 	 *            String The search string for this query.
 	 * @param cb
@@ -739,7 +738,7 @@ public class Controller {
 	/**
 	 * Builds the button panel that appears at the top of the work bench
 	 * application.
-	 * 
+	 *
 	 * @return VerticalPanel The vertical panel containing the buttons.
 	 */
 	HorizontalPanel buildButtPan() {
@@ -791,36 +790,36 @@ public class Controller {
 	}
 
 	Panel buildStatusPanel() {
-		HorizontalPanel pan = new HorizontalPanel();
-		_statusIcon = new Image("./images/timy-meandre-logo.png");
-		_statusBar = new Label();
-		_statusIcon.setPixelSize(16, 16);
-		pan.setSpacing(2);
-		pan.add(_statusIcon);
-		pan.add(_statusBar);
-		pan.setWidth("100%");
-		pan.setStyleName("status-bar");
-		return pan;
+		HorizontalPanel hpStatusPanel = new HorizontalPanel();
+		_imgStatusIcon = new Image("./images/timy-meandre-logo.png");
+		_lblStatusText = new Label();
+		_imgStatusIcon.setPixelSize(16, 16);
+		hpStatusPanel.setSpacing(2);
+		hpStatusPanel.add(_imgStatusIcon);
+		hpStatusPanel.add(_lblStatusText);
+		hpStatusPanel.setWidth("100%");
+		hpStatusPanel.setStyleName("status-bar");
+		return hpStatusPanel;
 	}
 
 	void showStatusBusy() {
-		_statusIcon.setUrl("images/wait-14x14.gif");
+		_imgStatusIcon.setUrl("images/wait-14x14.gif");
 	}
 
 	void hideStatusBusy() {
-		_statusIcon.setUrl("./images/timy-meandre-logo.png");
+		_imgStatusIcon.setUrl("./images/timy-meandre-logo.png");
 	}
 
 	Label getStatusBar() {
-		return _statusBar;
+		return _lblStatusText;
 	}
 
 	void setStatusMessage(String s) {
-		_statusBar.setText(s);
+		_lblStatusText.setText(s);
 	}
 
 	void clearStatusMessage() {
-		_statusBar.setText("");
+		_lblStatusText.setText("");
 	}
 
 	private Button _button_save = null;
@@ -850,38 +849,43 @@ public class Controller {
 	/**
 	 * Builds the button panel that appears at the top of the work bench
 	 * application.
-	 * 
+	 *
 	 * @return VerticalPanel The vertical panel containing the buttons.
 	 */
 	Panel buildCanvasButtPan() {
-		VerticalPanel outerButtPan = new VerticalPanel();
+		VerticalPanel vpFlowTopHeader = new VerticalPanel();
+		vpFlowTopHeader.setWidth("100%");
 
-		HorizontalPanel canvasLabelPanel = new HorizontalPanel();
-		canvasLabelPanel.addStyleName("canvas-label-bar");
-		canvasLabelPanel.add(_canvasLabel);
-		canvasLabelPanel.add(_canvasLabelID);
-		_canvasLabel.addStyleName("canvas-label-bar-flow-title");
-		canvasLabelPanel.setCellHorizontalAlignment(_canvasLabel,
-				canvasLabelPanel.ALIGN_LEFT);
-		canvasLabelPanel.setCellVerticalAlignment(_canvasLabel,
-				canvasLabelPanel.ALIGN_MIDDLE);
-		canvasLabelPanel.setCellHorizontalAlignment(_canvasLabelID,
-				canvasLabelPanel.ALIGN_RIGHT);
-		canvasLabelPanel.setCellVerticalAlignment(_canvasLabelID,
-				canvasLabelPanel.ALIGN_MIDDLE);
-		canvasLabelPanel.setWidth("100%");
-		_canvasLabel.setWidth("100%");
-		outerButtPan.add(canvasLabelPanel);
+		HorizontalPanel hpFlowLabel = new HorizontalPanel();
+		hpFlowLabel.addStyleName("canvas-label-bar");
+		hpFlowLabel.add(_lblFlowTitle);
+		hpFlowLabel.add(_lblFlowID);
+		_lblFlowTitle.addStyleName("canvas-label-bar-flow-title");
+		hpFlowLabel.setCellHorizontalAlignment(_lblFlowTitle, HorizontalPanel.ALIGN_LEFT);
+		hpFlowLabel.setCellVerticalAlignment(_lblFlowTitle, HorizontalPanel.ALIGN_MIDDLE);
+		hpFlowLabel.setCellHorizontalAlignment(_lblFlowID, HorizontalPanel.ALIGN_RIGHT);
+		hpFlowLabel.setCellVerticalAlignment(_lblFlowID, HorizontalPanel.ALIGN_MIDDLE);
+		hpFlowLabel.setWidth("100%");
+		//_lblFlowTitle.setWidth("100%");
+		vpFlowTopHeader.add(hpFlowLabel);
 
-		Grid gPan = new Grid(1, 6);
-		gPan.setCellSpacing(4);
-		gPan.setCellPadding(0);
+		Grid gridFlowButtons = new Grid(1, 6);
+		gridFlowButtons.setCellSpacing(4);
+		gridFlowButtons.setCellPadding(0);
 
-		outerButtPan.add(gPan);
+		HorizontalPanel hpTools = new HorizontalPanel();
+        Label lblTools = new Label("TOOLS");
+        lblTools.addStyleName("canvas-tools-label");
 
-		outerButtPan.addStyleName("menu-panel");
-		outerButtPan.setCellHorizontalAlignment(gPan, outerButtPan.ALIGN_RIGHT);
-		outerButtPan.setCellVerticalAlignment(gPan, outerButtPan.ALIGN_MIDDLE);
+        hpTools.add(lblTools);
+        hpTools.add(gridFlowButtons);
+        hpTools.setCellVerticalAlignment(lblTools, HorizontalPanel.ALIGN_MIDDLE);
+
+		vpFlowTopHeader.add(hpTools);
+
+		vpFlowTopHeader.addStyleName("menu-panel");
+		vpFlowTopHeader.setCellHorizontalAlignment(hpTools, VerticalPanel.ALIGN_RIGHT);
+		//vpFlowTopHeader.setCellVerticalAlignment(hpTools, VerticalPanel.ALIGN_MIDDLE);
 
 		// SAVE
 		_button_popup_save = new CanvasButtonPopUp("Save");
@@ -911,7 +915,7 @@ public class Controller {
 		_button_save.setHeight("35");
 		_button_save.addStyleName("menu-button");
 		_button_save.sinkEvents(Event.MOUSEEVENTS);
-		gPan.setWidget(0, 0, _button_save);
+		gridFlowButtons.setWidget(0, 0, _button_save);
 
 		// SAVE AS
 		_button_popup_save_as = new CanvasButtonPopUp("Save As");
@@ -943,7 +947,7 @@ public class Controller {
 		_button_save_as.setHeight("35");
 		_button_save_as.addStyleName("menu-button");
 		_button_save_as.sinkEvents(Event.MOUSEEVENTS);
-		gPan.setWidget(0, 1, _button_save_as);
+		gridFlowButtons.setWidget(0, 1, _button_save_as);
 
 		// REMOVE
 		_button_popup_remove = new CanvasButtonPopUp("Remove");
@@ -974,7 +978,7 @@ public class Controller {
 		_button_remove.setHeight("35");
 		_button_remove.addStyleName("menu-button");
 		_button_remove.sinkEvents(Event.MOUSEEVENTS);
-		gPan.setWidget(0, 2, _button_remove);
+		gridFlowButtons.setWidget(0, 2, _button_remove);
 
 		// CLEAR
 		_button_popup_clear = new CanvasButtonPopUp("Clear");
@@ -1005,7 +1009,7 @@ public class Controller {
 		_button_clear.setHeight("35");
 		_button_clear.addStyleName("menu-button");
 		_button_clear.sinkEvents(Event.MOUSEEVENTS);
-		gPan.setWidget(0, 3, _button_clear);
+		gridFlowButtons.setWidget(0, 3, _button_clear);
 
 		// RUN
 		_button_popup_run = new CanvasButtonPopUp("Run");
@@ -1035,7 +1039,7 @@ public class Controller {
 		_button_run.setHeight("35");
 		_button_run.addStyleName("menu-button");
 		_button_run.sinkEvents(Event.MOUSEEVENTS);
-		gPan.setWidget(0, 4, _button_run);
+		gridFlowButtons.setWidget(0, 4, _button_run);
 
 		// LAYOUT
 		_button_popup_layout = new CanvasButtonPopUp("Layout");
@@ -1066,22 +1070,22 @@ public class Controller {
 		_button_layout.setHeight("35");
 		_button_layout.addStyleName("menu-button");
 		_button_layout.sinkEvents(Event.MOUSEEVENTS);
-		gPan.setWidget(0, 5, _button_layout);
+		gridFlowButtons.setWidget(0, 5, _button_layout);
 
-		return outerButtPan;
+		return vpFlowTopHeader;
 	}
 
 	void setCanvasLabel(String flowname, String id) {
 		if (id == null) {
-			this._canvasLabel
+			this._lblFlowTitle
 					.setHTML("<span CLASS=\"leftalign\"><font color=\"#ffffff\">FLOW:&nbsp;</font><font color=\"#000000\">"
 							+ flowname + "</font></span>");
-			this._canvasLabelID.setHTML("");
+			this._lblFlowID.setHTML("");
 		} else {
-			this._canvasLabel
+			this._lblFlowTitle
 					.setHTML("<span CLASS=\"leftalign\"><font color=\"#ffffff\">FLOW:&nbsp;</font><font color=\"#000000\">"
 							+ flowname + "</font></span>");
-			this._canvasLabelID
+			this._lblFlowID
 					.setHTML("<span CLASS=\"rightalign\"><font size=\"-2\" color=\"#000000\">"
 							+ id + "&nbsp;&nbsp;</font></span>");
 		}
@@ -1089,7 +1093,7 @@ public class Controller {
 
 	/**
 	 * Builds the menu for the work bench application.
-	 * 
+	 *
 	 * @return MenuBar The top level menu bar object.
 	 */
 	MenuBar buildMenu() {
@@ -1220,7 +1224,7 @@ public class Controller {
 	/**
 	 * Signals the DnD library that this component is designated to be
 	 * draggable.
-	 * 
+	 *
 	 * @param comp
 	 *            Widget Component to be designated as draggable.
 	 */
@@ -1231,7 +1235,7 @@ public class Controller {
 	/**
 	 * Signals the DnD library that this component is designated to be
 	 * draggable. The handle is the object that is used to activate dragging.
-	 * 
+	 *
 	 * @param comp
 	 *            Widget Component to be designated as draggable.
 	 * @param comp
@@ -1248,7 +1252,7 @@ public class Controller {
 
 	/**
 	 * Returns the "from" port of the connection under construction.
-	 * 
+	 *
 	 * @return PortComp
 	 */
 	PortComp getDrawingFromPort() {
@@ -1258,7 +1262,7 @@ public class Controller {
 	/**
 	 * Set the current connection flag. If the flag is true then set the from
 	 * port of the current connection to <code>pc</code>.
-	 * 
+	 *
 	 * @param b
 	 *            boolean boolean value that indicates if a connection is
 	 *            currently being being created.
@@ -1277,7 +1281,7 @@ public class Controller {
 	/**
 	 * Get the boolean value that indicates if a connection is currently being
 	 * created.
-	 * 
+	 *
 	 * @return boolean Boolean value that indicates if a connection is being
 	 *         created but not yet completed.
 	 */
@@ -1301,11 +1305,12 @@ public class Controller {
 		_flowExecuting = false;
 		setCanvasLabel("Untitled", null);
 		clearConnections();
+		_main.getBoundaryPanel().setSize("100%", "100%");
 	}
 
 	/**
 	 * Build an HTML flow description for input component.
-	 * 
+	 *
 	 * @param flow
 	 *            WBComponent Component to build description for.
 	 * @param incRights
@@ -1400,7 +1405,7 @@ public class Controller {
 	/**
 	 * For the input component, fetch and display its description in the lower
 	 * display window.
-	 * 
+	 *
 	 * @param flow
 	 *            WBComponent A component descriptor for the flow whose
 	 *            information should be displayed in the lower display window.
@@ -1413,7 +1418,7 @@ public class Controller {
 
 	/**
 	 * Build an HTML flow description for input flow.
-	 * 
+	 *
 	 * @param flow
 	 *            WBFlow Flow to build description for.
 	 * @param incRights
@@ -1501,7 +1506,7 @@ public class Controller {
 	/**
 	 * For the input, flow fetch and display its description in the lower
 	 * display window.
-	 * 
+	 *
 	 * @param flow
 	 *            WBFlow A flow descriptor for the flow whose information should
 	 *            be displayed in the lower display window.
@@ -1535,7 +1540,7 @@ public class Controller {
 
 	/**
 	 * Returns a boolean indicating whether a flow is executing or not.
-	 * 
+	 *
 	 * @return boolean A true/false value that indicates whether a flow is
 	 *         executing or not.
 	 */
@@ -1546,7 +1551,7 @@ public class Controller {
 	/**
 	 * Return boolean indicating if there are currently any components on the
 	 * canvas.
-	 * 
+	 *
 	 * @return boolean A boolean value indicating whether or not there are any
 	 *         components on the canvas.
 	 */
@@ -1822,7 +1827,7 @@ public class Controller {
 
 	/**
 	 * Remove a component from the canvas.
-	 * 
+	 *
 	 * @param cp
 	 *            ComponentPanel The component to remove from the canvas.
 	 */
@@ -1862,7 +1867,7 @@ public class Controller {
 	/**
 	 * Set the component on the canvas that has been selected. At this point in
 	 * time only one component may be selected at once.
-	 * 
+	 *
 	 * @param cp
 	 *            ComponentPanel The component to mark as selected.
 	 */
@@ -1915,7 +1920,7 @@ public class Controller {
 
 	/**
 	 * Save a flow to a newly generated name and then execute the flow.
-	 * 
+	 *
 	 * @todo Need to break this functionality apart.
 	 */
 	void saveFlowAndExecute() {
@@ -2045,7 +2050,7 @@ public class Controller {
 
 	/**
 	 * Move a component on the campus.
-	 * 
+	 *
 	 * @param cp
 	 *            ComponentPanel Component to move.
 	 * @param x
@@ -2065,7 +2070,7 @@ public class Controller {
 
 	/**
 	 * Clear the canvas and add the flow to the canvas.
-	 * 
+	 *
 	 * @param flow
 	 *            WBFlow Flow to add to the canvas.
 	 */
@@ -2078,6 +2083,9 @@ public class Controller {
 		// ===================================================
 
 		this.clearCanvas();
+		_main.getBoundaryPanel().setSize("100%", "100%");
+		int maxWidth = 0;
+		int maxHeight = 0;
 
 		boolean defFormat = true;
 
@@ -2103,9 +2111,20 @@ public class Controller {
 				// set with default positions
 				setComponent(cp);
 			} else {
+			    int xValue = Integer.parseInt(x);
+                int yValue = Integer.parseInt(y);
+
+                maxWidth = Math.max(maxWidth, xValue + cp.getOffsetWidth());
+                maxHeight = Math.max(maxHeight, yValue + cp.getOffsetHeight());
+
+                int bpWidth = _main.getBoundaryPanel().getOffsetWidth();
+                int bpHeight = _main.getBoundaryPanel().getOffsetHeight();
+
+                _main.getBoundaryPanel().setSize(Math.max(maxWidth+120, bpWidth)+"px",
+                        Math.max(maxHeight+120, bpHeight)+"px");
 				defFormat = false;
 				// set with saved x, y positions
-				setComponent(cp, Integer.parseInt(x), Integer.parseInt(y));
+				setComponent(cp, xValue, yValue);
 			}
 			// Effects.Effect("Appear", cp, "{duration: 1.0}");
 
@@ -2153,7 +2172,7 @@ public class Controller {
 	/**
 	 * Indicates whether there have been edits to the current flow that have ot
 	 * been saved.
-	 * 
+	 *
 	 * @return boolean Indictaes if there are editsa to the current flow that
 	 *         have not benn saved.
 	 */
@@ -2168,7 +2187,7 @@ public class Controller {
 	/**
 	 * Return a boolean that indicates whether there is an active flow being
 	 * edited.
-	 * 
+	 *
 	 * @return boolean Indicates whether an active flow object exists in the
 	 *         controller.
 	 */
@@ -2178,11 +2197,11 @@ public class Controller {
 
 	/**
 	 * Add the component to the canvas.
-	 * 
+	 *
 	 * @param comp
 	 *            WBComponent Component to add to the canvas.
 	 */
-	void addComponentToCanvas(WBComponent comp) {
+    void addComponentToCanvas(WBComponent comp) {
 		// change param to component obj
 
 		WBComponentInstance ci = new WBComponentInstance(comp.getID() + "/"
@@ -2208,7 +2227,7 @@ public class Controller {
 	 * Change the component name of a pre-existing component. NOTE: if the input
 	 * name already exists the new name will be appended with a number to make
 	 * it unique.
-	 * 
+	 *
 	 * @param cp
 	 *            ComponentPanel Component panel of component whose name will be
 	 *            changed.
@@ -2230,7 +2249,7 @@ public class Controller {
 	/**
 	 * Remove this string from the set of component names of active canvas
 	 * components.
-	 * 
+	 *
 	 * @param s
 	 *            String Name to remove from the set of component names.
 	 */
@@ -2241,7 +2260,7 @@ public class Controller {
 	/**
 	 * Checks to see if the input component's name is already in use. If so, an
 	 * integer is appended to the name to make it unique.
-	 * 
+	 *
 	 * @param ci
 	 *            WBComponentInstance Component the name of which will be
 	 *            checked.
@@ -2268,7 +2287,7 @@ public class Controller {
 	/**
 	 * Makes a connection between the output port of one compovevt and the input
 	 * port of another component.
-	 * 
+	 *
 	 * @param from
 	 *            PortComp Component connecting from.
 	 * @param to
@@ -2286,7 +2305,7 @@ public class Controller {
 
 	/**
 	 * Removes the connection from the output port.
-	 * 
+	 *
 	 * @param out
 	 *            PortComp Output port to remove component from.
 	 */
@@ -2299,7 +2318,7 @@ public class Controller {
 
 	/**
 	 * Removes the connection from the output port.
-	 * 
+	 *
 	 * @param out
 	 *            PortComp Output port to remove component from.
 	 */
@@ -2344,7 +2363,7 @@ public class Controller {
 
 	/**
 	 * Return the first input port that contains the point (x,y) or else null.
-	 * 
+	 *
 	 * @param x
 	 *            int X screen positon
 	 * @param y
@@ -2374,7 +2393,7 @@ public class Controller {
 	/**
 	 * For the input COmponentPanel show a popup dialogbox with the components
 	 * editable properties.
-	 * 
+	 *
 	 * @param cp
 	 *            ComponentPanel Component for which to show properties.
 	 */
@@ -2395,7 +2414,7 @@ public class Controller {
 
 	/**
 	 * Build the search panel.
-	 * 
+	 *
 	 * @return Panel The constructed search panel.
 	 */
 	Panel buildSearchPanel() {
@@ -2552,7 +2571,7 @@ public class Controller {
 
 	/**
 	 * Expand all the tree items in the imput tree.
-	 * 
+	 *
 	 * @param t
 	 *            Tree Tree for which all items will be expanded.
 	 */
@@ -2564,7 +2583,7 @@ public class Controller {
 
 	/**
 	 * Collapse all items for the input tree.
-	 * 
+	 *
 	 * @param t
 	 *            Tree Tree for which all items will be collapsed.
 	 */
@@ -2576,7 +2595,7 @@ public class Controller {
 
 	/**
 	 * Build a component tree.
-	 * 
+	 *
 	 * @param compTree
 	 *            Tree Tree to use for building.
 	 * @param compTreeRoot
@@ -2592,8 +2611,7 @@ public class Controller {
 		if (compTree != null) {
 			compTree.clear();
 		} else {
-			compTree = new DCTree(this, (TreeImages) GWT
-					.create(ComponentTreeImages.class));
+			compTree = new DCTree(this, (TreeImages) GWT.create(ComponentTreeImages.class));
 		}
 		if (compTreeRoot != null) {
 			compTreeRoot.removeItems();
@@ -2637,7 +2655,7 @@ public class Controller {
 	/**
 	 * Constructs a tree of tags where each tag node has as children all of the
 	 * components that bear that tag.
-	 * 
+	 *
 	 * @param items
 	 *            Active components.
 	 * @param compTreeRoot
@@ -2676,7 +2694,7 @@ public class Controller {
 
 	/**
 	 * Add component nodes to this tree root in node name alpha order.
-	 * 
+	 *
 	 * @param items
 	 *            Set Set of components to sort.
 	 * @param compTreeRoot
@@ -2713,7 +2731,7 @@ public class Controller {
 
 	/**
 	 * Add component nodes to this tree root in node Java component type order.
-	 * 
+	 *
 	 * @param items
 	 *            Set Set of components to sort.
 	 * @param compTreeRoot
@@ -2756,7 +2774,7 @@ public class Controller {
 
 	/**
 	 * Recurse the node tree and build the actual display tree.
-	 * 
+	 *
 	 * @param rootNode
 	 *            WBTreeNode The root of the node tree at this iteration.
 	 * @param compTreeRoot
@@ -2777,7 +2795,7 @@ public class Controller {
 	/**
 	 * Recurse the map tree and build a node tree that automatically sorts
 	 * leaves.
-	 * 
+	 *
 	 * @param rootMap
 	 *            Map The root of the map tree at this iteration.
 	 * @param rootNode
@@ -2823,7 +2841,7 @@ public class Controller {
 	/**
 	 * Recurse the type string adding a map node at each directory until we get
 	 * to the class name when we add the component object itself.
-	 * 
+	 *
 	 * @param nds
 	 *            ArrayList List of type directory segments.
 	 * @param nd
@@ -2847,7 +2865,7 @@ public class Controller {
 
 	/**
 	 * Generate the pop up text for this compnent.
-	 * 
+	 *
 	 * @param ecd
 	 *            WBComponent Target component.
 	 * @return String Pop up text (HTML) to use for this compnent.
@@ -2866,7 +2884,7 @@ public class Controller {
 
 	/**
 	 * Build a flow tree.
-	 * 
+	 *
 	 * @param flowTree
 	 *            Tree Tree object to use for building flow tree.
 	 * @param flowTreeRoot
@@ -2880,8 +2898,7 @@ public class Controller {
 		if (flowTree != null) {
 			flowTree.clear();
 		} else {
-			flowTree = new FlowTree(this, (TreeImages) GWT
-					.create(FlowTreeImages.class));
+			flowTree = new FlowTree(this, (TreeImages) GWT.create(FlowTreeImages.class));
 		}
 		if (flowTreeRoot != null) {
 			flowTreeRoot.removeItems();
@@ -2959,7 +2976,7 @@ public class Controller {
 
 	/**
 	 * Build a Location tree.
-	 * 
+	 *
 	 * @param locTree
 	 *            Tree Tree object to use for building flow tree.
 	 * @param locTreeRoot
@@ -3046,7 +3063,7 @@ public class Controller {
 	 * Move component on panel to row and col position. Remove the component
 	 * from the track set. Recursively call this method on components that are
 	 * connected to this components outputs.
-	 * 
+	 *
 	 * @param cp
 	 *            ComponentPanel Component to move on canvas.
 	 * @param track
@@ -3065,13 +3082,13 @@ public class Controller {
 		for (Iterator itty = cp.getOutputs().iterator(); itty.hasNext();) {
 			PortComp pc = (PortComp) itty.next();
 			if (pc.isConnected()) {
-				
+
 				Set parcomps = new HashSet();
 				Iterator iter = pc.getConnectedTo().iterator();
 				while (iter.hasNext()){
 					parcomps.add(((PortComp)iter.next()).getParentComponent());
 				}
-				ComponentPanel ch = (ComponentPanel)anyOneInOther(parcomps, track);				
+				ComponentPanel ch = (ComponentPanel)anyOneInOther(parcomps, track);
 				if (ch != null) {
 					if (col >= 5) {
 						col = 0;
@@ -3086,7 +3103,7 @@ public class Controller {
 		}
 		return rowNum;
 	}
-	
+
 	private Object anyOneInOther(Set ones, Set other){
 		Iterator itty = ones.iterator();
 		while (itty.hasNext()){
@@ -3108,7 +3125,7 @@ public class Controller {
 	/**
 	 * Find the PortComp with a given port id attached to a component with a
 	 * given id.
-	 * 
+	 *
 	 * @param id
 	 *            String Port id to compare to.
 	 * @param compID
@@ -3136,7 +3153,7 @@ public class Controller {
 
 	/**
 	 * Setup Repository Query remote interface
-	 * 
+	 *
 	 * @return WBRepositoryQueryAsync interface Impl
 	 */
 	private WBRepositoryQueryAsync setupRepQuery() {
@@ -3162,7 +3179,7 @@ public class Controller {
 			// }
 
 			// public void dragMove() {
-			//				
+			//
 			// }
 		};
 
@@ -3204,6 +3221,8 @@ public class Controller {
 		ci.getProperties().add(this.s_TopKey, "" + this.s_TopVal);
 		ci.getProperties().add(this.s_LeftKey, "" + this.s_LeftVal);
 		_main.getBoundaryPanel().add(cp, this.s_LeftVal, this.s_TopVal);
+//		System.out.println("setComponent(ComponentPanel): boundaryPanel=" + _main.getBoundaryPanel().getOffsetWidth()
+//                + "," + _main.getBoundaryPanel().getOffsetHeight());
 	}
 
 	private void setComponent(ComponentPanel cp, int x, int y) {
@@ -3211,5 +3230,7 @@ public class Controller {
 		ci.getProperties().add(this.s_TopKey, "" + y);
 		ci.getProperties().add(this.s_LeftKey, "" + x);
 		_main.getBoundaryPanel().add(cp, x, y);
+//        System.out.println("setComponent(ComponentPanel,x,y): boundaryPanel=" + _main.getBoundaryPanel().getOffsetWidth()
+//                + "," + _main.getBoundaryPanel().getOffsetHeight());
 	}
 }

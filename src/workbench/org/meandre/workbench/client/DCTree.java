@@ -61,8 +61,7 @@ public class DCTree extends Tree implements TreeListener {
         switch (type) {
         case Event.ONDBLCLICK: {
             if (getSelectedItem() != null) {
-                WBComponent comp = (WBComponent)this.getSelectedItem().
-                                   getUserObject();
+                WBComponent comp = (WBComponent)this.getSelectedItem().getUserObject();
                 if (comp != null) {
                     _controller.addComponentToCanvas(comp);
                 }

@@ -211,9 +211,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
             Set comps = queryableRep.getAvailableExecutableComponents();
             for (Iterator itty = comps.iterator(); itty.hasNext(); ) {
                 Resource res = (Resource) itty.next();
-                ExecutableComponentDescription ecd = queryableRep.
-                        getExecutableComponentDescription(
-                                res);
+                ExecutableComponentDescription ecd = queryableRep.getExecutableComponentDescription(res);
                 ret.add(MeandreToWBBeanConverter.convertComponent(ecd));
             }
 
@@ -440,7 +438,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
     synchronized public WBLoginBean checkSessionID(String sid) {
         Object obj = _proxies.get(sid);
         if (obj == null) {
-            return new WBLoginBean("No longer valid session ID.");
+            return new WBLoginBean("Invalid session ID.");
         } else {
             MeandreProxy proxy = (MeandreProxy) obj;
             if (proxy.getRoles() != null) {
@@ -448,7 +446,7 @@ public class WBRepositoryQueryImpl extends RemoteServiceServlet implements
                 return new WBLoginBean(proxy.getName(), sid, proxy.getBaseURL());
             }
         }
-        return new WBLoginBean("No longer valid session ID.");
+        return new WBLoginBean("Invalid session ID.");
     }
 
     /**

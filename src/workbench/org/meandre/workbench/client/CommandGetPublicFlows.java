@@ -37,14 +37,14 @@ class CommandGetPublicFlows implements WBCommand {
     //==============
 
     private WBCommand _cmd = null;
-    private Controller _cont = null;
+    private Controller _controller = null;
 
     //==============
     // Constructors
     //==============
 
     CommandGetPublicFlows(Controller cont, WBCommand cmd) {
-        _cont = cont;
+        _controller = cont;
         _cmd = cmd;
     }
 
@@ -59,7 +59,7 @@ class CommandGetPublicFlows implements WBCommand {
                 // do some UI stuff to show success
                 Set items = (Set) result;
 
-                Map pcs = _cont.getPublicFlowsMap();
+                Map pcs = _controller.getPublicFlowsMap();
                 pcs.clear();
                 if ((items != null) && (!items.isEmpty())){
                     for (Iterator itty = items.iterator(); itty.hasNext();){
@@ -81,8 +81,8 @@ class CommandGetPublicFlows implements WBCommand {
                         caught.getMessage());
             }
         };
-        _cont.getPublicRepositoryFlows(callback);
 
+        _controller.getPublicRepositoryFlows(callback);
     }
 
 }
