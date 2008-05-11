@@ -2340,10 +2340,10 @@ public class Controller {
 			PortConn conn = (PortConn) itty.next();
 			PortComp from = conn.getFrom();
 			PortComp to = conn.getTo();
-			_drawPan.drawLine(from.getAbsoluteLeft() + 10
-					- _drawPan.getAbsoluteLeft(), from.getAbsoluteTop() + 2
+			_drawPan.drawLine(from.getAbsoluteLeft() + from.getOffsetWidth()
+					- _drawPan.getAbsoluteLeft(), from.getAbsoluteTop() + (from.getOffsetHeight() / 2)
 					- _drawPan.getAbsoluteTop(), to.getAbsoluteLeft()
-					- _drawPan.getAbsoluteLeft(), to.getAbsoluteTop() + 2
+					- _drawPan.getAbsoluteLeft(), to.getAbsoluteTop() + (to.getOffsetHeight() / 2)
 					- _drawPan.getAbsoluteTop());
 		}
 		_drawPan.paint();

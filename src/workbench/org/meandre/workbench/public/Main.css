@@ -135,6 +135,14 @@ SPLIT PANELS *****************************************************
   margin-bottom: 2px;
 }
 
+.comp-ports-input {
+	margin-right: 1px;
+}
+
+.comp-ports-output {
+	margin-left: 1px;
+}
+
 .port-popup {
   background: #f5dabc;
   font-size: 70%;

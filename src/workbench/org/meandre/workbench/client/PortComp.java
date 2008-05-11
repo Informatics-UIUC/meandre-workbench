@@ -59,6 +59,14 @@ public class PortComp extends Image implements EventPreview {
         super();
         this.setUrl(_mouseOutImgURL);
         this.addStyleName("comp-ports");
+        switch (pt) {
+        case s_INPUT_PORT_TYPE:
+            this.addStyleName("comp-ports-input");
+            break;
+        case s_OUTPUT_PORT_TYPE:
+            this.addStyleName("comp-ports-output");
+            break;
+        }
         _parentComp = parent;
         _dp = dp;
         _ppp = new PortPopUp(_dp.getName());
@@ -90,7 +98,7 @@ public class PortComp extends Image implements EventPreview {
             _connectedTo.remove(conn);
         }
     }
-    
+
     /**
      * Return the PortComp objects that this port is connected to.
      * @return Set of PortComp objects or an empty set if there are no connections.
@@ -102,12 +110,12 @@ public class PortComp extends Image implements EventPreview {
     		if (this.getPortOrientation() == this.s_INPUT_PORT_TYPE){
     			ports.add(((PortConn)itty.next()).getFrom());
     		} else {
-    			ports.add(((PortConn)itty.next()).getTo());	
+    			ports.add(((PortConn)itty.next()).getTo());
     		}
     	}
         return ports;
     }
-    
+
     /**
      * Return set of connections for this object.
      * @return
