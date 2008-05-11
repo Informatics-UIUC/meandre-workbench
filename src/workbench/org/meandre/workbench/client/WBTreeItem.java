@@ -73,6 +73,9 @@ public class WBTreeItem extends TreeItem {
 			_ppp = new TreeItemPopUp(puString);
 			_ppp.addStyleName("port-popup");
 		}
+
+		ContextPopup.disableContextMenu(this.getElement());
+
 		_lab = new HTML(txt) {
 			public void onBrowserEvent(Event event) {
 			    switch (DOM.eventGetType(event)) {

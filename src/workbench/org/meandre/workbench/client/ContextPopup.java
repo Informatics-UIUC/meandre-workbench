@@ -1,5 +1,6 @@
 package org.meandre.workbench.client;
 
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -49,4 +50,13 @@ public class ContextPopup extends PopupPanel {
     public void setTargetTreeItem(TreeItem object) {
         _object = object;
     }
+    
+    /**
+     * Disables the browsers default context menu for the specified element.
+     *
+     * @param elem the element whos context menu will be disabled
+     */
+    public static native void disableContextMenu(Element elem) /*-{
+       elem.oncontextmenu=function() {  return false};
+     }-*/; 
 }
