@@ -37,6 +37,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -822,27 +823,27 @@ public class Controller {
 		_lblStatusText.setText("");
 	}
 
-	private Button _button_save = null;
+	private Image _button_save = null;
 
 	private CanvasButtonPopUp _button_popup_save = null;
 
-	private Button _button_save_as = null;
+	private Image _button_save_as = null;
 
 	private CanvasButtonPopUp _button_popup_save_as = null;
 
-	private Button _button_remove = null;
+	private Image _button_remove = null;
 
 	private CanvasButtonPopUp _button_popup_remove = null;
 
-	private Button _button_clear = null;
+	private Image _button_clear = null;
 
 	private CanvasButtonPopUp _button_popup_clear = null;
 
-	private Button _button_run = null;
+	private Image _button_run = null;
 
 	private CanvasButtonPopUp _button_popup_run = null;
 
-	private Button _button_layout = null;
+	private Image _button_layout = null;
 
 	private CanvasButtonPopUp _button_popup_layout = null;
 
@@ -890,19 +891,19 @@ public class Controller {
 		// SAVE
 		_button_popup_save = new CanvasButtonPopUp("Save");
 		_button_popup_save.addStyleName("canvas-button-popup");
-		_button_save = new Button("<IMG SRC='images/btn_save.gif'>") {
+		_button_save = new Image("images/btn_save.gif") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
 
-					_button_save.setHTML("<IMG SRC='images/btn_save_on.gif'>");
+					_button_save.setUrl("images/btn_save_on.gif");
 					_button_popup_save.setPopupPosition(_button_save
 							.getAbsoluteLeft(),
 							_button_save.getAbsoluteTop() + 36);
 					_button_popup_save.show();
 					break;
 				case Event.ONMOUSEOUT:
-					_button_save.setHTML("<IMG SRC='images/btn_save.gif'>");
+					_button_save.setUrl("images/btn_save.gif");
 					_button_popup_save.hide();
 					break;
 				case Event.ONCLICK:
@@ -911,8 +912,6 @@ public class Controller {
 				}
 			}
 		};
-		_button_save.setWidth("34");
-		_button_save.setHeight("35");
 		_button_save.addStyleName("menu-button");
 		_button_save.sinkEvents(Event.MOUSEEVENTS);
 		gridFlowButtons.setWidget(0, 0, _button_save);
@@ -920,21 +919,19 @@ public class Controller {
 		// SAVE AS
 		_button_popup_save_as = new CanvasButtonPopUp("Save As");
 		_button_popup_save_as.addStyleName("canvas-button-popup");
-		_button_save_as = new Button("<IMG SRC='images/btn_save_as.gif'>") {
+		_button_save_as = new Image("images/btn_save_as.gif") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
 
-					_button_save_as
-							.setHTML("<IMG SRC='images/btn_save_as_on.gif'>");
+					_button_save_as.setUrl("images/btn_save_as_on.gif");
 					_button_popup_save_as.setPopupPosition(_button_save_as
 							.getAbsoluteLeft(), _button_save_as
 							.getAbsoluteTop() + 36);
 					_button_popup_save_as.show();
 					break;
 				case Event.ONMOUSEOUT:
-					_button_save_as
-							.setHTML("<IMG SRC='images/btn_save_as.gif'>");
+					_button_save_as.setUrl("images/btn_save_as.gif");
 					_button_popup_save_as.hide();
 					break;
 				case Event.ONCLICK:
@@ -943,8 +940,6 @@ public class Controller {
 				}
 			}
 		};
-		_button_save_as.setWidth("34");
-		_button_save_as.setHeight("35");
 		_button_save_as.addStyleName("menu-button");
 		_button_save_as.sinkEvents(Event.MOUSEEVENTS);
 		gridFlowButtons.setWidget(0, 1, _button_save_as);
@@ -952,20 +947,19 @@ public class Controller {
 		// REMOVE
 		_button_popup_remove = new CanvasButtonPopUp("Remove");
 		_button_popup_remove.addStyleName("canvas-button-popup");
-		_button_remove = new Button("<IMG SRC='images/btn_delete.gif'>") {
+		_button_remove = new Image("images/btn_delete.gif") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
 
-					_button_remove
-							.setHTML("<IMG SRC='images/btn_delete_on.gif'>");
+					_button_remove.setUrl("images/btn_delete_on.gif");
 					_button_popup_remove.setPopupPosition(_button_remove
 							.getAbsoluteLeft(),
 							_button_remove.getAbsoluteTop() + 36);
 					_button_popup_remove.show();
 					break;
 				case Event.ONMOUSEOUT:
-					_button_remove.setHTML("<IMG SRC='images/btn_delete.gif'>");
+					_button_remove.setUrl("images/btn_delete.gif");
 					_button_popup_remove.hide();
 					break;
 				case Event.ONCLICK:
@@ -974,8 +968,6 @@ public class Controller {
 				}
 			}
 		};
-		_button_remove.setWidth("34");
-		_button_remove.setHeight("35");
 		_button_remove.addStyleName("menu-button");
 		_button_remove.sinkEvents(Event.MOUSEEVENTS);
 		gridFlowButtons.setWidget(0, 2, _button_remove);
@@ -983,20 +975,19 @@ public class Controller {
 		// CLEAR
 		_button_popup_clear = new CanvasButtonPopUp("Clear");
 		_button_popup_clear.addStyleName("canvas-button-popup");
-		_button_clear = new Button("<IMG SRC='images/btn_blank.gif'>") {
+		_button_clear = new Image("images/btn_blank.gif") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
 
-					_button_clear
-							.setHTML("<IMG SRC='images/btn_blank_on.gif'>");
+					_button_clear.setUrl("images/btn_blank_on.gif");
 					_button_popup_clear.setPopupPosition(_button_clear
 							.getAbsoluteLeft(),
 							_button_clear.getAbsoluteTop() + 36);
 					_button_popup_clear.show();
 					break;
 				case Event.ONMOUSEOUT:
-					_button_clear.setHTML("<IMG SRC='images/btn_blank.gif'>");
+					_button_clear.setUrl("images/btn_blank.gif");
 					_button_popup_clear.hide();
 					break;
 				case Event.ONCLICK:
@@ -1005,8 +996,6 @@ public class Controller {
 				}
 			}
 		};
-		_button_clear.setWidth("34");
-		_button_clear.setHeight("35");
 		_button_clear.addStyleName("menu-button");
 		_button_clear.sinkEvents(Event.MOUSEEVENTS);
 		gridFlowButtons.setWidget(0, 3, _button_clear);
@@ -1014,19 +1003,19 @@ public class Controller {
 		// RUN
 		_button_popup_run = new CanvasButtonPopUp("Run");
 		_button_popup_run.addStyleName("canvas-button-popup");
-		_button_run = new Button("<IMG SRC='images/btn_run.gif'>") {
+		_button_run = new Image("images/btn_run.gif") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
 
-					_button_run.setHTML("<IMG SRC='images/btn_run_on.gif'>");
+					_button_run.setUrl("images/btn_run_on.gif");
 					_button_popup_run.setPopupPosition(_button_run
 							.getAbsoluteLeft(),
 							_button_run.getAbsoluteTop() + 36);
 					_button_popup_run.show();
 					break;
 				case Event.ONMOUSEOUT:
-					_button_run.setHTML("<IMG SRC='images/btn_run.gif'>");
+					_button_run.setUrl("images/btn_run.gif");
 					_button_popup_run.hide();
 					break;
 				case Event.ONCLICK:
@@ -1035,8 +1024,6 @@ public class Controller {
 				}
 			}
 		};
-		_button_run.setWidth("34");
-		_button_run.setHeight("35");
 		_button_run.addStyleName("menu-button");
 		_button_run.sinkEvents(Event.MOUSEEVENTS);
 		gridFlowButtons.setWidget(0, 4, _button_run);
@@ -1044,20 +1031,19 @@ public class Controller {
 		// LAYOUT
 		_button_popup_layout = new CanvasButtonPopUp("Layout");
 		_button_popup_layout.addStyleName("canvas-button-popup");
-		_button_layout = new Button("<IMG SRC='images/btn_layout.gif'>") {
+		_button_layout = new Image("images/btn_layout.gif") {
 			public void onBrowserEvent(Event event) {
 				switch (DOM.eventGetType(event)) {
 				case Event.ONMOUSEOVER:
 
-					_button_layout
-							.setHTML("<IMG SRC='images/btn_layout_on.gif'>");
+					_button_layout.setUrl("images/btn_layout_on.gif");
 					_button_popup_layout.setPopupPosition(_button_layout
 							.getAbsoluteLeft(),
 							_button_layout.getAbsoluteTop() + 36);
 					_button_popup_layout.show();
 					break;
 				case Event.ONMOUSEOUT:
-					_button_layout.setHTML("<IMG SRC='images/btn_layout.gif'>");
+					_button_layout.setUrl("images/btn_layout.gif");
 					_button_popup_layout.hide();
 					break;
 				case Event.ONCLICK:
@@ -1066,8 +1052,6 @@ public class Controller {
 				}
 			}
 		};
-		_button_layout.setWidth("34");
-		_button_layout.setHeight("35");
 		_button_layout.addStyleName("menu-button");
 		_button_layout.sinkEvents(Event.MOUSEEVENTS);
 		gridFlowButtons.setWidget(0, 5, _button_layout);
