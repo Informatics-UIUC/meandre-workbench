@@ -1577,6 +1577,19 @@ public class Controller {
 		}
 	}
 
+	void delete() {
+	    TabPanel tp = _main.getTabPanel();
+	    switch (tp.getTabBar().getSelectedTab()) {
+	        case 0: /* COMPONENTS */
+	            Window.alert("not yet implemented");
+	            break;
+
+	        case 1: /* FLOWS */
+	            deleteFlow();
+	            break;
+	    }
+	}
+
 	/**
 	 * Delete a selected flow from the flow tree.
 	 */
@@ -1633,6 +1646,32 @@ public class Controller {
 				}
 			}
 		}
+	}
+
+	void publish() {
+	    TabPanel tp = _main.getTabPanel();
+	    switch (tp.getTabBar().getSelectedTab()) {
+	        case 0: /* COMPONENTS */
+	            publishComponent();
+	            break;
+
+	        case 1: /* FLOWS */
+	            publishFlow();
+	            break;
+	    }
+	}
+
+	void unpublish() {
+        TabPanel tp = _main.getTabPanel();
+        switch (tp.getTabBar().getSelectedTab()) {
+            case 0: /* COMPONENTS */
+                unpublishComponent();
+                break;
+
+            case 1: /* FLOWS */
+                unpublishFlow();
+                break;
+        }
 	}
 
 	/**

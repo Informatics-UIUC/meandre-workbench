@@ -76,6 +76,25 @@ SPLIT PANELS *****************************************************
   background: #C3D9FF;
 }
 
+.context-popup {
+	background: #D3E9FF;
+	border: 2px solid #93A9CC;
+	padding: 2px;
+}
+
+.context-popup-menuitem {
+	width: 100%;
+	cursor: pointer;
+    font-size: 80%;
+    font-weight: bold;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.context-popup-menuitem-selected {
+	background-color: #EEEE22;
+}
+
 /*
  COMPONENT WIDGET AND PARTS ***********************************************
  */
