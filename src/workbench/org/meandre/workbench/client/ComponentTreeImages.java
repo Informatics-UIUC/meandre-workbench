@@ -27,12 +27,12 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
   interface ComponentTreeImages extends TreeImages {
 
     /**
-     * @gwt.resource comp-tree-folder-open.png
+     * @gwt.resource comp-tree-folder-open.gif
      */
     AbstractImagePrototype treeOpen();
 
     /**
-     * @gwt.resource comp-tree-folder-closed.png
+     * @gwt.resource comp-tree-folder-closed.gif
      */
     AbstractImagePrototype treeClosed();
 

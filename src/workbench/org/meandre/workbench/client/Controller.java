@@ -2685,9 +2685,12 @@ public class Controller {
 			String imgFname = (getPublicComponentsMap().get(ecd.getID()) == null) ? "comp-tree-folder-leaf.png"
 					: "comp-tree-folder-leaf-pub.png";
 
+			if (ecd.getFormat().toLowerCase().startsWith("java"))
+			    imgFname = (getPublicComponentsMap().get(ecd.getID()) == null) ? "duke16.png" : "duke16-pub.png";
+
 			String leafHTML = "<table><tr><td>" + "<img src=\"images/"
 					+ imgFname + "\">" + "</td>"
-					+ "<td align=\"left\" valign=\"middle\" cellpadding=\"4\">"
+					+ "<td align=\"left\" valign=\"middle\">"
 					+ "<b><font size=\"-2\">" + ecd.getName() + "</font></b>"
 					+ "</td></tr></table>";
 
@@ -2782,21 +2785,23 @@ public class Controller {
 
 				WBTreeItem newItem = null;
 
-				String imgFname = (getPublicComponentsMap().get(
-						((WBComponent) val).getID()) == null) ? "comp-tree-folder-leaf.png"
-						: "comp-tree-folder-leaf-pub.png";
+				WBComponent component = (WBComponent) val;
+                String imgFname =
+                    (getPublicComponentsMap().get(component.getID()) == null) ?
+                            "duke16.png"
+                          : "duke16-pub.png";
 
 				String leafHTML = "<table><tr><td>"
 						+ "<img src=\"images/"
 						+ imgFname
 						+ "\">"
 						+ "</td>"
-						+ "<td align=\"left\" valign=\"middle\" cellpadding=\"4\">"
+						+ "<td align=\"left\" valign=\"middle\">"
 						+ "<b><font size=\"-2\">" + key + "</font></b>"
 						+ "</td></tr></table>";
 
 				newItem = new WBTreeItem(leafHTML,
-						getCompTreeItemPopUpText((WBComponent) val));
+						getCompTreeItemPopUpText(component));
 
 				newItem.setUserObject(val);
 				newND.setNodeItem(newItem);
