@@ -84,6 +84,7 @@ SPLIT PANELS *****************************************************
   font-size: 70%;
   font-weight: bold;
   cursor: text;
+  margin-top: 2px;
 }
 
 .comp-content-top {
