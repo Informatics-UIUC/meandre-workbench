@@ -15,7 +15,7 @@ public class ContextPopup extends PopupPanel {
 
         VerticalPanel vpMain = new VerticalPanel();
         vpMain.setHorizontalAlignment(VerticalPanel.ALIGN_LEFT);
-        vpMain.setSpacing(2);
+        vpMain.setSpacing(1);
 
         vpMain.add(new ContextPopupMenuItem("Publish") {
             public void onClick(Widget sender) {
