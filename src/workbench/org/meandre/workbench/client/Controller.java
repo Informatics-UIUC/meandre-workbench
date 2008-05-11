@@ -2914,7 +2914,7 @@ public class Controller {
 							+ imgFname
 							+ "\">"
 							+ "</td>"
-							+ "<td align=\"left\" valign=\"middle\" cellpadding=\"4\">"
+							+ "<td align=\"left\" valign=\"middle\">"
 							+ "<b><font size=\"-2\">" + f.getName()
 							+ "</font></b>" + "</td></tr></table>";
 
