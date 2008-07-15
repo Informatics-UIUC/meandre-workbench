@@ -46,6 +46,7 @@ import java.util.Date;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.SessionManager;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 
@@ -82,7 +83,10 @@ public class JettyBootstrapper {
         webapp.setContextPath("/");
         webapp.setWar(JETTY_HOME + "/war");
         webapp.setDefaultsDescriptor(JETTY_HOME + "/bootstrap/workbench-jetty.xml");
-        webapp.getSessionHandler().getSessionManager().setSessionCookie(SESSION_COOKIE_NAME);
+
+        SessionManager sessionManager = webapp.getSessionHandler().getSessionManager();
+        sessionManager.setSessionCookie(SESSION_COOKIE_NAME);
+        sessionManager.setSessionURL(SESSION_COOKIE_NAME.toLowerCase());
 
         server.setHandler(webapp);
         server.start();
