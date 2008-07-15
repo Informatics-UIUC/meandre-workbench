@@ -94,7 +94,9 @@
         <delete dir="${gwt.output.dir}"/>
         <java classname="com.google.gwt.dev.GWTCompiler" fork="yes" maxmemory="512m">
             <classpath refid="gwt_compile.classpath"/>
-            <arg line="-out ${gwt.output.dir}"/>
+            <!--<arg line="-out ${gwt.output.dir}"/>-->
+            <arg value="-out"/>
+            <arg value="${gwt.output.dir}"/>
             <arg value="$@"/>
             <arg value="${gwt.workbench}"/>
         </java>
