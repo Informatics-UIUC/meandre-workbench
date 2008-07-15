@@ -400,7 +400,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         String normalizedFlowURI = flow.getFlowComponent().getURI();
         if (!normalizedFlowURI.endsWith("/")) normalizedFlowURI += "/";
 
-        System.out.println("Uploading flow: flowURI=" + normalizedFlowURI + "   desiredURI=" + wbFlow.getDesiredURI());
+//        System.out.println("Uploading flow: flowURI=" + normalizedFlowURI + "   desiredURI=" + wbFlow.getDesiredURI());
 
         if (!normalizedFlowURI.equals(wbFlow.getDesiredURI())) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -412,30 +412,30 @@ public class Repository extends RemoteServiceServlet implements IRepository {
 
             String execStepMsg = null;
             try {
-                String fName = wbFlow.getDesiredURI().replaceAll(":|/", "_");
+//                String fName = wbFlow.getDesiredURI().replaceAll(":|/", "_");
 
                 execStepMsg = "STEP 1: Reading flow model";
+//
+//                String tempFolder = System.getProperty("java.io.tmpdir");
+//                if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
+//                    tempFolder += System.getProperty("file.separator");
 
-                String tempFolder = System.getProperty("java.io.tmpdir");
-                if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
-                    tempFolder += System.getProperty("file.separator");
-
-                FileWriter fw = new FileWriter(tempFolder + fName + ".nt");
-                fw.write(sModel);
-                fw.close();
+//                FileWriter fw = new FileWriter(tempFolder + fName + ".nt");
+//                fw.write(sModel);
+//                fw.close();
 
                 flowModel.read(new StringReader(sModel), null, "N-TRIPLE");
 
-                FileOutputStream modelStream = new FileOutputStream(tempFolder + fName + ".ttl");
-                flowModel.write(modelStream, "TTL");
-                modelStream.close();
+//                FileOutputStream modelStream = new FileOutputStream(tempFolder + fName + ".ttl");
+//                flowModel.write(modelStream, "TTL");
+//                modelStream.close();
 
                 // the following needs jena-iri.jar  and  ibm   icu.jar
 //                FileOutputStream modelStreamXml = new FileOutputStream("c:/temp/flows/" + fName + ".rdf");
 //                flowModel.write(modelStreamXml, "RDF/XML");
 //                modelStreamXml.close();
 
-                System.out.println("Model for flow " + wbFlow.getDesiredURI() + " written successfully in file " + tempFolder + fName);
+//                System.out.println("Model for flow " + wbFlow.getDesiredURI() + " written successfully in file " + tempFolder + fName);
 
                 execStepMsg = "STEP 2: Creating RepositoryImpl(flowModel) - flowModel.isEmpty()=" + flowModel.isEmpty();
                 RepositoryImpl repository = new RepositoryImpl(flowModel);
