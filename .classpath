@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src-bootstrap"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Google Web Toolkit 1.5">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/meandre-client-1.3.1.jar" sourcepath="/Meandre-Core/src-client/code">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/meandre-kernel-1.3.1.jar" sourcepath="/Meandre-Core/src-kernel/code">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://commons.apache.org/codec/api-release/"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/commons-httpclient-3.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://hc.apache.org/httpclient-3.x/apidocs/"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/commons-logging-1.1.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://commons.apache.org/logging/commons-logging-1.1.1/apidocs/"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/gwtext-2.0.4.jar" sourcepath="lib/gwtext-2.0.4.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/jena-2.5.5.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://jena.sourceforge.net/javadoc/"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/jena-arq-2.5.5.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://jena.sourceforge.net/ARQ/javadoc/"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/jena-json-2.5.5.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.json.org/javadoc/"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://logging.apache.org/log4j/1.2/apidocs/"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/lucene-core-2.3.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://lucene.apache.org/java/2_3_1/api/core/"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/xercesImpl-2.9.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://xerces.apache.org/xerces2-j/javadocs/api/"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/gwtextux-0.3.jar" sourcepath="lib/gwtextux-0.3.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/gwtext-diagrams-0.2.jar" sourcepath="lib/gwtext-diagrams-0.2.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/gwt-log-2.5.1.jar" sourcepath="lib/gwt-log-2.5.1.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/bootstrap/core-3.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/bootstrap/jetty-6.1.5.jar"/>
+	<classpathentry kind="lib" path="lib/bootstrap/jetty-util-6.1.5.jar"/>
+	<classpathentry kind="lib" path="lib/bootstrap/jsp-2.1.jar"/>
+	<classpathentry kind="lib" path="lib/bootstrap/jsp-api-2.1.jar"/>
+	<classpathentry kind="lib" path="lib/bootstrap/servlet-api-2.5-6.1.5.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>
