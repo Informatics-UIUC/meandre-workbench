@@ -108,7 +108,8 @@ public class WorkspaceTab extends Panel {
 
     private WBFlowDescription _wbFlow;
     private final Map<String, Component> _componentMap;
-    private final Map<AbstractConnection, WBConnectorDescription> _connectionMap;
+    private final Map<String, WBConnectorDescription> _connectorMap;
+    private final Map<AbstractConnection, String> _connectionMap;
     private final Set<WorkspaceActionListener> _actionListeners = new HashSet<WorkspaceActionListener>();
     private final FlowOutputPanel _outputPanel = new FlowOutputPanel();
     private Component _selectedComponent = null;
@@ -131,7 +132,8 @@ public class WorkspaceTab extends Panel {
 
         _wbFlow = (flow == null) ? createNewFlowDescription() : flow.clone();
         _componentMap = new HashMap<String, Component>();
-        _connectionMap = new HashMap<AbstractConnection, WBConnectorDescription>();
+        _connectionMap = new HashMap<AbstractConnection, String>();
+        _connectorMap = new HashMap<String, WBConnectorDescription>();
 
         setTitle((flow != null) ? _wbFlow.getName() : getUntitledName());
         setIconCls("icon-tab");
@@ -603,19 +605,31 @@ public class WorkspaceTab extends Panel {
                         port.getPortType() == PortType.INPUT ? port : _selectedPort;
 
                     WBConnectorDescription connectorDesc = new WBConnectorDescription();
-                    String resURI = _wbFlow.getFlowURI();
-                    if (!resURI.endsWith("/")) resURI += "/";
-                    resURI += "connector/" + _connectorCount++;
+                    String baseURI = _wbFlow.getFlowURI();
+                    if (!baseURI.endsWith("/")) baseURI += "/";
+                    baseURI += "connector/";
+
+                    // Create a unique URI
+                    String resURI;
+                    do {
+                        resURI = baseURI + _connectorCount++;
+                    }
+                    while (_connectorMap.containsKey(resURI));
+
                     connectorDesc.setConnector(resURI);
                     connectorDesc.setSourceInstance(srcPort.getComponent().getInstanceDescription().getExecutableComponentInstance());
                     connectorDesc.setSourceInstanceDataPort(srcPort.getDataPortDescription().getResourceURI());
                     connectorDesc.setTargetInstance(dstPort.getComponent().getInstanceDescription().getExecutableComponentInstance());
                     connectorDesc.setTargetInstanceDataPort(dstPort.getDataPortDescription().getResourceURI());
 
+                    Log.debug("Adding connector " + resURI + " between " + srcPort.getComponent().getName() +
+                            " and " + dstPort.getComponent().getName());
+
                     _wbFlow.getConnectorDescriptions().add(connectorDesc);
                     AbstractConnection connection = createConnection(srcPort, dstPort);
                     connection.addTo(WorkspaceTab.this);
-                    _connectionMap.put(connection, connectorDesc);
+                    _connectionMap.put(connection, resURI);
+                    _connectorMap.put(resURI, connectorDesc);
 
                     _selectedPort.unselect();
                     port.unselect();
@@ -727,6 +741,7 @@ public class WorkspaceTab extends Panel {
         compInstance.getProperties().add(COMP_LEFT_KEY, Integer.toString(x));
         compInstance.getProperties().add(COMP_TOP_KEY, Integer.toString(y));
 
+        Log.debug("Adding " + compInstance.getName() + " to flow " + _wbFlow.getName());
         _wbFlow.addExecutableComponentInstance(compInstance);
 
         if (setDirty)
@@ -761,12 +776,22 @@ public class WorkspaceTab extends Panel {
         WBExecutableComponentInstanceDescription instance = new WBExecutableComponentInstanceDescription();
         instance.setExecutableComponentDescription(compDesc);
         instance.setExecutableComponent(resourceURI);
-        String resURI = _wbFlow.getFlowURI();
-        if (!resURI.endsWith("/")) resURI += "/";
-        resURI += "instance/" + compDesc.getName().toLowerCase().replaceAll(" |\t", "-") + "/" + _componentCount++;
+        String baseURI = _wbFlow.getFlowURI();
+        if (!baseURI.endsWith("/")) baseURI += "/";
+        baseURI += "instance/" + compDesc.getName().toLowerCase().replaceAll(" |\t", "-") + "/";
+
+        // Create a unique URI
+        String resURI;
+        do {
+            resURI = baseURI + _componentCount++;
+        }
+        while (_componentMap.containsKey(resURI));
+
         instance.setExecutableComponentInstance(resURI);
         instance.setDescription(compDesc.getDescription());
         instance.setName(compDesc.getName());
+
+        Log.debug("Creating " + instance.getName() + " with URI: " + resURI);
 
         WBPropertiesDescriptionDefinition propsDef = compDesc.getProperties();
         WBPropertiesDescription props = new WBPropertiesDescription();
@@ -785,12 +810,14 @@ public class WorkspaceTab extends Panel {
         connection.addListener(new ConnectionActionListener() {
             public void connectionRemoved(AbstractConnection connection) {
 
-                WBConnectorDescription connectorDesc = _connectionMap.get(connection);
+                WBConnectorDescription connectorDesc = _connectorMap.get(_connectionMap.get(connection));
+                Log.debug("Removing connection " + connectorDesc.getConnector());
                 boolean success = _wbFlow.getConnectorDescriptions().remove(connectorDesc);
                 if (!success)
                     Log.error("The connector was not found in the flow description!");
 
-                Object result = _connectionMap.remove(connection);
+                _connectionMap.remove(connection);
+                Object result = _connectorMap.remove(connectorDesc.getConnector());
                 // for DEBUG purposes
                 if (result == null)
                     Log.error("Could not find the specified connection in the connection map. Probably a bug!");
@@ -812,9 +839,11 @@ public class WorkspaceTab extends Panel {
         Component srcComponent = _componentMap.get(srcCompInstanceURI);
         Component dstComponent = _componentMap.get(dstCompInstanceURI);
 
-        if (srcComponent == null || dstComponent == null)
+        if (srcComponent == null || dstComponent == null) {
             Log.error("Could not retrieve the source and/or target components for connector: " +
-                    connector.getConnector() + ". Probably a bug!");
+                    connector.getConnector());
+            Log.error("Source: " + srcCompInstanceURI + "  Target: " + dstCompInstanceURI);
+        }
 
         String srcDataPort = connector.getSourceInstanceDataPort();
         String dstDataPort = connector.getTargetInstanceDataPort();
@@ -822,12 +851,15 @@ public class WorkspaceTab extends Panel {
         ComponentPort srcPort = srcComponent.getOutputPort(srcDataPort);
         ComponentPort dstPort = dstComponent.getInputPort(dstDataPort);
 
-        if (srcPort == null || dstPort == null)
+        if (srcPort == null || dstPort == null) {
             Log.error("Could not retrive the source and/or target ports for the connector: " +
-                    connector.getConnector() + ". Probably a bug!");
+                    connector.getConnector());
+            Log.error("Source: " + srcDataPort + "  Target: " + dstDataPort);
+        }
 
         AbstractConnection connection = createConnection(srcPort, dstPort);
-        _connectionMap.put(connection, connector);
+        _connectionMap.put(connection, connector.getConnector());
+        _connectorMap.put(connector.getConnector(), connector);
 
         return connection;
     }
@@ -847,6 +879,7 @@ public class WorkspaceTab extends Panel {
             _selectedPort = null;
 
         String instanceURI = component.getInstanceDescription().getExecutableComponentInstance();
+        Log.debug("Removing component " + instanceURI);
         Object result = _componentMap.remove(instanceURI);
         // for DEBUG purposes
         if (result == null)
