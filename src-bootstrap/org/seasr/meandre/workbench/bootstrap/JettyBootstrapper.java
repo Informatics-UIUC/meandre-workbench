@@ -42,8 +42,6 @@
 
 package org.seasr.meandre.workbench.bootstrap;
 
-import java.util.Date;
-
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.SessionManager;
@@ -55,11 +53,24 @@ import org.mortbay.jetty.webapp.WebAppContext;
  *
  */
 public class JettyBootstrapper {
+    /**
+     * NOTE REGARDING SESSIONS:
+     *
+     * When the SESSION_COOKIE_NAME below is set to a fixed value, the
+     * "session overwriting" issue will manifest itself if two instances
+     * of the Workbench are ran on the same machine (two Jetty instances
+     * running on different ports) and the same browser instance (with
+     * two tabs) is used to "hit" the two Workbench instances.
+     * If you encounter this situation, setting the SESSION_COOKIE_NAME
+     * to something non-fixed (like adding the current timestamp to the
+     * name, will solve that problem at the expense of having multiple
+     * cookies that may be lying around unused after a while)
+     */
 
     /** The base Meandre Workbench port */
     public static final int BASE_PORT = 1712;
 
-    public final static String SESSION_COOKIE_NAME = "WORKBENCH_SID_" + new Date().getTime();
+    public final static String SESSION_COOKIE_NAME = "WORKBENCH_SESSIONID";
 
     /**
      * Bootstraps Meandre-Workbench
