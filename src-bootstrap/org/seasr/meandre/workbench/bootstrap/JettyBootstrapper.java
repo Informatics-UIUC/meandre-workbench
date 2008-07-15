@@ -42,6 +42,8 @@
 
 package org.seasr.meandre.workbench.bootstrap;
 
+import java.util.Date;
+
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
@@ -56,6 +58,8 @@ public class JettyBootstrapper {
     /** The base Meandre Workbench port */
     public static final int BASE_PORT = 1712;
 
+    public final static String SESSION_COOKIE_NAME = "WORKBENCH_SID_" + new Date().getTime();
+
     /**
      * Bootstraps Meandre-Workbench
      *
@@ -64,7 +68,9 @@ public class JettyBootstrapper {
      */
     public static void main(String[] args) throws Exception {
         final String JETTY_HOME = (args.length > 0) ? args[0] : System.getProperty("user.dir");
+
         System.out.println("Setting JETTY_HOME to " + JETTY_HOME);
+        System.out.println("Using session cookie name: " + SESSION_COOKIE_NAME);
 
         Server server = new Server();
 
@@ -76,6 +82,8 @@ public class JettyBootstrapper {
         webapp.setContextPath("/");
         webapp.setWar(JETTY_HOME + "/war");
         webapp.setDefaultsDescriptor(JETTY_HOME + "/bootstrap/workbench-jetty.xml");
+        webapp.getSessionHandler().getSessionManager().setSessionCookie(SESSION_COOKIE_NAME);
+
         server.setHandler(webapp);
         server.start();
         server.join();
