@@ -205,48 +205,30 @@ public class RepositoryState {
 
     public void addFlow(WBFlowDescription flow) {
         Record storedFlow = _flowsStore.getById(flow.getFlowURI());
-        if (storedFlow == null) {
+
+        if (storedFlow != null) {
+            _flowsStore.remove(storedFlow);
+            _flowsStore.commitChanges();
+        }
+        else {
             Log.info("Adding flow " + flow.getFlowURI());
 
             for (WBExecutableComponentInstanceDescription instance : flow.getExecutableComponentInstances())
                 instance.setExecutableComponentDescription(getComponent(instance.getExecutableComponent()));
-
-            _flowsStore.addSorted(_flowsReader.getRecordDef().createRecord(flow.getFlowURI(),
-                    new Object[] {
-                        flow,
-                        flow.getFlowURI(),
-                        flow.getName(),
-                        flow.getDescription(),
-                        flow.getRights(),
-                        flow.getCreator(),
-                        flow.getCreationDate(),
-                        flow.getExecutableComponentInstances(),
-                        flow.getConnectorDescriptions(),
-                        flow.getTags()
-                    }
-            ));
-        } else {
-            Log.info("Flow found - id=" + storedFlow.getId());
-
-            // Update record (redundancy is ok)
-            storedFlow.setId(flow.getFlowURI());
-            storedFlow.set("wbFlow", flow);
-            storedFlow.set("flowURI", flow.getFlowURI());
-            storedFlow.set("name", flow.getName());
-            storedFlow.set("description", flow.getDescription());
-            storedFlow.set("rights", flow.getRights());
-            storedFlow.set("creator", flow.getCreator());
-            storedFlow.set("creationDate", flow.getCreationDate());
-            storedFlow.set("compInstances", flow.getExecutableComponentInstances());
-            storedFlow.set("connectorDescriptions", flow.getConnectorDescriptions());
-            storedFlow.set("tags", flow.getTags());
-
-            if (!storedFlow.getAsString("flowURI").equals(flow.getFlowURI()))
-                Log.error("Flow URI mismatch on save! storeURI=" + storedFlow.getAsString("flowURI") +
-                        " savedURI=" + flow.getFlowURI());
-            else
-                Log.info("Save successful");
         }
+
+        _flowsStore.addSorted(_flowsReader.getRecordDef().createRecord(flow.getFlowURI(), new Object[] {
+            flow,
+            flow.getFlowURI(),
+            flow.getName(),
+            flow.getDescription(),
+            flow.getRights(),
+            flow.getCreator(),
+            flow.getCreationDate(),
+            flow.getExecutableComponentInstances(),
+            flow.getConnectorDescriptions(),
+            flow.getTags()
+        }));
     }
 
     public Store getLocationsStore() {

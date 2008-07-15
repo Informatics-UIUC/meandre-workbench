@@ -741,7 +741,9 @@ public class WorkspaceTab extends Panel {
         compInstance.getProperties().add(COMP_LEFT_KEY, Integer.toString(x));
         compInstance.getProperties().add(COMP_TOP_KEY, Integer.toString(y));
 
-        Log.debug("Adding " + compInstance.getName() + " to flow " + _wbFlow.getName());
+        if (setDirty)
+            Log.debug("Adding " + compInstance.getName() + " to flow " + _wbFlow.getName());
+
         _wbFlow.addExecutableComponentInstance(compInstance);
 
         if (setDirty)
@@ -820,7 +822,7 @@ public class WorkspaceTab extends Panel {
                 Object result = _connectorMap.remove(connectorDesc.getConnector());
                 // for DEBUG purposes
                 if (result == null)
-                    Log.error("Could not find the specified connection in the connection map. Probably a bug!");
+                    Log.error("Could not find the specified connection in the connection map.");
 
                 for (WorkspaceActionListener listener : _actionListeners)
                     listener.onConnectionRemoved(srcPort, dstPort);
