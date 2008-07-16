@@ -86,7 +86,8 @@ public class WBTagsDescription implements IsSerializable, Cloneable {
         for ( String sTag:setTags )
             sb.append(", " + sTag);
 
-        return sb.toString().substring(2).trim();
+        String result = sb.toString();
+        return (result.startsWith(", ")) ? result.substring(2).trim() : "";
     }
 
     public WBTagsDescription clone() {

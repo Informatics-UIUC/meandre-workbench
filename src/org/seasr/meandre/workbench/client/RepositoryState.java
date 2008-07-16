@@ -210,12 +210,11 @@ public class RepositoryState {
             _flowsStore.remove(storedFlow);
             _flowsStore.commitChanges();
         }
-        else {
+        else
             Log.info("Adding flow " + flow.getFlowURI());
 
-            for (WBExecutableComponentInstanceDescription instance : flow.getExecutableComponentInstances())
-                instance.setExecutableComponentDescription(getComponent(instance.getExecutableComponent()));
-        }
+        for (WBExecutableComponentInstanceDescription instance : flow.getExecutableComponentInstances())
+            instance.setExecutableComponentDescription(getComponent(instance.getExecutableComponent()));
 
         _flowsStore.addSorted(_flowsReader.getRecordDef().createRecord(flow.getFlowURI(), new Object[] {
             flow,
