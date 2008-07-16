@@ -95,7 +95,8 @@ public class WorkspacePanel extends Panel {
             @Override
             public boolean doBeforeRemove(Container tabPanel, Component component) {
                 WorkspaceTab wsTab = (WorkspaceTab) component;
-                return wsTab.close();
+
+                return wsTab.shouldClose();
             }
 
             @Override

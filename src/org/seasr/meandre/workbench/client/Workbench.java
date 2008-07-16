@@ -234,7 +234,7 @@ public class Workbench extends Application {
             }
 
             public void onTabClosed(WorkspacePanel wsPanel, WorkspaceTab wsTab) {
-                Log.info("Tab " + wsTab.getTitle() + " cosed");
+                Log.info("Tab " + wsTab.getTitle() + " closed");
                 workspacePanel.getOutputPanel().remove(wsTab.getFlowOutputPanel());
 
                 if (wsPanel.getTabs().length == 0)

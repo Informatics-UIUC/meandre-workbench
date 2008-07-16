@@ -68,6 +68,7 @@ import pl.balon.gwt.diagrams.client.connection.RectilinearTwoEndedConnection;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
+import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.EventObject;
@@ -123,7 +124,7 @@ public class WorkspaceTab extends Panel {
 
     private final ToolbarButton _btnSave = new ToolbarButton("Save");
     private final ToolbarButton _btnSaveAs = new ToolbarButton("Save As");
-    private final ToolbarButton _btnDeleteComponent = new ToolbarButton("Delete");
+    private final ToolbarButton _btnRemoveComponent = new ToolbarButton("Remove");
 
 
     public WorkspaceTab(final WBFlowDescription flow) {
@@ -157,9 +158,9 @@ public class WorkspaceTab extends Panel {
         _btnSave.addListener(btnSaveListener);
         _btnSaveAs.addListener(btnSaveListener);
 
-        _btnDeleteComponent.setIconCls("icon-component-delete");
-        _btnDeleteComponent.disable();
-        _btnDeleteComponent.addListener(new ButtonListenerAdapter() {
+        _btnRemoveComponent.setIconCls("icon-component-delete");
+        _btnRemoveComponent.disable();
+        _btnRemoveComponent.addListener(new ButtonListenerAdapter() {
             @Override
             public void onClick(Button button, EventObject e) {
                 if (_selectedComponent != null)
@@ -189,7 +190,7 @@ public class WorkspaceTab extends Panel {
         toolbar.addButton(_btnSave);
         toolbar.addButton(_btnSaveAs);
         toolbar.addSeparator();
-        toolbar.addButton(_btnDeleteComponent);
+        toolbar.addButton(_btnRemoveComponent);
         toolbar.addFill();
         toolbar.addButton(btnRunFlow);
         toolbar.addButton(btnStopFlow);
@@ -230,14 +231,19 @@ public class WorkspaceTab extends Panel {
                         WBExecutableComponentDescription compDesc =
                             (WBExecutableComponentDescription) record.getAsObject("wbComponent");
 
-                        final Component component = new Component(createComponentInstance(compDesc));
+                        WBExecutableComponentInstanceDescription compInstance = createComponentInstance(compDesc);
+                        final Component component = new Component(compInstance);
                         component.doOnRender(new Function() {
                             public void execute() {
                                 component.select();
                             }
                         });
 
-                        addComponent(component, xy, true);
+                        WBPropertiesDescription compProps = compInstance.getProperties();
+                        compProps.add(COMP_LEFT_KEY, Integer.toString(xy[0]));
+                        compProps.add(COMP_TOP_KEY, Integer.toString(xy[1]));
+
+                        addComponent(component, true);
                     }
 
                     doLayout();
@@ -255,7 +261,7 @@ public class WorkspaceTab extends Panel {
                 Log.error("Could not find the component: " + compInstance.getExecutableComponent());
 
             Component component = new Component(compInstance);
-            addComponent(component, false);
+            addComponentToCanvas(component, false);
         }
 
         for (WBConnectorDescription connector : flow.getConnectorDescriptions())
@@ -430,14 +436,15 @@ public class WorkspaceTab extends Panel {
         return _isClosing;
     }
 
-    public boolean close() {
-        Log.debug("close called");
-        if (_isClosing || !isDirty()) {
-            if (!_isClosing) {
-                _isClosing = true;
-                _parent.removeTab(this);
-            }
+    public void close() {
+        if (!_isClosing) {
+            _isClosing = true;
+            _parent.removeTab(this);
+        }
+    }
 
+    boolean shouldClose() {
+        if (_isClosing || !isDirty()) {
             // unselect any selected components
             // (causes the details panel to clear if any components were previously selected)
             if (_selectedComponent != null)
@@ -494,20 +501,16 @@ public class WorkspaceTab extends Panel {
 
     public void addComponent(Component component, boolean setDirty) {
         WBExecutableComponentInstanceDescription compInstance = component.getInstanceDescription();
-        WBPropertiesDescription compProps = compInstance.getProperties();
-        if (compProps.getKeys().contains(COMP_LEFT_KEY) && compProps.getKeys().contains(COMP_TOP_KEY)) {
-            int[] xy = new int[] {
-                    Integer.parseInt(compProps.getValue(COMP_LEFT_KEY)),
-                    Integer.parseInt(compProps.getValue(COMP_TOP_KEY))
-            };
 
-            addComponent(component, xy, setDirty);
-        }
-        else
-            addComponent(component, getRandomCompPosition(), setDirty);
+        Log.debug("Adding " + compInstance.getName() + " to flow " + _wbFlow.getName());
+        _wbFlow.addExecutableComponentInstance(compInstance);
+
+        addComponentToCanvas(component, setDirty);
     }
 
-    public void addComponent(final Component component, int[] posXY, boolean setDirty) {
+    private void addComponentToCanvas(final Component component, boolean setDirty) {
+        int[] posXY = getComponentXY(component);
+
         final int x = posXY[0];
         final int y = posXY[1];
 
@@ -535,7 +538,7 @@ public class WorkspaceTab extends Panel {
 
                 clearSelection();
                 _selectedComponent = component;
-                _btnDeleteComponent.enable();
+                _btnRemoveComponent.enable();
 
                 for (WorkspaceActionListener listener : _actionListeners)
                     listener.onComponentSelected(component);
@@ -544,7 +547,7 @@ public class WorkspaceTab extends Panel {
             @Override
             public void onUnselected(Component component) {
                 _selectedComponent = null;
-                _btnDeleteComponent.disable();
+                _btnRemoveComponent.disable();
 
                 for (WorkspaceActionListener listener : _actionListeners)
                     listener.onComponentUnselected(component);
@@ -737,15 +740,6 @@ public class WorkspaceTab extends Panel {
         for (WorkspaceActionListener listener : _actionListeners)
             listener.onComponentAdded(component, x, y);
 
-        WBExecutableComponentInstanceDescription compInstance = component.getInstanceDescription();
-        compInstance.getProperties().add(COMP_LEFT_KEY, Integer.toString(x));
-        compInstance.getProperties().add(COMP_TOP_KEY, Integer.toString(y));
-
-        if (setDirty)
-            Log.debug("Adding " + compInstance.getName() + " to flow " + _wbFlow.getName());
-
-        _wbFlow.addExecutableComponentInstance(compInstance);
-
         if (setDirty)
             setDirty();
     }
@@ -768,8 +762,24 @@ public class WorkspaceTab extends Panel {
     }
 
     private int[] getRandomCompPosition() {
-        // TODO change this
-        return new int[] { 100, 100 };
+        return new int[] { Random.nextInt(500), Random.nextInt(500) };
+    }
+
+    private int[] getComponentXY(Component component) {
+        WBExecutableComponentInstanceDescription compInstance = component.getInstanceDescription();
+        WBPropertiesDescription compProps = compInstance.getProperties();
+        if (compProps.getKeys().contains(COMP_LEFT_KEY) && compProps.getKeys().contains(COMP_TOP_KEY))
+            return new int[] {
+                    Integer.parseInt(compProps.getValue(COMP_LEFT_KEY)),
+                    Integer.parseInt(compProps.getValue(COMP_TOP_KEY))
+            };
+        else {
+            int[] xy = getRandomCompPosition();
+            compProps.add(COMP_LEFT_KEY, Integer.toString(xy[0]));
+            compProps.add(COMP_TOP_KEY, Integer.toString(xy[1]));
+
+            return xy;
+        }
     }
 
     private WBExecutableComponentInstanceDescription createComponentInstance(WBExecutableComponentDescription compDesc) {
@@ -812,7 +822,8 @@ public class WorkspaceTab extends Panel {
         connection.addListener(new ConnectionActionListener() {
             public void connectionRemoved(AbstractConnection connection) {
 
-                WBConnectorDescription connectorDesc = _connectorMap.get(_connectionMap.get(connection));
+                String connectorURI = _connectionMap.get(connection);
+                WBConnectorDescription connectorDesc = _connectorMap.get(connectorURI);
                 Log.debug("Removing connection " + connectorDesc.getConnector());
                 boolean success = _wbFlow.getConnectorDescriptions().remove(connectorDesc);
                 if (!success)
