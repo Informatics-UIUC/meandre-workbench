@@ -136,11 +136,36 @@
         </copy>
     </target>
 
-    <target name="run" depends="dist" description="-> runs the Jetty engine">
+    <target name="run" depends="dist" description="-> compiles and runs Meandre-Workbench">
+        <antcall target="run-fast"/>
+    </target>
+    
+    <condition property="can.run-fast">
+        <and>
+            <available file="${dist.dir}/bootstrap" type="dir"/>
+            <available file="${war.dir}" type="dir"/>
+            <available classname="${bootstrap.class}" classpathref="dist.classpath"/>
+        </and>
+    </condition>
+    
+    <target name="run-fast" depends="run-fast.check" if="can.run-fast" description="-> runs and already compiled Meandre-Workbech">
         <java classname="${bootstrap.class}" fork="yes" maxmemory="1024m">
             <classpath refid="dist.classpath"/>
             <arg value="${dist.dir}"/>
         </java>
+    </target>
+    
+    <target name="run-fast.check" unless="can.run-fast">
+        <echo message="Cannot perform run-fast - required files are missing. Performing full build..."/>
+        <antcall target="dist"/>
+        
+        <condition property="can.run-fast">
+            <and>
+                <available file="${dist.dir}/bootstrap" type="dir"/>
+                <available file="${war.dir}" type="dir"/>
+                <available classname="${bootstrap.class}" classpathref="dist.classpath"/>
+            </and>
+        </condition>
     </target>
 
 </project> 
