@@ -582,6 +582,7 @@ public class Workbench extends Application {
                         for (Entry<String, String> entry : result.entrySet())
                             Log.debug("flow: " + entry.getKey() + " webui: " + entry.getValue());
 
+                        Log.debug("Looking for: " + flow.getFlowURI());
                         final String webUIURL = result.get(flow.getFlowURI());
                         if (webUIURL == null)
                             Application.showMessage("Stop Flow", "This flow is not currently running", MessageBox.INFO);

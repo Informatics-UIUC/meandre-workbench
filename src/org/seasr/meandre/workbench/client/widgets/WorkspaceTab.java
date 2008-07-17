@@ -128,9 +128,6 @@ public class WorkspaceTab extends Panel {
 
 
     public WorkspaceTab(final WBFlowDescription flow) {
-        if (_outputPanel.getUrl().length() > 0)
-            Log.warn("Output panel url not empty! " + _outputPanel.getUrl());
-
         _wbFlow = (flow == null) ? createNewFlowDescription() : flow.clone();
         _componentMap = new HashMap<String, Component>();
         _connectionMap = new HashMap<AbstractConnection, String>();
@@ -257,8 +254,10 @@ public class WorkspaceTab extends Panel {
     private void loadFlow(final WBFlowDescription flow) {
         for (WBExecutableComponentInstanceDescription compInstance : flow.getExecutableComponentInstances()) {
             WBExecutableComponentDescription compDesc = compInstance.getExecutableComponentDescription();
-            if (compDesc == null)
-                Log.error("Could not find the component: " + compInstance.getExecutableComponent());
+            if (compDesc == null) {
+                Log.error("Could not find the component: " + compInstance.getExecutableComponent() + " - ignoring");
+                continue;
+            }
 
             Component component = new Component(compInstance);
             addComponentToCanvas(component, false);
@@ -853,9 +852,14 @@ public class WorkspaceTab extends Panel {
         Component dstComponent = _componentMap.get(dstCompInstanceURI);
 
         if (srcComponent == null || dstComponent == null) {
-            Log.error("Could not retrieve the source and/or target components for connector: " +
-                    connector.getConnector());
+            String msg = "";
+            if (srcComponent == null) msg = "source";
+            if (dstComponent == null) msg += " and target";
+            Log.error("Could not retrieve the " + msg + " component(s) for connector: " +
+                    connector.getConnector() + " - ignoring");
             Log.error("Source: " + srcCompInstanceURI + "  Target: " + dstCompInstanceURI);
+
+            return null;
         }
 
         String srcDataPort = connector.getSourceInstanceDataPort();
@@ -865,9 +869,14 @@ public class WorkspaceTab extends Panel {
         ComponentPort dstPort = dstComponent.getInputPort(dstDataPort);
 
         if (srcPort == null || dstPort == null) {
-            Log.error("Could not retrive the source and/or target ports for the connector: " +
-                    connector.getConnector());
+            String msg = "";
+            if (srcPort == null) msg = "source";
+            if (dstPort == null) msg += " and target";
+            Log.error("Could not retrive the " + msg + " port(s) for the connector: " +
+                    connector.getConnector() + " - ignoring");
             Log.error("Source: " + srcDataPort + "  Target: " + dstDataPort);
+
+            return null;
         }
 
         AbstractConnection connection = createConnection(srcPort, dstPort);
