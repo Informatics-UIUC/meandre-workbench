@@ -854,7 +854,7 @@ public class WorkspaceTab extends Panel {
         if (srcComponent == null || dstComponent == null) {
             String msg = "";
             if (srcComponent == null) msg = "source";
-            if (dstComponent == null) msg += " and target";
+            if (dstComponent == null) msg += (msg.length() > 0) ? " and target" : "target";
             Log.error("Could not retrieve the " + msg + " component(s) for connector: " +
                     connector.getConnector() + " - ignoring");
             Log.error("Source: " + srcCompInstanceURI + "  Target: " + dstCompInstanceURI);
@@ -871,7 +871,7 @@ public class WorkspaceTab extends Panel {
         if (srcPort == null || dstPort == null) {
             String msg = "";
             if (srcPort == null) msg = "source";
-            if (dstPort == null) msg += " and target";
+            if (dstPort == null) msg += (msg.length() > 0) ? " and target" : "target";
             Log.error("Could not retrive the " + msg + " port(s) for the connector: " +
                     connector.getConnector() + " - ignoring");
             Log.error("Source: " + srcDataPort + "  Target: " + dstDataPort);
@@ -932,12 +932,21 @@ public class WorkspaceTab extends Panel {
     }
 
     private static int _webUICounter = 0;
-    public void openWebUI(WBWebUIInfo webUIInfo) {
+    private WBWebUIInfo _webUIInfo = null;
+    public void openWebUI() {
 //        WebUI webUI = new WebUI(_wbFlow.getName(), webUIInfo);
 //        webUI.show();
         String windowName = _wbFlow.getName().toLowerCase().replaceAll(" |\t", "_") + _webUICounter++;
-        Window.open(webUIInfo.getWebUIUrl(), windowName,
+        Window.open(_webUIInfo.getWebUIUrl(), windowName,
                 "resizable=yes,scrollbars=yes,status=yes,location=yes,chrome=yes,width=800,height=600,centerscreen=yes");
+    }
+
+    public WBWebUIInfo getWebUIInfo() {
+        return _webUIInfo;
+    }
+
+    public void setWebUIInfo(WBWebUIInfo webUI) {
+        _webUIInfo = webUI;
     }
 
     public void setFlowDescription(WBFlowDescription uploadedFlow) {

@@ -43,8 +43,6 @@
 package org.seasr.meandre.workbench.client;
 
 import java.util.Date;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentDescription;
@@ -563,7 +561,8 @@ public class Workbench extends Application {
                                     Log.info("Found WebUI: " + webUIInfo.getWebUIUrl() + " (" +
                                             webUIInfo.getURI() + ") token: " + webUIInfo.getToken());
 
-                                    flowTab.openWebUI(webUIInfo);
+                                    flowTab.setWebUIInfo(webUIInfo);
+                                    flowTab.openWebUI();
                                 }
                             });
                         }
@@ -575,20 +574,23 @@ public class Workbench extends Application {
 
             @Override
             public void onFlowStop(final WBFlowDescription flow) {
-                Repository.retrieveRunningFlows(new WBCallback<Map<String,String>>() {
-                    @Override
-                    public void onSuccess(Map<String, String> result) {
-                        Log.debug("Got result: size=" + result.size());
-                        for (Entry<String, String> entry : result.entrySet())
-                            Log.debug("flow: " + entry.getKey() + " webui: " + entry.getValue());
+                WBWebUIInfo webUI = workspaceTab.getWebUIInfo();
+                if (webUI == null) {
+                    Application.showMessage("Stop Flow", "This flow is not currently running", MessageBox.INFO);
+                    return;
+                }
 
-                        Log.debug("Looking for: " + flow.getFlowURI());
-                        final String webUIURL = result.get(flow.getFlowURI());
-                        if (webUIURL == null)
-                            Application.showMessage("Stop Flow", "This flow is not currently running", MessageBox.INFO);
-                        else {
-                            Log.info("Found running flow at " + webUIURL);
-                        }
+                Repository.abortFlow(webUI.getPort(), new WBCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean success) {
+                        workspaceTab.setWebUIInfo(null);
+                        Application.showMessage("Abort Flow", "Request successfully dispatched", MessageBox.INFO);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        super.onFailure(caught);
+                        workspaceTab.setWebUIInfo(null);
                     }
                 });
             }
