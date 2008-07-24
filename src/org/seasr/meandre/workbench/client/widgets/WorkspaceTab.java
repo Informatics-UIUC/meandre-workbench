@@ -258,8 +258,8 @@ public class WorkspaceTab extends Panel {
         String selectedComponent = null;
         if (_selectedComponent != null) {
             selectedComponent = _selectedComponent.getInstanceDescription().getExecutableComponentInstance();
-            if (selectedComponent.startsWith(WBFlowDescription.BASE_URL))
-                selectedComponent = _wbFlow.getDesiredURI() + selectedComponent.substring(_wbFlow.getFlowURI().length());
+            if (!_wbFlow.getDesiredURI().equals(flow.getDesiredURI()))
+                selectedComponent = flow.getDesiredURI() + selectedComponent.substring(_wbFlow.getFlowURI().length());
         }
 
         String selectedPortComponent = null;
@@ -267,8 +267,8 @@ public class WorkspaceTab extends Panel {
         if (_selectedPort != null) {
             selectedPort = _selectedPort.getIdentifier();
             selectedPortComponent = _selectedPort.getComponent().getInstanceDescription().getExecutableComponentInstance();
-            if (selectedPortComponent.startsWith(WBFlowDescription.BASE_URL))
-                selectedPortComponent = _wbFlow.getDesiredURI() + selectedPortComponent.substring(_wbFlow.getFlowURI().length());
+            if (!_wbFlow.getDesiredURI().equals(flow.getDesiredURI()))
+                selectedPortComponent = flow.getDesiredURI() + selectedPortComponent.substring(_wbFlow.getFlowURI().length());
         }
 
         Log.debug("=== BEFORE REFRESH ===");
@@ -324,10 +324,16 @@ public class WorkspaceTab extends Panel {
     }
 
     public void loadFlow(final WBFlowDescription flow) {
-        for (WBExecutableComponentInstanceDescription compInstance : flow.getExecutableComponentInstances()) {
+        int nInstances = flow.getExecutableComponentInstances().size();
+        WBExecutableComponentInstanceDescription[] instances = new WBExecutableComponentInstanceDescription[nInstances];
+        instances = flow.getExecutableComponentInstances().toArray(instances);
+        for (int i = 0; i < nInstances; i++) {
+            WBExecutableComponentInstanceDescription compInstance = instances[i];
             WBExecutableComponentDescription compDesc = compInstance.getExecutableComponentDescription();
             if (compDesc == null) {
-                Log.error("Could not find the component: " + compInstance.getExecutableComponent() + " - ignoring");
+                Log.error("Could not find the component: " + compInstance.getExecutableComponent() + " - removing from flow");
+                flow.removeExecutableComponentInstance(compInstance);
+                setDirty();
                 continue;
             }
 
@@ -335,8 +341,16 @@ public class WorkspaceTab extends Panel {
             addComponentToCanvas(component, false);
         }
 
-        for (WBConnectorDescription connector : flow.getConnectorDescriptions())
-            createConnection(connector);
+        int nConnectors = flow.getConnectorDescriptions().size();
+        WBConnectorDescription[] connectors = new WBConnectorDescription[nConnectors];
+        connectors = flow.getConnectorDescriptions().toArray(connectors);
+        for (int i = 0; i < nConnectors; i++) {
+            WBConnectorDescription connector = connectors[i];
+            if (createConnection(connector) == null) {
+                flow.getConnectorDescriptions().remove(connector);
+                setDirty();
+            }
+        }
 
         // Perform lazy add of connections since they don't get rendered otherwise
         DeferredCommand.addCommand(new Command() {
