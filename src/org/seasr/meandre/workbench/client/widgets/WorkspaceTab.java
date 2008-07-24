@@ -44,6 +44,7 @@ package org.seasr.meandre.workbench.client.widgets;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -108,9 +109,9 @@ public class WorkspaceTab extends Panel {
     private static int TAB_COUNTER = 1;
 
     private WBFlowDescription _wbFlow;
-    private final Map<String, Component> _componentMap;
-    private final Map<String, WBConnectorDescription> _connectorMap;
-    private final Map<AbstractConnection, String> _connectionMap;
+    private Map<String, Component> _componentMap;
+    private Map<String, WBConnectorDescription> _connectorMap;
+    private Map<AbstractConnection, String> _connectionMap;
     private final Set<WorkspaceActionListener> _actionListeners = new HashSet<WorkspaceActionListener>();
     private final FlowOutputPanel _outputPanel = new FlowOutputPanel();
     private Component _selectedComponent = null;
@@ -251,7 +252,78 @@ public class WorkspaceTab extends Panel {
         };
     }
 
-    private void loadFlow(final WBFlowDescription flow) {
+    //FIXME: temporary fix -- when removed, add the 'final' keyword back to the Map objects...
+    public void refresh(WBFlowDescription flow) {
+        // save the selected component and selected port values
+        String selectedComponent = null;
+        if (_selectedComponent != null) {
+            selectedComponent = _selectedComponent.getInstanceDescription().getExecutableComponentInstance();
+            if (selectedComponent.startsWith(WBFlowDescription.BASE_URL))
+                selectedComponent = _wbFlow.getDesiredURI() + selectedComponent.substring(_wbFlow.getFlowURI().length());
+        }
+
+        String selectedPortComponent = null;
+        String selectedPort = null;
+        if (_selectedPort != null) {
+            selectedPort = _selectedPort.getIdentifier();
+            selectedPortComponent = _selectedPort.getComponent().getInstanceDescription().getExecutableComponentInstance();
+            if (selectedPortComponent.startsWith(WBFlowDescription.BASE_URL))
+                selectedPortComponent = _wbFlow.getDesiredURI() + selectedPortComponent.substring(_wbFlow.getFlowURI().length());
+        }
+
+        Log.debug("=== BEFORE REFRESH ===");
+        Log.debug("componentMap size=" + _componentMap.size());
+        Log.debug("connectorMap size=" + _connectorMap.size());
+        Log.debug("connectionMap size=" + _connectionMap.size());
+        Log.debug("wbFlow.instances size=" + _wbFlow.getExecutableComponentInstances().size());
+        Log.debug("wbFlow.connectors size=" + _wbFlow.getConnectorDescriptions().size());
+
+        Iterator<Component> iterator = _componentMap.values().iterator();
+        while (iterator.hasNext()) {
+            removeComponent(iterator.next());
+        }
+
+        Log.debug("=== AFTER RESET ===");
+        Log.debug("componentMap size=" + _componentMap.size());
+        Log.debug("connectorMap size=" + _connectorMap.size());
+        Log.debug("connectionMap size=" + _connectionMap.size());
+        Log.debug("wbFlow.instances size=" + _wbFlow.getExecutableComponentInstances().size());
+        Log.debug("wbFlow.connectors size=" + _wbFlow.getConnectorDescriptions().size());
+
+        _componentMap = new HashMap<String, Component>();
+        _connectorMap = new HashMap<String, WBConnectorDescription>();
+        _connectionMap = new HashMap<AbstractConnection, String>();
+
+        _wbFlow = flow;
+        loadFlow(flow);
+
+        Log.debug("=== AFTER REFRESH ===");
+        Log.debug("componentMap size=" + _componentMap.size());
+        Log.debug("connectorMap size=" + _connectorMap.size());
+        Log.debug("connectionMap size=" + _connectionMap.size());
+        Log.debug("wbFlow.instances size=" + _wbFlow.getExecutableComponentInstances().size());
+        Log.debug("wbFlow.connectors size=" + _wbFlow.getConnectorDescriptions().size());
+
+        // Restore the selected component and port
+        if (selectedComponent != null) {
+            Component comp = _componentMap.get(selectedComponent);
+            comp.select();
+            Log.debug("Selected component " + comp.getName());
+        }
+
+        if (selectedPort != null) {
+            Component comp = _componentMap.get(selectedPortComponent);
+            ComponentPort port = comp.getInputPort(selectedPort);
+            if (port == null)
+                port = comp.getOutputPort(selectedPort);
+            port.select();
+            Log.debug("Selected port " + port.getName() + " from component " + comp.getName());
+        }
+
+        doLayout();
+    }
+
+    public void loadFlow(final WBFlowDescription flow) {
         for (WBExecutableComponentInstanceDescription compInstance : flow.getExecutableComponentInstances()) {
             WBExecutableComponentDescription compDesc = compInstance.getExecutableComponentDescription();
             if (compDesc == null) {
@@ -891,11 +963,7 @@ public class WorkspaceTab extends Panel {
             _selectedComponent.unselect();
 
         component.disconnect();
-        component.fadeOut(new Function() {
-            public void execute() {
-                remove(component);
-            }
-        });
+        remove(component);
 
         if (_selectedPort != null && _selectedPort.getComponent() == component)
             _selectedPort = null;
@@ -926,8 +994,10 @@ public class WorkspaceTab extends Panel {
             _selectedComponent.unselect();
     }
 
-    public void refresh() {
-
+    public void checkValid() {
+        // check whether components have been removed
+        // check whether connections make sense
+        // check whether ports have been added/removed - update UI?
     }
 
     private static int _webUICounter = 0;
@@ -937,7 +1007,7 @@ public class WorkspaceTab extends Panel {
 //        webUI.show();
         String windowName = _wbFlow.getName().toLowerCase().replaceAll(" |\t", "_") + _webUICounter++;
         Window.open(_webUIInfo.getWebUIUrl(), windowName,
-                "resizable=yes,scrollbars=yes,status=yes,location=yes,chrome=yes,width=800,height=600,centerscreen=yes");
+                "resizable=yes,scrollbars=yes,status=yes,location=no,chrome=yes,width=800,height=600,centerscreen=yes");
     }
 
     public WBWebUIInfo getWebUIInfo() {

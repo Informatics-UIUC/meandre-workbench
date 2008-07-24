@@ -45,6 +45,7 @@ package org.seasr.meandre.workbench.client;
 import java.util.Date;
 
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
+import org.seasr.meandre.workbench.client.beans.repository.WBConnectorDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentInstanceDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBFlowDescription;
@@ -478,7 +479,10 @@ public class Workbench extends Application {
                 Repository.uploadFlow(flow, true, new WBCallback<WBFlowDescription>() {
                     public void onSuccess(WBFlowDescription uploadedFlow) {
                         _repositoryState.addFlow(uploadedFlow);
-                        workspaceTab.setFlowDescription(uploadedFlow);
+                        WBFlowDescription uploadClone = uploadedFlow.clone();
+                        workspaceTab.refresh(uploadClone);   //FIXME: for now this is fine - a RepositoryState solution
+                                                                      //that provides update events is better
+
 
                         workspaceTab.clearDirty();
                         workspaceTab.setTitle(flow.getName());
@@ -486,7 +490,7 @@ public class Workbench extends Application {
                         MessageBox.hide();
 
                         if (callback != null)
-                            callback.onSuccess(uploadedFlow);
+                            callback.onSuccess(uploadClone);
                     }
 
                     @Override
@@ -517,17 +521,25 @@ public class Workbench extends Application {
                 Log.info("Running flow " + runFlowURL);
                 flowTab.getFlowOutputPanel().setUrl(runFlowURL);
 
-                boolean hasWebUI = false;
+                boolean showWebUI = false;
 
                 for (WBExecutableComponentInstanceDescription compInstance : flow.getExecutableComponentInstances()) {
                     WBExecutableComponentDescription compDesc = compInstance.getExecutableComponentDescription();
                     if (compDesc.getMode().equals(WBExecutableComponentDescription.WEBUI_COMPONENT)) {
-                        hasWebUI = true;
-                        break;
+                        boolean isConnected = false;
+                        for (WBConnectorDescription connector : flow.getConnectorDescriptions())
+                            if (connector.getTargetInstance().equals(compInstance.getExecutableComponentInstance())) {
+                                isConnected = true;
+                                break;
+                            }
+                        if (compDesc.getInputs().isEmpty() || isConnected) {
+                            showWebUI = true;
+                            break;
+                        }
                     }
                 }
 
-                if (hasWebUI) {
+                if (showWebUI) {
                     Log.debug("Flow should have a WebUI - looking for one (timeout: " + WEBUI_TIMEOUT/1000 + " seconds)...");
 
                     Timer timer = new Timer() {
@@ -607,6 +619,9 @@ public class Workbench extends Application {
         _repositoryState.refresh(new ICommand<Object>() {
             public void execute(Object args) {
                 repositoryPanel.clearMask();
+
+                for (WorkspaceTab tab : _mainPanel.getWorkspacePanel().getTabs())  //FIXME: temporary, remove when the event-driven
+                    tab.checkValid();                                                 //RepositoryState is implemented
 
                 if (cmd != null)
                     cmd.execute(null);
