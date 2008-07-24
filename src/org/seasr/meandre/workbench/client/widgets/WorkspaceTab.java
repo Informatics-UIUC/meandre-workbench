@@ -927,8 +927,7 @@ public class WorkspaceTab extends Panel {
     }
 
     public void refresh() {
-       for (Component component : _componentMap.values())
-           component.updateConnections();
+
     }
 
     private static int _webUICounter = 0;
