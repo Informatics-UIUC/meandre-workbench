@@ -258,8 +258,11 @@ public class WorkspaceTab extends Panel {
         String selectedComponent = null;
         if (_selectedComponent != null) {
             selectedComponent = _selectedComponent.getInstanceDescription().getExecutableComponentInstance();
-            if (!_wbFlow.getDesiredURI().equals(flow.getDesiredURI()))
+            Log.debug("wbFlow URI=" + _wbFlow.getFlowURI());
+            Log.debug("flow desiredURI=" + flow.getDesiredURI());
+            if (!_wbFlow.getFlowURI().equals(flow.getDesiredURI()))
                 selectedComponent = flow.getDesiredURI() + selectedComponent.substring(_wbFlow.getFlowURI().length());
+            Log.debug("selectedComponent=" + selectedComponent);
         }
 
         String selectedPortComponent = null;
@@ -267,7 +270,7 @@ public class WorkspaceTab extends Panel {
         if (_selectedPort != null) {
             selectedPort = _selectedPort.getIdentifier();
             selectedPortComponent = _selectedPort.getComponent().getInstanceDescription().getExecutableComponentInstance();
-            if (!_wbFlow.getDesiredURI().equals(flow.getDesiredURI()))
+            if (!_wbFlow.getFlowURI().equals(flow.getDesiredURI()))
                 selectedPortComponent = flow.getDesiredURI() + selectedPortComponent.substring(_wbFlow.getFlowURI().length());
         }
 
