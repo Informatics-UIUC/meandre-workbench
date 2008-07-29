@@ -130,16 +130,14 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                         hostName = remoteAddr.getCanonicalHostName();
                 }
 
-                MeandreAdminClient adminClient = new MeandreAdminClient(hostName, port);
-                adminClient.setCredentials(userName, password);
-                User user = adminClient.getUser(userName);
-                if (!adminClient.hasRoleGranted(user, Role.WORKBENCH))
-                    throw new LoginFailedException("Insufficient permissions");
-
                 MeandreClient client = new MeandreClient(hostName, port);
                 client.setCredentials(userName, password);
 
-                Set<Role> userRoles = adminClient.getRolesOfUser(user);
+				if(!client.hasRoleGranted(Role.WORKBENCH))
+                    throw new LoginFailedException("Insufficient permissions");
+
+				Set<Role> userRoles = client.retrieveRoles();
+
                 WBSession wbSession =
                     new WBSession(session.getId(), userName, password, getRolesAsString(userRoles), hostName, port);
 
@@ -151,9 +149,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
             catch (LoginFailedException e) {
                 throw e;
             }
-            catch (SecurityStoreException e) {
-                throw new LoginFailedException(e);
-            }
+
             catch (Exception e) {
                 throw new MeandreCommunicationException(e);
             }
