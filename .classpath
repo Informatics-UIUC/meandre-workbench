@@ -38,11 +38,6 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/gwtext-2.0.4.jar" sourcepath="lib/gwtext-2.0.4.jar">
-		<attributes>
-			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/jena-2.5.5.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="http://jena.sourceforge.net/javadoc/"/>
@@ -100,5 +95,6 @@
 	<classpathentry kind="lib" path="lib/bootstrap/jsp-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/jsp-api-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/servlet-api-2.5-6.1.5.jar"/>
+	<classpathentry kind="lib" path="lib/gwtext-2.0.5.jar" sourcepath="lib/gwtext-2.0.5.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
