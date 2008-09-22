@@ -80,6 +80,12 @@ public abstract class Application implements EntryPoint {
         });
     }
 
+    /**
+     * Returns a pretty-print version of an exception
+     *
+     * @param throwable The exception
+     * @return A formatted string containing the exception and its stack trace
+     */
     public static String formatException(Throwable throwable) {
         String text = "";
 
@@ -98,6 +104,7 @@ public abstract class Application implements EntryPoint {
 
     /**
      * The functional entry point of the application
+     * (to be overriden by main application)
      */
     protected abstract void onLoad();
 
@@ -113,6 +120,14 @@ public abstract class Application implements EntryPoint {
         showError(title, message, throwable, null);
     }
 
+    /**
+     * Helper method that shows an error window describing an exception
+     *
+     * @param title The window title
+     * @param message The message to be displayed
+     * @param throwable The exception that caused the error
+     * @param callback A callback that indicates when the window was dismissed
+     */
     public static void showError(final String title, final String message, final Throwable throwable, final MessageBox.PromptCallback callback) {
         MessageBox.hide(); // just in case any other MessageBox is showing
         MessageBox.show(new MessageBoxConfig() {
@@ -146,6 +161,15 @@ public abstract class Application implements EntryPoint {
         showMessage(title, message, iconCls, buttons, null);
     }
 
+    /**
+     * Helper method that displays a message in a window, and optionally prompts for an action
+     *
+     * @param title The title of the window
+     * @param message The message to be displayed
+     * @param iconCls An optional icon class
+     * @param buttons Optional buttons to be displayed
+     * @param callback A callback that indicates when the window was dismissed
+     */
     public static void showMessage(final String title, final String message,
             final String iconCls, final MessageBox.Button buttons, final PromptCallback callback) {
 
