@@ -48,6 +48,7 @@ import java.io.FileWriter;
 import java.io.StringReader;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
@@ -94,9 +95,9 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     private static final long serialVersionUID = -1606693690185487714L;
     private static final int SESSION_TIMEOUT = 24 * 60 * 60;  // 24 hours
 
-    private static final IBeanConverter<URL, String> UrlStringConverter =
-        new IBeanConverter<URL, String>() {
-            public String convert(URL url) {
+    private static final IBeanConverter<URI, String> UriStringConverter =
+        new IBeanConverter<URI, String>() {
+            public String convert(URI url) {
                 return url.toString();
             }
         };
@@ -133,13 +134,13 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                 MeandreClient client = new MeandreClient(hostName, port);
                 client.setCredentials(userName, password);
 
-				if(!client.hasRoleGranted(Role.WORKBENCH))
+                Set<String> userRoles = client.retrieveUserRoles();
+
+                if(!userRoles.contains(Role.WORKBENCH.getUrl()))
                     throw new LoginFailedException("Insufficient permissions");
 
-				Set<Role> userRoles = client.retrieveRoles();
-
                 WBSession wbSession =
-                    new WBSession(session.getId(), userName, password, getRolesAsString(userRoles), hostName, port);
+                    new WBSession(session.getId(), userName, password, userRoles, hostName, port);
 
                 session.setAttribute("client", client);
                 session.setAttribute("session", wbSession);
@@ -236,8 +237,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            Set<URL> componentUrls = getClient().retrieveComponentUrls();
-            return MeandreConverter.convert(componentUrls, UrlStringConverter);
+            Set<URI> componentUrls = getClient().retrieveComponentUris();
+            return MeandreConverter.convert(componentUrls, UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -274,7 +275,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            return MeandreConverter.convert(getClient().retrieveFlowUrls(), UrlStringConverter);
+            return MeandreConverter.convert(getClient().retrieveFlowUris(), UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -344,8 +345,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            Set<URL> componentUrls = getClient().retrieveComponentsByTag(tag);
-            return MeandreConverter.convert(componentUrls, UrlStringConverter);
+            Set<URI> componentUrls = getClient().retrieveComponentsByTag(tag);
+            return MeandreConverter.convert(componentUrls, UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -356,8 +357,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            Set<URL> flowUrls = getClient().retrieveFlowsByTag(tag);
-            return MeandreConverter.convert(flowUrls, UrlStringConverter);
+            Set<URI> flowUrls = getClient().retrieveFlowsByTag(tag);
+            return MeandreConverter.convert(flowUrls, UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -368,8 +369,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            Set<URL> componentUrls = getClient().retrieveComponentUrlsByQuery(query);
-            return MeandreConverter.convert(componentUrls, UrlStringConverter);
+            Set<URI> componentUrls = getClient().retrieveComponentUrlsByQuery(query);
+            return MeandreConverter.convert(componentUrls, UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -380,8 +381,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            Set<URL> flowUrls = getClient().retrieveFlowUrlsByQuery(query);
-            return MeandreConverter.convert(flowUrls, UrlStringConverter);
+            Set<URI> flowUrls = getClient().retrieveFlowUrlsByQuery(query);
+            return MeandreConverter.convert(flowUrls, UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -518,8 +519,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            Map<URL, URL> runningFlowsMap = getClient().retrieveRunningFlows();
-            return MeandreConverter.convert(runningFlowsMap, UrlStringConverter, UrlStringConverter);
+            Map<URI, URI> runningFlowsMap = getClient().retrieveRunningFlows();
+            return MeandreConverter.convert(runningFlowsMap, UriStringConverter, UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -652,14 +653,5 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
 
         return repository;
-    }
-
-    private Set<String> getRolesAsString(Set<Role> userRoles) {
-        Set<String> roles = new HashSet<String>(userRoles.size());
-
-        for (Role role : userRoles)
-            roles.add(role.getShortName());
-
-        return roles;
     }
 }
