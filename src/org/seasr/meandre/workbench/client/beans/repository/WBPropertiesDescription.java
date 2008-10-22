@@ -121,6 +121,9 @@ public class WBPropertiesDescription implements IsSerializable, Cloneable {
         htValues.remove(sKey);
     }
 
+    /**
+     * Returns a deep copy of this object
+     */
     public WBPropertiesDescription clone() {
         return new WBPropertiesDescription(new HashMap<String, String>(this.htValues));
     }

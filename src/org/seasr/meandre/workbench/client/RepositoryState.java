@@ -68,14 +68,20 @@ import com.gwtext.client.data.Store;
 import com.gwtext.client.data.StringFieldDef;
 
 /**
+ * A singleton class that maintains the state of the repository.
+ * It stores the list of components, list of flows, and list of locations with their specific metadata.
+ * 
  * @author Boris Capitanu
  *
  */
 public class RepositoryState {
 
+    // reference to the RPC interface providing repository access on Meandre server
     public static final IRepositoryAsync Repository = IRepository.Util.getInstance();
+
     private static RepositoryState _instance = null;
 
+    // State stores
     private final Store _componentsStore = new GroupingStore();
     private final Store _flowsStore = new GroupingStore();
     private Store _locationsStore;
@@ -84,6 +90,11 @@ public class RepositoryState {
     private ArrayReader _flowsReader;
     private ArrayReader _locationsReader;
 
+    /**
+     * Provides access to the singleton instance of RepositoryState
+     *
+     * @return The singleton RepositoryState instance
+     */
     public static RepositoryState getInstance() {
         if (_instance == null)
             _instance = new RepositoryState();
@@ -91,15 +102,22 @@ public class RepositoryState {
         return _instance;
     }
 
+    /**
+     * Private constructor - initializes the state stores
+     */
     private RepositoryState() {
         initComponentsStore();
         initFlowsStore();
         initLocationsStore();
     }
 
+    /**
+     * Initializes the Components store - creates the field definitions for the metadata
+     * associated with components that the workbench might need to access later.
+     */
     private void initComponentsStore() {
         RecordDef recordDef = new RecordDef(new FieldDef[] {
-                new ObjectFieldDef("wbComponent"),
+                new ObjectFieldDef("wbComponent"),      // the WBExecutableComponentDescription object for the component
                 new StringFieldDef("componentURI"),
                 new StringFieldDef("name"),
                 new StringFieldDef("description"),
@@ -118,15 +136,19 @@ public class RepositoryState {
             });
 
         _compsReader = new ArrayReader(recordDef);
-        _compsReader.setId(1);
+        _compsReader.setId(1);  // use "componentURI" as the ID
 
         _componentsStore.setReader(_compsReader);
         _componentsStore.setSortInfo(new SortState("name", SortDir.ASC));
     }
 
+    /**
+     * Initializes the Flows store - creates the field definitions for the metadata
+     * associated with flows that the workbench might need to access later.
+     */
     private void initFlowsStore() {
         RecordDef recordDef = new RecordDef(new FieldDef[] {
-                new ObjectFieldDef("wbFlow"),
+                new ObjectFieldDef("wbFlow"),       // the WBFlowDescription object for the flow
                 new StringFieldDef("flowURI"),
                 new StringFieldDef("name"),
                 new StringFieldDef("description"),
@@ -139,30 +161,44 @@ public class RepositoryState {
             });
 
         _flowsReader = new ArrayReader(recordDef);
-        _flowsReader.setId(1);
+        _flowsReader.setId(1);  // use "flowURI" as the ID
 
         _flowsStore.setReader(_flowsReader);
         _flowsStore.setSortInfo(new SortState("name", SortDir.ASC));
     }
 
+    /**
+     * Initializes the Locations store - creates the field definitions for the metadata
+     * associated with locations that the workbench might need to access later.
+     */
     private void initLocationsStore() {
         RecordDef recordDef = new RecordDef(new FieldDef[] {
-                new ObjectFieldDef("wbLocation"),
+                new ObjectFieldDef("wbLocation"),       // the WBLocation object for the location
                 new StringFieldDef("description"),
                 new StringFieldDef("url")
         });
 
         _locationsReader = new ArrayReader(recordDef);
-        _locationsReader.setId(2);
+        _locationsReader.setId(2);  // use "url" as the ID
 
         _locationsStore = new Store(_locationsReader);
         _locationsStore.setSortInfo(new SortState("description", SortDir.ASC));
     }
 
+    /**
+     * Retrieves the components store
+     *
+     * @return The components store
+     */
     public Store getComponentsStore() {
         return _componentsStore;
     }
 
+    /**
+     * Retrieves all components in the store
+     *
+     * @return The set of all components
+     */
     public Set<WBExecutableComponentDescription> getComponents() {
         Set<WBExecutableComponentDescription> components =
             new HashSet<WBExecutableComponentDescription>(_componentsStore.getCount());
@@ -173,18 +209,40 @@ public class RepositoryState {
         return components;
     }
 
+    /**
+     * Retrieves a component by its URI
+     *
+     * @param compURI The URI of the component sought
+     * @return The component sought, or null if none found
+     */
     public WBExecutableComponentDescription getComponent(String compURI) {
         return getComponent(_componentsStore.getById(compURI));
     }
 
+    /**
+     * Retrieves a component from its store record
+     *
+     * @param record The record associated with the component
+     * @return The component, or null if record was null
+     */
     private WBExecutableComponentDescription getComponent(Record record) {
         return (record != null) ? (WBExecutableComponentDescription) record.getAsObject("wbComponent") : null;
     }
 
+    /**
+     * Retrieves the flows store
+     *
+     * @return The flows store
+     */
     public Store getFlowsStore() {
         return _flowsStore;
     }
 
+    /**
+     * Retrieves all flows in the store
+     *
+     * @return The set of all flows
+     */
     public Set<WBFlowDescription> getFlows() {
         Set<WBFlowDescription> flows =
             new HashSet<WBFlowDescription>(_flowsStore.getCount());
@@ -195,27 +253,49 @@ public class RepositoryState {
         return flows;
     }
 
+    /**
+     * Retrieves a flow by its URI
+     *
+     * @param flowURI The URI of the flow sought
+     * @return The flow sought, or null if none found
+     */
     public WBFlowDescription getFlow(String flowURI) {
         return getFlow(_flowsStore.getById(flowURI));
     }
 
+    /**
+     * Retrieves a flow from its store record
+     *
+     * @param record The record associated with the flow
+     * @return The flow, or null if record was null
+     */
     private WBFlowDescription getFlow(Record record) {
         return (record != null) ? (WBFlowDescription) record.getAsObject("wbFlow") : null;
     }
 
+    /**
+     * Adds a flow to the store
+     *
+     * @param flow The flow to be added
+     */
     public void addFlow(WBFlowDescription flow) {
+        // check if the flow already exists
         Record storedFlow = _flowsStore.getById(flow.getFlowURI());
 
         if (storedFlow != null) {
+            // ...and if it does, remove it so it can be replaced
+            Log.warn("Flow " + flow.getFlowURI() + " already exists in store - replacing...");
             _flowsStore.remove(storedFlow);
             _flowsStore.commitChanges();
         }
         else
             Log.info("Adding flow " + flow.getFlowURI());
 
+        // make sure each instance also "knows" about the component it came from
         for (WBExecutableComponentInstanceDescription instance : flow.getExecutableComponentInstances())
             instance.setExecutableComponentDescription(getComponent(instance.getExecutableComponent()));
 
+        // add the flow to the store
         _flowsStore.addSorted(_flowsReader.getRecordDef().createRecord(flow.getFlowURI(), new Object[] {
             flow,
             flow.getFlowURI(),
@@ -230,10 +310,20 @@ public class RepositoryState {
         }));
     }
 
+    /**
+     * Retrieves the locations store
+     *
+     * @return The locations store
+     */
     public Store getLocationsStore() {
         return _locationsStore;
     }
 
+    /**
+     * Retrieves all locations in the store
+     *
+     * @return The set of all locations
+     */
     public Set<WBLocation> getLocations() {
         Set<WBLocation> locations = new HashSet<WBLocation>(_locationsStore.getCount());
         for (Record record : _locationsStore.getRecords())
@@ -242,15 +332,33 @@ public class RepositoryState {
         return locations;
     }
 
+    /**
+     * Retrieves a location by its url
+     *
+     * @param url The url for the location sought
+     * @return The location sought
+     */
     public WBLocation getLocation(String url) {
         return getLocation(_locationsStore.getById(url));
     }
 
+    /**
+     * Retrieves a location from its store record
+     *
+     * @param record The record associated with the location
+     * @return The location, or null if the record was null
+     */
     private WBLocation getLocation(Record record) {
         return (record != null) ? (WBLocation) record.getAsObject("wbLocation") : null;
     }
 
+    /**
+     * Adds a location to the store
+     *
+     * @param location The location to be added
+     */
     public void addLocation(WBLocation location) {
+        // check whether the location already exists
         Record storeLocation = _locationsStore.getById(location.getLocation());
         if (storeLocation == null) {
             Log.info("Adding location " + location.getLocation());
@@ -267,25 +375,36 @@ public class RepositoryState {
                     " param: " + location.getLocation());
     }
 
+    /**
+     * Performs a refresh of the repository
+     * This effectively loads all the components, flows, and locations from the server into the stores anew.
+     *
+     * @param cmd The command to be executed afterwards, or null if none
+     */
     public void refresh(final ICommand<?> cmd) {
         Repository.clearCache(new WBCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {
+                Log.debug("[1/4] Cache cleared");
+
                 Repository.retrieveComponentDescriptors(new WBCallback<Set<WBExecutableComponentDescription>>() {
                     @Override
                     public void onSuccess(Set<WBExecutableComponentDescription> components) {
+                        Log.debug("[2/4] Component descriptors retrieved");
 
                         loadComponentsStore(components);
 
                         Repository.retrieveFlowDescriptors(new WBCallback<Set<WBFlowDescription>>() {
                             @Override
                             public void onSuccess(Set<WBFlowDescription> flows) {
+                                Log.debug("[3/4] Flow descriptors retrieved");
 
                                 loadFlowsStore(flows);
 
                                 Repository.retrieveLocations(new WBCallback<Set<WBLocation>>() {
                                     @Override
                                     public void onSuccess(Set<WBLocation> locations) {
+                                        Log.debug("[4/4] Locations retrieved");
 
                                         loadLocationsStore(locations);
 
@@ -301,6 +420,11 @@ public class RepositoryState {
         });
     }
 
+    /**
+     * Populates the components store
+     *
+     * @param components The set of components to load into the store
+     */
     private void loadComponentsStore(Set<WBExecutableComponentDescription> components) {
         Object[][] data = new Object[components.size()][];
         int i = 0;
@@ -330,6 +454,11 @@ public class RepositoryState {
         _componentsStore.load();
     }
 
+    /**
+     * Populates the flows store
+     *
+     * @param flows The set of flows to load into the store
+     */
     private void loadFlowsStore(Set<WBFlowDescription> flows) {
         Object[][] data = new Object[flows.size()][];
         int i = 0;
@@ -348,6 +477,7 @@ public class RepositoryState {
                     flow.getTags()
             };
 
+            // make sure each component instance "knows" about which components it came from
             for (WBExecutableComponentInstanceDescription instance : flow.getExecutableComponentInstances())
                 instance.setExecutableComponentDescription(getComponent(instance.getExecutableComponent()));
         }
@@ -356,6 +486,11 @@ public class RepositoryState {
         _flowsStore.load();
     }
 
+    /**
+     * Populates the locations store
+     *
+     * @param locations The set of locations to load into the store
+     */
     private void loadLocationsStore(Set<WBLocation> locations) {
         Object[][] data = new Object[locations.size()][];
         int i = 0;

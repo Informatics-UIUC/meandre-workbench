@@ -47,6 +47,12 @@ import java.util.Set;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
+/**
+ * Maintains the user session metadata
+ *
+ * @author capitanu
+ *
+ */
 public class WBSession implements IsSerializable {
 
     private String _sid;
@@ -57,8 +63,21 @@ public class WBSession implements IsSerializable {
     private String _hostName;
     private int _port;
 
+    /**
+     * Empty constructor - not used - needed by GWT
+     */
     public WBSession() {}
 
+    /**
+     * Constructor
+     *
+     * @param sid The session id
+     * @param userName The user name
+     * @param password The user password
+     * @param userRoles The user roles
+     * @param hostName The host name
+     * @param port The port number
+     */
     public WBSession(String sid, String userName, String password, Set<String> userRoles, String hostName, int port) {
         _sid = sid;
         _userName = userName;
@@ -69,30 +88,66 @@ public class WBSession implements IsSerializable {
         _date = new Date();
     }
 
+    /**
+     * Returns the session id
+     *
+     * @return The session id
+     */
     public String getSid() {
         return _sid;
     }
 
+    /**
+     * Returns the user name
+     *
+     * @return The user name
+     */
     public String getUserName() {
         return _userName;
     }
 
+    /**
+     * Returns the user password
+     * Note: This is only temporary and it's used for flow execution - it will be removed once the job API is implemented
+     *
+     * @return The user password
+     */
     public String getPassword() {
         return _password;
     }
 
+    /**
+     * Returns the user roles
+     *
+     * @return The user roles
+     */
     public Set<String> getUserRoles() {
         return _userRoles;
     }
 
+    /**
+     * Returns the session date
+     *
+     * @return The session date
+     */
     public Date getDate() {
         return _date;
     }
 
+    /**
+     * Returns the session host name
+     *
+     * @return The session host name
+     */
     public String getHostName() {
         return _hostName;
     }
 
+    /**
+     * Returns the session port number
+     *
+     * @return The session port number
+     */
     public int getPort() {
         return _port;
     }

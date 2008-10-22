@@ -198,6 +198,9 @@ public class WBConnectorDescription implements IsSerializable, Cloneable {
         return bRes;
     }
 
+    /**
+     * Returns a deep copy of this object
+     */
     public WBConnectorDescription clone() {
         return
             new WBConnectorDescription(

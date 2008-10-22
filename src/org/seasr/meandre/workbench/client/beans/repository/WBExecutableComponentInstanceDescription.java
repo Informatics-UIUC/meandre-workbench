@@ -194,6 +194,9 @@ public class WBExecutableComponentInstanceDescription implements IsSerializable,
         return pdProperties;
     }
 
+    /**
+     * Returns a deep copy of this object
+     */
     public WBExecutableComponentInstanceDescription clone() {
         WBExecutableComponentInstanceDescription instanceClone = new WBExecutableComponentInstanceDescription(
                 this.sResExecutableComponentInstaceURI,

@@ -329,6 +329,9 @@ public class WBFlowDescription implements IsSerializable, Cloneable {
         return sName+" ("+sResFlowURI+")";
     }
 
+    /**
+     * Returns a deep copy of this object
+     */
     public WBFlowDescription clone() {
         Set<WBExecutableComponentInstanceDescription> execCompInstances =
             new HashSet<WBExecutableComponentInstanceDescription>();

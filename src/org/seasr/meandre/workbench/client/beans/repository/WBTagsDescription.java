@@ -90,6 +90,9 @@ public class WBTagsDescription implements IsSerializable, Cloneable {
         return (result.startsWith(", ")) ? result.substring(2).trim() : "";
     }
 
+    /**
+     * Returns a deep copy of this object
+     */
     public WBTagsDescription clone() {
         return
             new WBTagsDescription(new HashSet<String>(this.setTags));
