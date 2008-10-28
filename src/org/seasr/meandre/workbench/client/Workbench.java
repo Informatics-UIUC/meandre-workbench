@@ -98,6 +98,7 @@ import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 
 /**
+ * Main controller class for the Workbench
  *
  * @author Boris Capitanu
  *
@@ -119,14 +120,19 @@ public class Workbench extends Application {
 
     private static boolean _loggingOut = false;
 
+    /**
+     * Called at application startup (from Application.java)
+     */
     @Override
     protected void onLoad() {
         _workbench = this;
 
+        // hook the close window event to check whether there are unsaved flows
         Window.addWindowCloseListener(new WindowCloseListener() {
             public String onWindowClosing() {
                 String closingMsg = null;
 
+                // _loggingOut is set when user clicks the "logout" button - an intentional action
                 if (_mainPanel != null && !_loggingOut) {
                     WorkspacePanel workspacePanel = _mainPanel.getWorkspacePanel();
                     boolean dirty = false;
@@ -146,12 +152,14 @@ public class Workbench extends Application {
             }
         });
 
+        // retrieve the user session, if already exists
         Repository.getSession(new WBCallback<WBSession>() {
             @Override
             public void onSuccess(WBSession session) {
                 Log.info("Session " + session.getSid() + " from date " + session.getDate() +
                         " for user " + session.getUserName() + " has been found");
 
+                // session found, continue loading the app
                 onLoginSuccess(session);
             }
 
@@ -162,18 +170,30 @@ public class Workbench extends Application {
         });
     }
 
+    /**
+     * Force the Workbench to jump to the login screen
+     */
     public static void showLogin() {
         _workbench.doLogin();
     }
 
+    /**
+     * Removes all visual elements
+     */
     public static void clear() {
         _workbench.doClear();
     }
 
+    /**
+     * Removes all visual elements from the main panel
+     */
     private void doClear() {
         _mainPanel.getEl().remove();
     }
 
+    /**
+     * Presents the login dialog and invokes the authentication routine when the login button is pressed
+     */
     private void doLogin() {
         LoginListener loginListener = new LoginListener() {
             public void onLogin(String userName, String password, String hostName, int port) {
@@ -185,14 +205,25 @@ public class Workbench extends Application {
         RootPanel.get().add(_loginDialog);
     }
 
+    /**
+     * Constructs the user interface after the user session has been validated
+     *
+     * @param session The user session
+     */
     protected void onLoginSuccess(WBSession session) {
         _session = session;
+
+        // constructs the base url used for invoking the execute flow service on the meandre server
         _meandreBaseURL = "http://" + _session.getUserName() + ":" + _session.getPassword() +
             "@" + _session.getHostName() + ":" + _session.getPort();
 
+        // remove all visual elements
         RootPanel.get().clear();
 
+        // construct the main panel
         _mainPanel = new MainPanel(session);
+
+        // set up the repository panel
         final RepositoryPanel repositoryPanel = _mainPanel.getRepositoryPanel();
         repositoryPanel.getComponentsPanel().setStore(_repositoryState.getComponentsStore());
         repositoryPanel.getFlowsPanel().setStore(_repositoryState.getFlowsStore());
@@ -203,11 +234,20 @@ public class Workbench extends Application {
             }
         });
 
+        // set up the workspace panel
         final WorkspacePanel workspacePanel = _mainPanel.getWorkspacePanel();
         workspacePanel.setActionListener(new WorkspacePanelActionListenerAdapter() {
+            /**
+             * Constructs the context menu for tabs
+             *
+             * @param wsPanel The panel to which the tab belongs
+             * @param wsTab The tab where the context menu was invoked
+             * @return The context menu
+             */
             public Menu getTabContextMenu(final WorkspacePanel wsPanel, final WorkspaceTab wsTab) {
                 wsPanel.setActiveTab(wsTab);
 
+                // create the "New Tab" menu option
                 final Item btnNewTab = new Item("New Tab");
                 btnNewTab.setIconCls("icon-tab-new");
                 btnNewTab.addListener(new BaseItemListenerAdapter() {
@@ -217,6 +257,7 @@ public class Workbench extends Application {
                     }
                 });
 
+                // create the "Close Tab" menu option
                 final Item btnCloseTab = new Item("Close Tab");
                 btnCloseTab.addListener(new BaseItemListenerAdapter() {
                     @Override
@@ -225,6 +266,7 @@ public class Workbench extends Application {
                     }
                 });
 
+                // create the tab context menu
                 Menu tabContextMenu = new Menu();
                 tabContextMenu.addItem(btnNewTab);
                 tabContextMenu.addItem(btnCloseTab);
@@ -232,55 +274,108 @@ public class Workbench extends Application {
                 return tabContextMenu;
             }
 
+            /**
+             * Removes the output panel associated with the closed tab
+             *
+             * @param wsPanel The panel to which the tab belongs
+             * @param wsTab The tab that was closed
+             */
             public void onTabClosed(WorkspacePanel wsPanel, WorkspaceTab wsTab) {
                 Log.info("Tab " + wsTab.getTitle() + " closed");
+
+                // remove the output panel
                 workspacePanel.getOutputPanel().remove(wsTab.getFlowOutputPanel());
 
                 if (wsPanel.getTabs().length == 0)
                     addNewTab(null);
             }
 
+            /**
+             * Adds a new tab
+             *
+             * @param wsPanel The panel where the new tab will be created
+             */
             public void onNewTab(WorkspacePanel wsPanel) {
                 addNewTab(null);
             }
 
+            /**
+             * Resets the selection state of the current tab before switching to a different one
+             *
+             * @param oldTab The current active tab
+             * @param newTab The new tab that will be activated
+             * @return
+             */
             @Override
             public boolean doBeforeTabChange(WorkspaceTab oldTab, WorkspaceTab newTab) {
+                // if there's something selected in the old tab, reset state to default
                 if (oldTab != null && oldTab.getSelectedComponent() != null)
                     resetDetails();
 
                 return super.doBeforeTabChange(oldTab, newTab);
             }
 
+            /**
+             * Updates the output panel and selection state for the newly switched to tab
+             *
+             * @param tab The newly activated tab
+             */
             @Override
             public void onTabChanged(WorkspaceTab tab) {
+                // bring the output panel associated with this tab into the foreground
                 workspacePanel.getOutputPanel().setActiveItemID(tab.getFlowOutputPanel().getId());
+                // restore any visual selections
                 if (tab.getSelectedComponent() != null)
                     showDetails(tab, tab.getSelectedComponent());
             }
         });
 
+        // set up the components panel
         final ComponentsGrid componentsPanel = repositoryPanel.getComponentsPanel();
         componentsPanel.addListener(new ComponentsGridActionListenerAdapter() {
+            /**
+             * Updates the selection state and details section
+             *
+             * @param comp The component that was selected
+             */
             @Override
             public void onSelected(WBExecutableComponentDescription comp) {
+                // clear any tab selection (only one component can be selected at any time,
+                // either in the workspace area or in the components grid - so that the details panel
+                // shows the details of the currently selected component, if any)
                 workspacePanel.getActiveTab().clearSelection();
                 clearFlowsGridSelection();
                 showDetails(comp);
             }
 
+            /**
+             * Resets the selection state
+             *
+             * @param comp The component that was unselected
+             */
             @Override
             public void onUnselected(WBExecutableComponentDescription comp) {
+                // clear all info from the details panel
                 resetDetails();
             }
         });
         componentsPanel.addListener(new PanelListenerAdapter() {
+            /**
+             * Resets the details section state upon components panel collapse
+             *
+             * @param panel The components panel
+             */
             @Override
             public void onCollapse(Panel panel) {
                 if (componentsPanel.getSelectedComponent() != null)
                     resetDetails();
             }
 
+            /**
+             * Restores the details section state upon components panel expand
+             *
+             * @param panel The components panel
+             */
             @Override
             public void onExpand(Panel panel) {
                 WBExecutableComponentDescription selectedComponent = componentsPanel.getSelectedComponent();
@@ -289,14 +384,25 @@ public class Workbench extends Application {
             }
         });
 
+        // set up the flows panel
         final FlowsGrid flowsPanel = repositoryPanel.getFlowsPanel();
         flowsPanel.addListener(new FlowsGridActionListenerAdapter() {
+            /**
+             * Updates the details section state with information about the selected flow
+             *
+             * @param flow The selected flow
+             */
             public void onSelected(WBFlowDescription flow) {
                 workspacePanel.getActiveTab().clearSelection();
                 clearComponentsGridSelection();
                 showDetails(flow);
             }
 
+            /**
+             * Opens a new tab when a flow is "opened" (double-clicked on), if one doesn't already exist
+             *
+             * @param flow The opened flow
+             */
             @Override
             public void onOpen(WBFlowDescription flow) {
                 boolean alreadyOpened = false;
@@ -316,12 +422,22 @@ public class Workbench extends Application {
             }
         });
         flowsPanel.addListener(new PanelListenerAdapter() {
+            /**
+             * Resets the details section state when the flows panel is collapsed
+             *
+             * @param panel The flows panel
+             */
             @Override
             public void onCollapse(Panel panel) {
                 if (flowsPanel.getSelectedFlow() != null)
                     resetDetails();
             }
 
+            /**
+             * Updates the details section state with information about the currently selected flow, if any
+             *
+             * @param panel The flows panel
+             */
             @Override
             public void onExpand(Panel panel) {
                 WBFlowDescription selectedFlow = flowsPanel.getSelectedFlow();
@@ -330,8 +446,12 @@ public class Workbench extends Application {
             }
         });
 
+        // set up the locations panel
         final LocationsGrid locationsPanel = repositoryPanel.getLocationsPanel();
         locationsPanel.setActionListener(new LocationsGridActionListener() {
+            /**
+             * Adds a new Meandre components location via the wizard
+             */
             public void onAdd() {
                 AddLocationDialog addLocationDialog = new AddLocationDialog(new AddLocationListener() {
                     public void onAdd(final String description, final String url) {
@@ -350,6 +470,11 @@ public class Workbench extends Application {
                 addLocationDialog.show();
             }
 
+            /**
+             * Removes an existing Meandre components location
+             *
+             * @param location The location to be removed
+             */
             public void onRemove(final WBLocation location) {
                 MessageBox.confirm("Remove Location", "Are you sure you want to remove this location?",
                         new ConfirmCallback() {
@@ -368,6 +493,9 @@ public class Workbench extends Application {
                         });
             }
 
+            /**
+             * Warns user about regenerating repository, and invokes regenerate if user approved
+             */
             public void onRegenerate() {
                 Application.showMessage("Regenerate",
                         "<b>Regenerating the repository will delete all components and " +
@@ -392,7 +520,11 @@ public class Workbench extends Application {
             }
         });
 
+        // set up the main panel
         _mainPanel.setActionListener(new MainPanelActionListener() {
+            /**
+             * Warns user about logging out while having unsaved changes, and performs logout if user approves
+             */
             public void onLogout() {
                 boolean dirty = false;
                 for (WorkspaceTab tab : workspacePanel.getTabs())
@@ -418,6 +550,9 @@ public class Workbench extends Application {
                 });
             }
 
+            /**
+             * Presents application credits information
+             */
             public void onCredits() {
                 if (_creditsDialog == null)
                     _creditsDialog = new CreditsDialog();
@@ -426,6 +561,7 @@ public class Workbench extends Application {
             }
         });
 
+        // create an empty flow for people to use
         workspacePanel.addTab(createTab(null));
 
         new Viewport(_mainPanel);
@@ -433,6 +569,11 @@ public class Workbench extends Application {
         refreshRepository(null);
     }
 
+    /**
+     * Adds a new tab based on a specified flow
+     *
+     * @param flow The flow
+     */
     private void addNewTab(WBFlowDescription flow) {
         WorkspaceTab newTab = createTab(flow);
 
@@ -441,27 +582,51 @@ public class Workbench extends Application {
         wsPanel.setActiveTab(newTab);
     }
 
+    /**
+     * Creates (but does not add) a new tab for the specified flow
+     *
+     * @param flow The flow
+     * @return The new tab object
+     */
     private WorkspaceTab createTab(WBFlowDescription flow) {
         final WorkspaceTab workspaceTab = new WorkspaceTab(flow);
         _mainPanel.getWorkspacePanel().getOutputPanel().add(workspaceTab.getFlowOutputPanel());
         workspaceTab.addListener(new WorkspaceActionListenerAdapter() {
+            /**
+             * Shows the details for the selected component
+             *
+             * @param component The component
+             */
             @Override
             public void onComponentSelected(Component component) {
                 showDetails(workspaceTab, component);
             }
 
+            /**
+             * Resets the details section when a component is unselected
+             *
+             * @param component The component
+             */
             @Override
             public void onComponentUnselected(Component component) {
                 resetDetails();
             }
 
+            /**
+             * Saves/uploads a flow
+             *
+             * @param flow The flow
+             * @param callback Called upon the completion of the save operation
+             */
             @Override
             public void onFlowSave(final WBFlowDescription flow, final AsyncCallback<WBFlowDescription> callback) {
                 // TODO check if the flow already exists and present overwrite message
 
+                // update the flow details
                 flow.setCreator(_session.getUserName());
                 flow.setCreationDate(new Date());
 
+                // show informative message to user
                 MessageBox.show(new MessageBoxConfig() {
                     {
                         setMsg("Saving your flow, please wait...");
@@ -476,6 +641,7 @@ public class Workbench extends Application {
                     }
                 });
 
+                // perform the upload to the server (via RPC)
                 Repository.uploadFlow(flow, true, new WBCallback<WBFlowDescription>() {
                     public void onSuccess(WBFlowDescription uploadedFlow) {
                         _repositoryState.addFlow(uploadedFlow);
@@ -511,18 +677,27 @@ public class Workbench extends Application {
                 });
             }
 
+            /**
+             * Runs a flow
+             *
+             * @param flowTab The tab for the flow to be ran
+             */
             @Override
             public void onFlowRun(final WorkspaceTab flowTab) {
                 WBFlowDescription flow = flowTab.getFlowDescription();
+
+                // construct the URL used to execute the flow on the server
                 final String token = _session.getUserName() + "_" + new Date().getTime();
                 String meandreExecuteURL = _meandreBaseURL + "/services/execute/flow.txt";
                 String runFlowURL = meandreExecuteURL + "?uri=" + flow.getFlowURI() + "&statistics=true&token=" + token;
 
                 Log.info("Running flow " + runFlowURL);
+                // start the flow
                 flowTab.getFlowOutputPanel().setUrl(runFlowURL);
 
                 boolean showWebUI = false;
 
+                // check if the flow contains any components that have a WebUI
                 for (WBExecutableComponentInstanceDescription compInstance : flow.getExecutableComponentInstances()) {
                     WBExecutableComponentDescription compDesc = compInstance.getExecutableComponentDescription();
                     if (compDesc.getMode().equals(WBExecutableComponentDescription.WEBUI_COMPONENT)) {
@@ -542,6 +717,7 @@ public class Workbench extends Application {
                 if (showWebUI) {
                     Log.debug("Flow should have a WebUI - looking for one (timeout: " + WEBUI_TIMEOUT/1000 + " seconds)...");
 
+                    // wait to receive the WebUI info for the component
                     Timer timer = new Timer() {
                         private Long startTime = null;
 
@@ -551,6 +727,7 @@ public class Workbench extends Application {
                                 startTime = new Date().getTime();
                             else {
                                 Long timeNow = new Date().getTime();
+                                // give up if we waited long enough
                                 if (timeNow - startTime > WEBUI_TIMEOUT) {
                                     Log.debug("WebUI retrieve timeout");
                                     cancel();
@@ -560,6 +737,7 @@ public class Workbench extends Application {
 
                             Log.debug("Checking for WebUI");
 
+                            // check whether a WebUI is available (via RPC)
                             Repository.retrieveWebUIInfo(token, new WBCallback<WBWebUIInfo>() {
                                 @Override
                                 public void onSuccess(WBWebUIInfo webUIInfo) {
@@ -584,6 +762,11 @@ public class Workbench extends Application {
                 }
             }
 
+            /**
+             * Attempts to abort an executing flow
+             *
+             * @param flow The flow to abort
+             */
             @Override
             public void onFlowStop(final WBFlowDescription flow) {
                 WBWebUIInfo webUI = workspaceTab.getWebUIInfo();
@@ -592,6 +775,7 @@ public class Workbench extends Application {
                     return;
                 }
 
+                // attempts to abort the flow (via RPC)
                 Repository.abortFlow(webUI.getPort(), new WBCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
@@ -612,6 +796,11 @@ public class Workbench extends Application {
         return workspaceTab;
     }
 
+    /**
+     * Refreshes the components/flows/locations repositories (pulls fresh data from the server)
+     *
+     * @param cmd An optional follow-on executable command
+     */
     private void refreshRepository(final ICommand<?> cmd) {
         final RepositoryPanel repositoryPanel = _mainPanel.getRepositoryPanel();
 
@@ -629,9 +818,18 @@ public class Workbench extends Application {
         });
     }
 
+    /**
+     * Authenticates user credentials
+     *
+     * @param userName The user name
+     * @param password The user password
+     * @param hostName The host name
+     * @param port The port for the running Meandre server
+     */
     private void login(final String userName, final String password, final String hostName, final int port) {
         _loginDialog.disableLogin();
 
+        // perform login (via RPC)
         Repository.login(userName, password, hostName, port, new WBCallback<WBSession>() {
             @Override
             public void onSuccess(WBSession session) {
@@ -663,6 +861,9 @@ public class Workbench extends Application {
         });
     }
 
+    /**
+     * Logs out user and clears the user's session
+     */
     public static void logout() {
         Repository.logout(new WBCallback<Boolean>() {
             @Override
@@ -679,37 +880,67 @@ public class Workbench extends Application {
         });
     }
 
+    /**
+     * Forces a browser refresh
+     */
     public static native void reload() /*-{
         $wnd.location.reload();
     }-*/;
 
-
+    /**
+     * Resets the selection state for the components and flows panels
+     */
     private void clearRepositoryGridSelections() {
         clearComponentsGridSelection();
         clearFlowsGridSelection();
     }
 
+    /**
+     * Resets the selection state for the components panel
+     */
     private void clearComponentsGridSelection() {
         _mainPanel.getRepositoryPanel().getComponentsPanel().clearSelection();
     }
 
+    /**
+     * Resets the selection state for the flows panel
+     */
     private void clearFlowsGridSelection() {
         _mainPanel.getRepositoryPanel().getFlowsPanel().clearSelection();
     }
 
+    /**
+     * Shows the details of a component
+     *
+     * @param comp The component
+     */
     private void showDetails(WBExecutableComponentDescription comp) {
         _mainPanel.getDetailsPanel().view(comp);
     }
 
+    /**
+     * Shows the details for a flow
+     *
+     * @param flow The flow
+     */
     private void showDetails(WBFlowDescription flow) {
         _mainPanel.getDetailsPanel().view(flow);
     }
 
+    /**
+     * Shows the details for an open flow
+     *
+     * @param tab The tab corresponding to the open flow
+     * @param component The selected component
+     */
     private void showDetails(WorkspaceTab tab, Component component) {
         clearRepositoryGridSelections();
         _mainPanel.getDetailsPanel().view(tab, component);
     }
 
+    /**
+     * Resets the details panel
+     */
     private void resetDetails() {
         _mainPanel.getDetailsPanel().reset();
     }

@@ -43,6 +43,8 @@
 package org.seasr.meandre.workbench.client.exceptions;
 
 /**
+ * Describes an problem with the RDF state on the server
+ *
  * @author Boris Capitanu
  *
  */

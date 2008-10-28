@@ -45,6 +45,8 @@ package org.seasr.meandre.workbench.client.exceptions;
 import org.seasr.meandre.workbench.client.Application;
 
 /**
+ * Wrapper for Workbench-specific exceptions
+ *
  * @author Boris Capitanu
  *
  */

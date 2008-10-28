@@ -42,6 +42,12 @@
 
 package org.seasr.meandre.workbench.client.exceptions;
 
+/**
+ * Used to describe the exceptional condition asserting that a user's session expired
+ *
+ * @author Boris Capitanu
+ *
+ */
 public class SessionExpiredException extends WBException {
 
     private static final long serialVersionUID = 3896616612384178231L;

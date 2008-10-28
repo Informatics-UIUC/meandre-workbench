@@ -42,6 +42,12 @@
 
 package org.seasr.meandre.workbench.client.exceptions;
 
+/**
+ * Describes a problem encountered while communicating with the Meandre server
+ *
+ * @author Boris Capitanu
+ *
+ */
 public class MeandreCommunicationException extends WBException {
 
     private static final long serialVersionUID = 5323563991672198206L;
