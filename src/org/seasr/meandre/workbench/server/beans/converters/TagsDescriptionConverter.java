@@ -46,6 +46,8 @@ import org.meandre.core.repository.TagsDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBTagsDescription;
 
 /**
+ * Converts the Meandre TagsDescription bean to its workbench equivalent
+ *
  * @author Boris Capitanu
  *
  */

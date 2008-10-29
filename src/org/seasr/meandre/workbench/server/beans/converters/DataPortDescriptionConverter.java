@@ -46,6 +46,8 @@ import org.meandre.core.repository.DataPortDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBDataPortDescription;
 
 /**
+ * Converts the Meandre DataPortDescription bean to its workbench equivalent
+ *
  * @author Boris Capitanu
  *
  */

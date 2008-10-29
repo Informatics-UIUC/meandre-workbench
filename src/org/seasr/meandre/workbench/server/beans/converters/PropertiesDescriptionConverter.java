@@ -47,6 +47,8 @@ import org.seasr.meandre.workbench.client.beans.repository.WBPropertiesDescripti
 import org.seasr.meandre.workbench.server.rpc.MeandreConverter;
 
 /**
+ * Converts the Meandre PropertiesDescription bean to its workbench equivalent
+ *
  * @author Boris Capitanu
  *
  */

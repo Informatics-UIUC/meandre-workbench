@@ -48,6 +48,8 @@ import org.meandre.core.repository.PropertiesDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBPropertiesDescription;
 
 /**
+ * Converts the workbench WBPropertiesDescription bean to the Meandre equivalent
+ *
  * @author Boris Capitanu
  *
  */
