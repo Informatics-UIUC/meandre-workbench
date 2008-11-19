@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Meandre-Workbench" basedir="." default="dist">
-    <!-- Check whether Java 1.5 is being used -->
-    <condition property="jdk15">
+    <!-- Check whether Java 1.5 or Java 1.6 is being used -->
+    <condition property="jdk15or16">
+        <or>
             <contains string="${java.version}" substring="1.5"/>
+            <contains string="${java.version}" substring="1.6"/>
+        </or>
     </condition>
 
-    <fail unless="jdk15" 
-          message="This project requires Java 5. Please set JAVA_HOME to point to where JDK 1.5 is installed."/>
+    <fail unless="jdk15or16" 
+          message="This project requires Java 5 or Java 6. Please set JAVA_HOME to point to where JDK is installed."/>
 
     <condition property="isMac">
         <os family="mac"/>
@@ -148,7 +151,7 @@
         </and>
     </condition>
     
-    <target name="run-fast" depends="run-fast.check" if="can.run-fast" description="-> runs and already compiled Meandre-Workbech">
+    <target name="run-fast" depends="run-fast.check" if="can.run-fast" description="-> runs an already compiled Meandre-Workbech">
         <java classname="${bootstrap.class}" fork="yes" maxmemory="1024m">
             <classpath refid="dist.classpath"/>
             <arg value="${dist.dir}"/>
