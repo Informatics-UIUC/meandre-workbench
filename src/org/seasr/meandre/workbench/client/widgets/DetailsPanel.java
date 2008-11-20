@@ -171,9 +171,14 @@ public class DetailsPanel extends Panel {
             _allowEditing = allowEditing;
 
             _instancePropMap = comp.getProperties().getValueMap();
+            Map<String, String> defaultValueMap = comp.getExecutableComponentDescription().getProperties().getValueMap();
             Map<String, String> editablePropMap = new HashMap<String, String>(keySet.size());
-            for (String key : keySet)
-                editablePropMap.put(key, _instancePropMap.get(key));
+            for (String key : keySet) {
+                String instancePropValue = _instancePropMap.get(key);
+                if (instancePropValue == null)
+                    instancePropValue = defaultValueMap.get(key);
+                editablePropMap.put(key, instancePropValue);
+            }
 
             setSource(editablePropMap);
         }
