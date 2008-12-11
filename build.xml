@@ -132,6 +132,7 @@
     <condition property="can.run-fast">
         <and>
             <available file="${war.file}"/>
+            <available file="${dist.dir}/bootstrap/workbench-jetty.xml"/>
             <available classname="${bootstrap.class}" classpathref="run.classpath"/>
         </and>
     </condition>
@@ -151,6 +152,7 @@
         <condition property="can.run-fast">
             <and>
                 <available file="${war.file}"/>
+                <available file="${dist.dir}/bootstrap/workbench-jetty.xml"/>
                 <available classname="${bootstrap.class}" classpathref="run.classpath"/>
             </and>
         </condition>
