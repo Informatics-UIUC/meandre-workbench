@@ -8,7 +8,7 @@
         </or>
     </condition>
 
-    <fail unless="jdk15or16" 
+    <fail unless="jdk15or16"
           message="This project requires Java 5 or Java 6. Please set JAVA_HOME to point to where JDK is installed."/>
 
     <condition property="isMac">
@@ -25,7 +25,7 @@
 
     <fail message="${ant.project.name} is only supported on Macintosh, Unix, and Windows systems">
         <condition>
-            <and> 
+            <and>
                 <not> <isset property="isMac"/> </not>
                 <not> <isset property="isUnix"/> </not>
                 <not> <isset property="isWindows"/> </not>
@@ -46,14 +46,14 @@
     <property name="gwt.output.dir" value="${build.dir}/gwtOutput"/>
     <property name="gwt.workbench" value="org.seasr.meandre.workbench.Workbench"/>
     <property name="bootstrap.class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
-    <property name="war.dir" value="${dist.dir}/war"/>
+    <property name="war.file" value="${dist.dir}/${ant.project.name}.war"/>
+    <property name="web.xml" value="${basedir}/www/WEB-INF/web.xml"/>
 
     <path id="deploy.classpath">
         <fileset dir="${lib.deploy.dir}" includes="*.jar"/>
     </path>
-    
+
     <path id="run.classpath">
-        <fileset dir="${war.dir}/WEB-INF/lib" includes="*.jar"/>
         <fileset dir="${dist.dir}/bootstrap/lib" includes="*.jar"/>
         <pathelement location="${dist.dir}/bootstrap"/>
     </path>
@@ -71,15 +71,13 @@
 
     <target name="init">
         <tstamp/>
-        
+
         <mkdir dir="${build.bootstrap.dir}"/>
         <mkdir dir="${build.server.dir}"/>
         <mkdir dir="${gwt.output.dir}"/>
         <mkdir dir="${dist.dir}/bootstrap/lib"/>
-        <mkdir dir="${war.dir}/WEB-INF/classes"/>
-        <mkdir dir="${war.dir}/WEB-INF/lib"/>
     </target>
-    
+
     <target name="clean" description="-> removes auto-generated files/folders">
         <delete dir="${build.bootstrap.dir}"/>
         <delete dir="${build.server.dir}"/>
@@ -108,63 +106,57 @@
 
     <target name="compile" depends="gwt_compile, server_compile, bootstrap_compile" description="-> compiles the entire project"/>
 
-    <target name="dist" depends="compile" description="-> creates distribution">
-        <copy todir="${war.dir}/WEB-INF/classes">
-            <fileset dir="${build.server.dir}"/>
-        </copy>
-        
-        <copy todir="${war.dir}/WEB-INF/lib">
-            <path refid="deploy.classpath"/>
-        </copy>
-                
-        <copy todir="${war.dir}">
-            <fileset dir="${gwt.output.dir}/${gwt.workbench}"/>
-        </copy>
-        
+    <target name="dist" depends="compile" description="-> creates WAR distribution">
+        <echo message="Deploying bootstrapper"/>
         <copy todir="${dist.dir}/bootstrap">
             <fileset dir="${build.bootstrap.dir}"/>
         </copy>
-        
+
         <copy file="${src.bootstrap.dir}/workbench-jetty.xml" todir="${dist.dir}/bootstrap" />
-        
+
         <copy todir="${dist.dir}/bootstrap/lib">
             <path refid="bootstrap.classpath"/>
         </copy>
+
+        <war destfile="${war.file}" webxml="${web.xml}">
+            <fileset dir="${gwt.output.dir}/${gwt.workbench}"/>
+            <lib dir="${lib.deploy.dir}"/>
+            <classes dir="${build.server.dir}"/>
+        </war>
     </target>
 
     <target name="run" depends="dist" description="-> compiles and runs Meandre-Workbench">
         <antcall target="run-fast"/>
     </target>
-    
+
     <condition property="can.run-fast">
         <and>
-            <available file="${dist.dir}/bootstrap" type="dir"/>
-            <available file="${war.dir}" type="dir"/>
+            <available file="${war.file}"/>
             <available classname="${bootstrap.class}" classpathref="run.classpath"/>
         </and>
     </condition>
-    
+
     <target name="run-fast" depends="run-fast.check" if="can.run-fast" description="-> runs an already compiled Meandre-Workbech">
         <java classname="${bootstrap.class}" fork="yes" maxmemory="1024m">
             <classpath refid="run.classpath"/>
-            <arg value="${dist.dir}"/>
+            <arg value="${war.file}"/>
+            <arg value="${dist.dir}/bootstrap/workbench-jetty.xml"/>
         </java>
     </target>
-    
+
     <target name="run-fast.check" unless="can.run-fast">
         <echo message="Cannot perform run-fast - required files are missing. Performing full build..."/>
         <antcall target="dist"/>
-        
+
         <condition property="can.run-fast">
             <and>
-                <available file="${dist.dir}/bootstrap" type="dir"/>
-                <available file="${war.dir}" type="dir"/>
+                <available file="${war.file}"/>
                 <available classname="${bootstrap.class}" classpathref="run.classpath"/>
             </and>
         </condition>
     </target>
 
-</project> 
+</project>
 
 <!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
 <!-- vim:sw=4:softtabstop=4:expandtab

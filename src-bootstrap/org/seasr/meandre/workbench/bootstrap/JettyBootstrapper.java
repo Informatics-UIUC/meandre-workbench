@@ -42,6 +42,8 @@
 
 package org.seasr.meandre.workbench.bootstrap;
 
+import java.io.File;
+
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.SessionManager;
@@ -79,9 +81,25 @@ public class JettyBootstrapper {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        final String JETTY_HOME = (args.length > 0) ? args[0] : System.getProperty("user.dir");
+        String wbWarFile = "Meandre-Workbench.war";
+        String wbJettyDescriptorFile = "workbench-jetty.xml";
 
-        System.out.println("Setting JETTY_HOME to " + JETTY_HOME);
+        if (args.length == 2) {
+            wbWarFile = args[0];
+            wbJettyDescriptorFile = args[1];
+        } else {
+            System.err.println("No arguments specified - attempting to find required files...");
+            File warFile = new File(wbWarFile);
+            File descriptorFile = new File(wbJettyDescriptorFile);
+
+            if (!warFile.exists() || !descriptorFile.exists()) {
+                System.err.println("Could not find " + wbWarFile + " or " + wbJettyDescriptorFile + " in current directory - exiting");
+                System.exit(-1);
+            }
+        }
+
+        System.out.println("Workbench WAR: " + wbWarFile);
+        System.out.println("Jetty descriptor: " + wbJettyDescriptorFile);
         System.out.println("Using session cookie name: " + SESSION_COOKIE_NAME);
 
         Server server = new Server();
@@ -92,8 +110,8 @@ public class JettyBootstrapper {
 
         WebAppContext webapp = new WebAppContext();
         webapp.setContextPath("/");
-        webapp.setWar(JETTY_HOME + "/war");
-        webapp.setDefaultsDescriptor(JETTY_HOME + "/bootstrap/workbench-jetty.xml");
+        webapp.setWar(wbWarFile);
+        webapp.setDefaultsDescriptor(wbJettyDescriptorFile);
 
         SessionManager sessionManager = webapp.getSessionHandler().getSessionManager();
         sessionManager.setSessionCookie(SESSION_COOKIE_NAME);
