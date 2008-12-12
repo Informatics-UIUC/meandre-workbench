@@ -219,14 +219,24 @@ public class DetailsPanel extends Panel {
 
         WBExecutableComponentDescription comp =
             RepositoryState.getInstance().getComponent(instance.getExecutableComponent());
+
         String tags = "";
         for (String tag : comp.getTags().getTags())
             tags += ", " + tag;
-        tags = "[" + tags.substring(2) + "]";
+        tags = tags.substring(2);
 
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Tags:</b>&nbsp;&nbsp;").append(tags).append("<br/>");
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Creator:</b>&nbsp;&nbsp;").append(comp.getCreator()).append("<br/>");
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Date:</b>&nbsp;&nbsp;").append(comp.getCreationDate()).append("<br/>");
+        String location = comp.getLocation();
+        String implementation = "/implementation/";
+        int n = location.indexOf(implementation);
+        location = (n > 0) ? location.substring(n + implementation.length()) : null;
+
+        sb.append("<table border='0' cellspacing='5' style='font-size: 13px;'>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Tags:</b></td><td>").append(tags).append("<td>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Creator:</b></td><td>").append(comp.getCreator()).append("</td>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Date:</b></td><td style='white-space: nowrap;'>").append(comp.getCreationDate()).append("</td>");
+        if (location != null)
+            sb.append("<tr><td align='right' valign='top'>").append("<b>Class:</b></td><td>").append(location).append("</td>");
+        sb.append("</table>");
 
         sb.append("</p><br/>");
         sb.append("<p>");
@@ -274,17 +284,27 @@ public class DetailsPanel extends Panel {
         sb.append("<div style='font-family: arial, tahoma, helvetica, sans-serif; font-size: 12px; margin: 4px;'>");
         sb.append("<b style='font-size: 14px;'>").append(comp.getName()).append("</b><br/>");
         sb.append("<i style='font-size: 11px;'>").append(comp.getResourceURI()).append("</i>");
+
+        String location = comp.getLocation();
+        String implementation = "/implementation/";
+        int n = location.indexOf(implementation);
+        location = (n > 0) ? location.substring(n + implementation.length()) : null;
+
         sb.append("<br/><br/>");
         sb.append("<p>");
 
         String tags = "";
         for (String tag : comp.getTags().getTags())
             tags += ", " + tag;
-        tags = "[" + tags.substring(2) + "]";
+        tags = tags.substring(2);
 
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Tags:</b>&nbsp;&nbsp;").append(tags).append("<br/>");
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Creator:</b>&nbsp;&nbsp;").append(comp.getCreator()).append("<br/>");
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Date:</b>&nbsp;&nbsp;").append(comp.getCreationDate()).append("<br/>");
+        sb.append("<table border='0' cellspacing='5' style='font-size: 13px;'>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Tags:</b></td><td>").append(tags).append("<td>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Creator:</b></td><td>").append(comp.getCreator()).append("</td>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Date:</b></td><td style='white-space: nowrap;'>").append(comp.getCreationDate()).append("</td>");
+        if (location != null)
+            sb.append("<tr><td align='right' valign='top'>").append("<b>Class:</b></td><td>").append(location).append("</td>");
+        sb.append("</table>");
 
         sb.append("</p><br/>");
         sb.append("<p>");
@@ -338,11 +358,13 @@ public class DetailsPanel extends Panel {
         String tags = "";
         for (String tag : flow.getTags().getTags())
             tags += ", " + tag;
-        tags = "[" + tags.substring(2) + "]";
+        tags = tags.substring(2);
 
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Tags:</b>&nbsp;&nbsp;").append(tags).append("<br/>");
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Creator:</b>&nbsp;&nbsp;").append(flow.getCreator()).append("<br/>");
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Date:</b>&nbsp;&nbsp;").append(flow.getCreationDate()).append("<br/>");
+        sb.append("<table border='0' cellspacing='5' style='font-size: 13px;'>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Tags:</b></td><td>").append(tags).append("<td>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Creator:</b></td><td>").append(flow.getCreator()).append("</td>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Date:</b></td><td style='white-space: nowrap;'>").append(flow.getCreationDate()).append("</td>");
+        sb.append("</table>");
 
         sb.append("</p><br/>");
         sb.append("<p>");
