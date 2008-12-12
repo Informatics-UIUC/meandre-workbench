@@ -230,7 +230,12 @@ public class Workbench extends Application {
         repositoryPanel.getLocationsPanel().setStore(_repositoryState.getLocationsStore());
         repositoryPanel.addListener(new RefreshListener() {
             public void onRefresh() {
-                refreshRepository(null);
+                refreshRepository(new ICommand<Boolean>() {
+                    public void execute(Boolean args) {
+                        repositoryPanel.getComponentsPanel().clearSearch();
+                        repositoryPanel.getFlowsPanel().clearSearch();
+                    }
+                });
             }
         });
 

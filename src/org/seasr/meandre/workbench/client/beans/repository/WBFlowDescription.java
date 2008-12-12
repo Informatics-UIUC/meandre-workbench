@@ -105,6 +105,7 @@ public class WBFlowDescription implements IsSerializable, Cloneable {
     }
 
     public WBFlowDescription(String name, String baseURL) {
+        this();
         this.sResFlowURI = baseURL + name.replaceAll(" |\t|/", "-") + "/";
     }
 
@@ -215,7 +216,7 @@ public class WBFlowDescription implements IsSerializable, Cloneable {
     public void setName( String sName ) {
         if (this.sName == null || !this.sName.equals(sName)) {
             this.sName=sName;
-            setFlowURI(getBaseURI() + sName.toLowerCase().replaceAll(" |\t|/", "-") + "/");
+            setFlowURI(getBaseURI() + sName.toLowerCase().replaceAll(" |\t|/|'", "-") + "/");
         }
     }
 
