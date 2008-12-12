@@ -44,11 +44,11 @@ package org.seasr.meandre.workbench.client.widgets;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.seasr.meandre.workbench.client.RepositoryState;
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBConnectorDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentDescription;
@@ -109,9 +109,8 @@ public class WorkspaceTab extends Panel {
     private static int TAB_COUNTER = 1;
 
     private WBFlowDescription _wbFlow;
-    private Map<String, Component> _componentMap;
-    private Map<String, WBConnectorDescription> _connectorMap;
-    private Map<AbstractConnection, String> _connectionMap;
+    private Map<WBExecutableComponentInstanceDescription, Component> _componentMap;
+    private Map<AbstractConnection, WBConnectorDescription> _connectionMap;
     private final Set<WorkspaceActionListener> _actionListeners = new HashSet<WorkspaceActionListener>();
     private final FlowOutputPanel _outputPanel = new FlowOutputPanel();
     private Component _selectedComponent = null;
@@ -129,12 +128,18 @@ public class WorkspaceTab extends Panel {
 
 
     public WorkspaceTab(final WBFlowDescription flow) {
-        _wbFlow = (flow == null) ? createNewFlowDescription() : flow.clone();
-        _componentMap = new HashMap<String, Component>();
-        _connectionMap = new HashMap<AbstractConnection, String>();
-        _connectorMap = new HashMap<String, WBConnectorDescription>();
+        if (flow == null) {
+            String flowName = getUntitledName();
+            _wbFlow = createNewFlowDescription(flowName);
+            setTitle(flowName);
+        } else {
+            _wbFlow = flow.clone();
+            setTitle(_wbFlow.getName());
+        }
 
-        setTitle((flow != null) ? _wbFlow.getName() : getUntitledName());
+        _componentMap = new HashMap<WBExecutableComponentInstanceDescription, Component>();
+        _connectionMap = new HashMap<AbstractConnection, WBConnectorDescription>();
+
         setIconCls("icon-tab");
         setAutoScroll(true);
         setClosable(true);
@@ -230,7 +235,7 @@ public class WorkspaceTab extends Panel {
                             (WBExecutableComponentDescription) record.getAsObject("wbComponent");
 
                         WBExecutableComponentInstanceDescription compInstance = createComponentInstance(compDesc);
-                        final Component component = new Component(compInstance);
+                        final Component component = new Component(compInstance, compDesc);
                         component.doOnRender(new Function() {
                             public void execute() {
                                 component.select();
@@ -252,87 +257,17 @@ public class WorkspaceTab extends Panel {
         };
     }
 
-    //FIXME: temporary fix -- when removed, add the 'final' keyword back to the Map objects...
-    public void refresh(WBFlowDescription flow) {
-        // save the selected component and selected port values
-        String selectedComponent = null;
-        if (_selectedComponent != null) {
-            selectedComponent = _selectedComponent.getInstanceDescription().getExecutableComponentInstance();
-            Log.debug("wbFlow URI=" + _wbFlow.getFlowURI());
-            Log.debug("flow desiredURI=" + flow.getDesiredURI());
-            if (!_wbFlow.getFlowURI().equals(flow.getDesiredURI()))
-                selectedComponent = flow.getDesiredURI() + selectedComponent.substring(_wbFlow.getFlowURI().length());
-            Log.debug("selectedComponent=" + selectedComponent);
-        }
-
-        String selectedPortComponent = null;
-        String selectedPort = null;
-        if (_selectedPort != null) {
-            selectedPort = _selectedPort.getIdentifier();
-            selectedPortComponent = _selectedPort.getComponent().getInstanceDescription().getExecutableComponentInstance();
-            if (!_wbFlow.getFlowURI().equals(flow.getDesiredURI()))
-                selectedPortComponent = flow.getDesiredURI() + selectedPortComponent.substring(_wbFlow.getFlowURI().length());
-        }
-
-        Log.debug("=== BEFORE REFRESH ===");
-        Log.debug("componentMap size=" + _componentMap.size());
-        Log.debug("connectorMap size=" + _connectorMap.size());
-        Log.debug("connectionMap size=" + _connectionMap.size());
-        Log.debug("wbFlow.instances size=" + _wbFlow.getExecutableComponentInstances().size());
-        Log.debug("wbFlow.connectors size=" + _wbFlow.getConnectorDescriptions().size());
-
-        Iterator<Component> iterator = _componentMap.values().iterator();
-        while (iterator.hasNext()) {
-            removeComponent(iterator.next());
-        }
-
-        Log.debug("=== AFTER RESET ===");
-        Log.debug("componentMap size=" + _componentMap.size());
-        Log.debug("connectorMap size=" + _connectorMap.size());
-        Log.debug("connectionMap size=" + _connectionMap.size());
-        Log.debug("wbFlow.instances size=" + _wbFlow.getExecutableComponentInstances().size());
-        Log.debug("wbFlow.connectors size=" + _wbFlow.getConnectorDescriptions().size());
-
-        _componentMap = new HashMap<String, Component>();
-        _connectorMap = new HashMap<String, WBConnectorDescription>();
-        _connectionMap = new HashMap<AbstractConnection, String>();
-
-        _wbFlow = flow;
-        loadFlow(flow);
-
-        Log.debug("=== AFTER REFRESH ===");
-        Log.debug("componentMap size=" + _componentMap.size());
-        Log.debug("connectorMap size=" + _connectorMap.size());
-        Log.debug("connectionMap size=" + _connectionMap.size());
-        Log.debug("wbFlow.instances size=" + _wbFlow.getExecutableComponentInstances().size());
-        Log.debug("wbFlow.connectors size=" + _wbFlow.getConnectorDescriptions().size());
-
-        // Restore the selected component and port
-        if (selectedComponent != null) {
-            Component comp = _componentMap.get(selectedComponent);
-            comp.select();
-            Log.debug("Selected component " + comp.getName());
-        }
-
-        if (selectedPort != null) {
-            Component comp = _componentMap.get(selectedPortComponent);
-            ComponentPort port = comp.getInputPort(selectedPort);
-            if (port == null)
-                port = comp.getOutputPort(selectedPort);
-            port.select();
-            Log.debug("Selected port " + port.getName() + " from component " + comp.getName());
-        }
-
-        doLayout();
-    }
-
     public void loadFlow(final WBFlowDescription flow) {
         int nInstances = flow.getExecutableComponentInstances().size();
         WBExecutableComponentInstanceDescription[] instances = new WBExecutableComponentInstanceDescription[nInstances];
         instances = flow.getExecutableComponentInstances().toArray(instances);
         for (int i = 0; i < nInstances; i++) {
             WBExecutableComponentInstanceDescription compInstance = instances[i];
-            WBExecutableComponentDescription compDesc = compInstance.getExecutableComponentDescription();
+
+            // attempt to retrieve the component description for this instance
+            WBExecutableComponentDescription compDesc =
+                RepositoryState.getInstance().getComponent(compInstance.getExecutableComponent()); //TODO refactor
+
             if (compDesc == null) {
                 Log.error("Could not find the component: " + compInstance.getExecutableComponent() + " - removing from flow");
                 flow.removeExecutableComponentInstance(compInstance);
@@ -340,7 +275,17 @@ public class WorkspaceTab extends Panel {
                 continue;
             }
 
-            Component component = new Component(compInstance);
+            // augment the properties of the component instance with the missing ones
+            // from the component description definition
+            Map<String, String> compDescPropsMap = compDesc.getProperties().getValueMap();
+            Map<String, String> compInstancePropsMap = compInstance.getProperties().getValueMap();
+
+            for (Entry<String, String> prop : compDescPropsMap.entrySet())
+                if (!compInstancePropsMap.containsKey(prop.getKey()))
+                    compInstancePropsMap.put(prop.getKey(), prop.getValue());
+
+            // create the component and add it to the workspace
+            Component component = new Component(compInstance, compDesc);
             addComponentToCanvas(component, false);
         }
 
@@ -371,7 +316,7 @@ public class WorkspaceTab extends Panel {
                     _wbFlow.setName(name);
                     _wbFlow.setDescription(description);
                     _wbFlow.setRights(rights);
-                    _wbFlow.setDesiredBaseURI(baseURI);
+                    _wbFlow.setBaseURI(baseURI);
                     _wbFlow.getTags().getTags().clear();
                     for (String tag : tags.split(",")) {
                         tag = tag.trim();
@@ -384,8 +329,8 @@ public class WorkspaceTab extends Panel {
             });
 
             if (_wbFlow.getName().length() > 0)
-                saveDialog.setFormValues(null, _wbFlow.getDescription(), _wbFlow.getRights(),
-                        _wbFlow.getDesiredBaseURI(), _wbFlow.getTags().toString());
+                saveDialog.setFormValues(_wbFlow.getName(), _wbFlow.getDescription(), _wbFlow.getRights(),
+                        _wbFlow.getBaseURI(), _wbFlow.getTags().toString());
 
             saveDialog.show(/** button.getElement() **/);
 
@@ -407,7 +352,7 @@ public class WorkspaceTab extends Panel {
             MessageBox.Button buttons;
             PromptCallback callback;
 
-            if (_wbFlow.getDesiredBaseURI() == null) {
+            if (_wbFlow.getName().length() == 0) {
                 message = "You <u>must</u> save your flow before you can execute it. Would you like to do that now?";
                 iconCls = MessageBox.INFO;
                 buttons = MessageBox.YESNO;
@@ -464,11 +409,8 @@ public class WorkspaceTab extends Panel {
             listener.onFlowRun(WorkspaceTab.this);
     }
 
-    private WBFlowDescription createNewFlowDescription() {
-        WBFlowDescription flowDesc = new WBFlowDescription();
-        flowDesc.setFlowURI(WBFlowDescription.BASE_URL + TAB_COUNTER + "/");
-
-        return flowDesc;
+    private WBFlowDescription createNewFlowDescription(String name) {
+        return new WBFlowDescription(name, WBFlowDescription.BASE_URL);
     }
 
     @Override
@@ -590,7 +532,7 @@ public class WorkspaceTab extends Panel {
     public void addComponent(Component component, boolean setDirty) {
         WBExecutableComponentInstanceDescription compInstance = component.getInstanceDescription();
 
-        Log.debug("Adding " + compInstance.getName() + " to flow " + _wbFlow.getName());
+        Log.debug("Adding " + compInstance.getName() + " to flow " + _wbFlow.getFlowURI());
         _wbFlow.addExecutableComponentInstance(compInstance);
 
         addComponentToCanvas(component, setDirty);
@@ -602,7 +544,7 @@ public class WorkspaceTab extends Panel {
         final int x = posXY[0];
         final int y = posXY[1];
 
-        _componentMap.put(component.getInstanceDescription().getExecutableComponentInstance(), component);
+        _componentMap.put(component.getInstanceDescription(), component);
 
         component.addListener(new ComponentActionListenerAdapter() {
             private int[] _compPosition = null;
@@ -695,18 +637,16 @@ public class WorkspaceTab extends Panel {
                     final ComponentPort dstPort =
                         port.getPortType() == PortType.INPUT ? port : _selectedPort;
 
-                    WBConnectorDescription connectorDesc = new WBConnectorDescription();
-                    String baseURI = _wbFlow.getFlowURI();
-                    if (!baseURI.endsWith("/")) baseURI += "/";
-                    baseURI += "connector/";
+                    String baseURI = _wbFlow.getNormalizedFlowURI() + "connector/";
 
                     // Create a unique URI
                     String resURI;
                     do {
                         resURI = baseURI + _connectorCount++;
                     }
-                    while (_connectorMap.containsKey(resURI));
+                    while (connectorIsNotUnique(resURI));
 
+                    WBConnectorDescription connectorDesc = new WBConnectorDescription();
                     connectorDesc.setConnector(resURI);
                     connectorDesc.setSourceInstance(srcPort.getComponent().getInstanceDescription().getExecutableComponentInstance());
                     connectorDesc.setSourceInstanceDataPort(srcPort.getDataPortDescription().getResourceURI());
@@ -717,10 +657,10 @@ public class WorkspaceTab extends Panel {
                             " and " + dstPort.getComponent().getName());
 
                     _wbFlow.getConnectorDescriptions().add(connectorDesc);
+
                     AbstractConnection connection = createConnection(srcPort, dstPort);
                     connection.addTo(WorkspaceTab.this);
-                    _connectionMap.put(connection, resURI);
-                    _connectorMap.put(resURI, connectorDesc);
+                    _connectionMap.put(connection, connectorDesc);
 
                     _selectedPort.unselect();
                     port.unselect();
@@ -730,6 +670,14 @@ public class WorkspaceTab extends Panel {
 
                     setDirty();
                 }
+            }
+
+            private boolean connectorIsNotUnique(String resURI) {
+                for (WBConnectorDescription connector : _connectionMap.values())
+                    if (connector.getConnector().equalsIgnoreCase(resURI))
+                        return true;
+
+                return false;
             }
 
             @Override
@@ -871,21 +819,16 @@ public class WorkspaceTab extends Panel {
     }
 
     private WBExecutableComponentInstanceDescription createComponentInstance(WBExecutableComponentDescription compDesc) {
-        String resourceURI = compDesc.getResourceURI();
-
         WBExecutableComponentInstanceDescription instance = new WBExecutableComponentInstanceDescription();
-        instance.setExecutableComponentDescription(compDesc);
-        instance.setExecutableComponent(resourceURI);
-        String baseURI = _wbFlow.getFlowURI();
-        if (!baseURI.endsWith("/")) baseURI += "/";
-        baseURI += "instance/" + compDesc.getName().toLowerCase().replaceAll(" |\t", "-") + "/";
+        instance.setExecutableComponent(compDesc.getResourceURI());
+        String baseURI = _wbFlow.getNormalizedFlowURI() + "instance/" + compDesc.getName().toLowerCase().replaceAll(" |\t", "-") + "/";
 
         // Create a unique URI
         String resURI;
         do {
             resURI = baseURI + _componentCount++;
         }
-        while (_componentMap.containsKey(resURI));
+        while (componentInstanceIsNotUnique(resURI));
 
         instance.setExecutableComponentInstance(resURI);
         instance.setDescription(compDesc.getDescription());
@@ -893,14 +836,23 @@ public class WorkspaceTab extends Panel {
 
         Log.debug("Creating " + instance.getName() + " with URI: " + resURI);
 
+        // copy all properties and default values from the component descriptor
         WBPropertiesDescriptionDefinition propsDef = compDesc.getProperties();
         WBPropertiesDescription props = new WBPropertiesDescription();
         for (Entry<String, String> entry : propsDef.getValueMap().entrySet())
-            props.add(entry.getKey(), entry.getValue());
+            props.add(entry.getKey(), entry.getValue());  // TODO debug this to make sure it does what it's supposed to
 
         instance.setProperties(props);
 
         return instance;
+    }
+
+    private boolean componentInstanceIsNotUnique(String resURI) {
+        for (WBExecutableComponentInstanceDescription ecid : _componentMap.keySet())
+            if (ecid.getExecutableComponentInstance().equalsIgnoreCase(resURI))
+                return true;
+
+        return false;
     }
 
     private AbstractConnection createConnection(final ComponentPort srcPort, final ComponentPort dstPort) {
@@ -910,15 +862,13 @@ public class WorkspaceTab extends Panel {
         connection.addListener(new ConnectionActionListener() {
             public void connectionRemoved(AbstractConnection connection) {
 
-                String connectorURI = _connectionMap.get(connection);
-                WBConnectorDescription connectorDesc = _connectorMap.get(connectorURI);
+                WBConnectorDescription connectorDesc = _connectionMap.get(connection);
                 Log.debug("Removing connection " + connectorDesc.getConnector());
                 boolean success = _wbFlow.getConnectorDescriptions().remove(connectorDesc);
                 if (!success)
                     Log.error("The connector was not found in the flow description!");
 
-                _connectionMap.remove(connection);
-                Object result = _connectorMap.remove(connectorDesc.getConnector());
+                Object result = _connectionMap.remove(connection);
                 // for DEBUG purposes
                 if (result == null)
                     Log.error("Could not find the specified connection in the connection map.");
@@ -937,8 +887,8 @@ public class WorkspaceTab extends Panel {
         String srcCompInstanceURI = connector.getSourceInstance();
         String dstCompInstanceURI = connector.getTargetInstance();
 
-        Component srcComponent = _componentMap.get(srcCompInstanceURI);
-        Component dstComponent = _componentMap.get(dstCompInstanceURI);
+        Component srcComponent = getComponentForURI(srcCompInstanceURI);
+        Component dstComponent = getComponentForURI(dstCompInstanceURI);
 
         if (srcComponent == null || dstComponent == null) {
             String msg = "";
@@ -969,10 +919,17 @@ public class WorkspaceTab extends Panel {
         }
 
         AbstractConnection connection = createConnection(srcPort, dstPort);
-        _connectionMap.put(connection, connector.getConnector());
-        _connectorMap.put(connector.getConnector(), connector);
+        _connectionMap.put(connection, connector);
 
         return connection;
+    }
+
+    private Component getComponentForURI(String compInstanceURI) {
+        for (Component component : _componentMap.values())
+            if (component.getInstanceDescription().getExecutableComponentInstance().equalsIgnoreCase(compInstanceURI))
+                return component;
+
+        return null;
     }
 
     public void removeComponent(final Component component) {
@@ -985,14 +942,15 @@ public class WorkspaceTab extends Panel {
         if (_selectedPort != null && _selectedPort.getComponent() == component)
             _selectedPort = null;
 
-        String instanceURI = component.getInstanceDescription().getExecutableComponentInstance();
+        WBExecutableComponentInstanceDescription compInstance = component.getInstanceDescription();
+        String instanceURI = compInstance.getExecutableComponentInstance();
         Log.debug("Removing component " + instanceURI);
-        Object result = _componentMap.remove(instanceURI);
+        Object result = _componentMap.remove(compInstance);
         // for DEBUG purposes
         if (result == null)
             Log.error("Could not find " + instanceURI + " in the component map. Probably a bug!");
 
-        boolean success = _wbFlow.removeExecutableComponentInstance(component.getInstanceDescription());
+        boolean success = _wbFlow.removeExecutableComponentInstance(compInstance);
         if (!success)
             Log.error("Could not find the component " + component.getName() + " in the flow description");
 

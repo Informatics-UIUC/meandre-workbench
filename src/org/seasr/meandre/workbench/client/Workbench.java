@@ -408,9 +408,7 @@ public class Workbench extends Application {
                 boolean alreadyOpened = false;
                 for (WorkspaceTab wsTab : workspacePanel.getTabs()) {
                     WBFlowDescription wsFlow = wsTab.getFlowDescription();
-                    String baseURI = wsFlow.getDesiredBaseURI();
-                    if (wsFlow.getName().equals(flow.getName()) &&
-                            baseURI != null && baseURI.equals(flow.getDesiredBaseURI())) {
+                    if (wsFlow.getFlowURI().equalsIgnoreCase(flow.getFlowURI())) {
                         alreadyOpened = true;
                         workspacePanel.setActiveTab(wsTab);
                         break;
@@ -642,13 +640,9 @@ public class Workbench extends Application {
                 });
 
                 // perform the upload to the server (via RPC)
-                Repository.uploadFlow(flow, true, new WBCallback<WBFlowDescription>() {
-                    public void onSuccess(WBFlowDescription uploadedFlow) {
-                        _repositoryState.addFlow(uploadedFlow);
-                        WBFlowDescription uploadClone = uploadedFlow.clone();
-                        workspaceTab.refresh(uploadClone);   //FIXME: for now this is fine - a RepositoryState solution
-                                                                      //that provides update events is better
-
+                Repository.uploadFlow(flow, true, new WBCallback<Boolean>() {
+                    public void onSuccess(Boolean success) {
+                        _repositoryState.addFlow(flow.clone());
 
                         workspaceTab.clearDirty();
                         workspaceTab.setTitle(flow.getName());
@@ -656,7 +650,7 @@ public class Workbench extends Application {
                         MessageBox.hide();
 
                         if (callback != null)
-                            callback.onSuccess(uploadClone);
+                            callback.onSuccess(flow);
                     }
 
                     @Override
@@ -699,7 +693,13 @@ public class Workbench extends Application {
 
                 // check if the flow contains any components that have a WebUI
                 for (WBExecutableComponentInstanceDescription compInstance : flow.getExecutableComponentInstances()) {
-                    WBExecutableComponentDescription compDesc = compInstance.getExecutableComponentDescription();
+                    WBExecutableComponentDescription compDesc = _repositoryState.getComponent(compInstance.getExecutableComponent());
+                    if (compDesc == null) {
+                        Log.error("Cannot retrieve ECD (" + compInstance.getExecutableComponent() +
+                                ") for instance " + compInstance.getExecutableComponentInstance() +
+                                " - ignoring error");
+                        continue;
+                    }
                     if (compDesc.getMode().equals(WBExecutableComponentDescription.WEBUI_COMPONENT)) {
                         boolean isConnected = false;
                         for (WBConnectorDescription connector : flow.getConnectorDescriptions())

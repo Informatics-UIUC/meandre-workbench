@@ -107,7 +107,6 @@
     <target name="compile" depends="gwt_compile, server_compile, bootstrap_compile" description="-> compiles the entire project"/>
 
     <target name="dist" depends="compile" description="-> creates WAR distribution">
-        <echo message="Deploying bootstrapper"/>
         <copy todir="${dist.dir}/bootstrap">
             <fileset dir="${build.bootstrap.dir}"/>
         </copy>

@@ -132,6 +132,7 @@ public class SaveFlowDialog extends Window {
         saveForm.doOnRender(new Function() {
             public void execute() {
                 _fName.focus();
+                _fName.selectText();
             }
         }, 1000);
 

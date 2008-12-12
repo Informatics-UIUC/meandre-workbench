@@ -277,7 +277,7 @@ public interface IRepositoryAsync {
      * @throws CorruptedFlowException Thrown if the repository state on the server is corrupted
      */
     // TODO: change return type to boolean once refactoring is done
-    public void uploadFlow(WBFlowDescription flow, boolean overwrite, AsyncCallback<WBFlowDescription> callback);
+    public void uploadFlow(WBFlowDescription flow, boolean overwrite, AsyncCallback<Boolean> callback);
 
     /**
      * Uploads flows in batch

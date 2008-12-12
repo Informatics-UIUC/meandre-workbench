@@ -46,7 +46,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentDescription;
-import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentInstanceDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBFlowDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBLocation;
 import org.seasr.meandre.workbench.client.callbacks.WBCallback;
@@ -70,7 +69,7 @@ import com.gwtext.client.data.StringFieldDef;
 /**
  * A singleton class that maintains the state of the repository.
  * It stores the list of components, list of flows, and list of locations with their specific metadata.
- * 
+ *
  * @author Boris Capitanu
  *
  */
@@ -216,7 +215,10 @@ public class RepositoryState {
      * @return The component sought, or null if none found
      */
     public WBExecutableComponentDescription getComponent(String compURI) {
-        return getComponent(_componentsStore.getById(compURI));
+        WBExecutableComponentDescription component = getComponent(_componentsStore.getById(compURI));
+        if (component == null)
+            Log.warn("The attempt to retrieve component " + compURI + " failed");
+        return component;
     }
 
     /**
@@ -290,10 +292,6 @@ public class RepositoryState {
         }
         else
             Log.info("Adding flow " + flow.getFlowURI());
-
-        // make sure each instance also "knows" about the component it came from
-        for (WBExecutableComponentInstanceDescription instance : flow.getExecutableComponentInstances())
-            instance.setExecutableComponentDescription(getComponent(instance.getExecutableComponent()));
 
         // add the flow to the store
         _flowsStore.addSorted(_flowsReader.getRecordDef().createRecord(flow.getFlowURI(), new Object[] {
@@ -476,10 +474,6 @@ public class RepositoryState {
                     flow.getConnectorDescriptions(),
                     flow.getTags()
             };
-
-            // make sure each component instance "knows" about which components it came from
-            for (WBExecutableComponentInstanceDescription instance : flow.getExecutableComponentInstances())
-                instance.setExecutableComponentDescription(getComponent(instance.getExecutableComponent()));
         }
 
         _flowsStore.setDataProxy(new MemoryProxy(data));

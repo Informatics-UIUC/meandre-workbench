@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.seasr.meandre.workbench.client.RepositoryState;
 import org.seasr.meandre.workbench.client.beans.repository.WBDataPortDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentInstanceDescription;
@@ -171,14 +172,9 @@ public class DetailsPanel extends Panel {
             _allowEditing = allowEditing;
 
             _instancePropMap = comp.getProperties().getValueMap();
-            Map<String, String> defaultValueMap = comp.getExecutableComponentDescription().getProperties().getValueMap();
             Map<String, String> editablePropMap = new HashMap<String, String>(keySet.size());
-            for (String key : keySet) {
-                String instancePropValue = _instancePropMap.get(key);
-                if (instancePropValue == null)
-                    instancePropValue = defaultValueMap.get(key);
-                editablePropMap.put(key, instancePropValue);
-            }
+            for (String key : keySet)
+                editablePropMap.put(key, _instancePropMap.get(key));
 
             setSource(editablePropMap);
         }
@@ -192,7 +188,8 @@ public class DetailsPanel extends Panel {
     public void view(WorkspaceTab tab, Component component) {
         _focusedTab = tab;
 
-        WBExecutableComponentDescription compDesc = component.getExecutableComponentDescription();
+        WBExecutableComponentDescription compDesc =
+            RepositoryState.getInstance().getComponent(component.getInstanceDescription().getExecutableComponent());
         WBExecutableComponentInstanceDescription compInstanceDesc = component.getInstanceDescription();
         _propPanel.viewComponent(compInstanceDesc, compDesc.getProperties().getKeys());
         _docPanel.setHtml(getDocumentationHtml(compInstanceDesc));
@@ -220,7 +217,8 @@ public class DetailsPanel extends Panel {
         sb.append("<br/><br/>");
         sb.append("<p>");
 
-        WBExecutableComponentDescription comp = instance.getExecutableComponentDescription();
+        WBExecutableComponentDescription comp =
+            RepositoryState.getInstance().getComponent(instance.getExecutableComponent());
         String tags = "";
         for (String tag : comp.getTags().getTags())
             tags += ", " + tag;
@@ -359,7 +357,8 @@ public class DetailsPanel extends Panel {
         sb.append("<b style='font-size: 13px'><u>Components:</u></b><br/>");
         for (WBExecutableComponentInstanceDescription instance : flow.getExecutableComponentInstances()) {
             sb.append("<div style='border: 1px dotted gray; padding: 2px; margin-top: 4px;'>");
-            WBExecutableComponentDescription compDesc = instance.getExecutableComponentDescription();
+            WBExecutableComponentDescription compDesc =
+                RepositoryState.getInstance().getComponent(instance.getExecutableComponent());
             String imgName = compDesc != null ? compDesc.getRunnable() : "warning";
             sb.append("<img src='images/" + imgName + ".png'/> ");
             sb.append("<b>").append(instance.getName()).append("</b>");

@@ -66,9 +66,6 @@ public class WBExecutableComponentInstanceDescription implements IsSerializable,
     /** The instance properties */
     private WBPropertiesDescription pdProperties = null;
 
-    // This will not be serialized by GWT
-    private transient WBExecutableComponentDescription _compDesc = null;
-
     /** Create an empty executable component instance description instance
     *
     *
@@ -138,14 +135,6 @@ public class WBExecutableComponentInstanceDescription implements IsSerializable,
         return sResComponentURI;
     }
 
-    public void setExecutableComponentDescription(WBExecutableComponentDescription compDesc) {
-        _compDesc = compDesc;
-    }
-
-    public WBExecutableComponentDescription getExecutableComponentDescription() {
-        return _compDesc;
-    }
-
     /** Sets the components name.
      *
      * @param sName The name
@@ -198,15 +187,12 @@ public class WBExecutableComponentInstanceDescription implements IsSerializable,
      * Returns a deep copy of this object
      */
     public WBExecutableComponentInstanceDescription clone() {
-        WBExecutableComponentInstanceDescription instanceClone = new WBExecutableComponentInstanceDescription(
+        return new WBExecutableComponentInstanceDescription(
                 this.sResExecutableComponentInstaceURI,
                 this.sResComponentURI,
                 this.sName,
                 this.sDescription,
                 (WBPropertiesDescription) this.pdProperties.clone()
                 );
-        instanceClone.setExecutableComponentDescription(this.getExecutableComponentDescription());
-
-        return instanceClone;
     }
 }

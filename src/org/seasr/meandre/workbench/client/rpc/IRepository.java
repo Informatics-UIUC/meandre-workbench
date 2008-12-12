@@ -330,7 +330,7 @@ public interface IRepository extends RemoteService {
      * @throws CorruptedFlowException Thrown if the repository state on the server is corrupted
      */
     // TODO: change return type to boolean once refactoring is done
-    public WBFlowDescription uploadFlow(WBFlowDescription flow, boolean overwrite)
+    public boolean uploadFlow(WBFlowDescription flow, boolean overwrite)
         throws SessionExpiredException, MeandreCommunicationException, CorruptedFlowException;
 
     /**

@@ -102,7 +102,7 @@ public class Component extends VerticalContainerPanel {
     private boolean _isBeingRenamed = false;
     private boolean _isBeingDragged = false;
 
-    public Component(final WBExecutableComponentInstanceDescription compInstance) {
+    public Component(final WBExecutableComponentInstanceDescription compInstance, final WBExecutableComponentDescription compDesc) {
         _compInstance = compInstance;
 
         setCls("component");
@@ -117,7 +117,7 @@ public class Component extends VerticalContainerPanel {
         };
 
         SortedSet<WBDataPortDescription> inputsSorted = new TreeSet<WBDataPortDescription>(comparator);
-        Set<WBDataPortDescription> componentInputs = getExecutableComponentDescription().getInputs();
+        Set<WBDataPortDescription> componentInputs = compDesc.getInputs();
         inputsSorted.addAll(componentInputs);
 
         _inputs = new HashMap<String, ComponentPort>(componentInputs.size());
@@ -131,7 +131,7 @@ public class Component extends VerticalContainerPanel {
         vpOutputs.setCls("component-vp-ports");
 
         SortedSet<WBDataPortDescription> outputsSorted = new TreeSet<WBDataPortDescription>(comparator);
-        Set<WBDataPortDescription> componentOutputs = getExecutableComponentDescription().getOutputs();
+        Set<WBDataPortDescription> componentOutputs = compDesc.getOutputs();
         outputsSorted.addAll(componentOutputs);
 
         _outputs = new HashMap<String, ComponentPort>(componentOutputs.size());
@@ -153,7 +153,7 @@ public class Component extends VerticalContainerPanel {
                 imgIcon.setStyleName("component-box-icon");
                 add(imgIcon);
 
-                if (!getExecutableComponentDescription().getProperties().getKeys().isEmpty()) {
+                if (!compDesc.getProperties().getKeys().isEmpty()) {
                     Image imgProps = new Image("images/component-props.png");
                     imgProps.setStyleName("component-box-prop");
                     add(imgProps);
@@ -287,10 +287,6 @@ public class Component extends VerticalContainerPanel {
         _outputs.clear();
 
         super.beforeDestroy();
-    }
-
-    public WBExecutableComponentDescription getExecutableComponentDescription() {
-        return _compInstance.getExecutableComponentDescription();
     }
 
     public WBExecutableComponentInstanceDescription getInstanceDescription() {

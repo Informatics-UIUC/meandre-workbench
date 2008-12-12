@@ -42,15 +42,10 @@
 
 package org.seasr.meandre.workbench.server.rpc;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.StringReader;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.URI;
-import java.net.URL;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,7 +53,6 @@ import javax.servlet.http.HttpSession;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.meandre.client.MeandreAdminClient;
 import org.meandre.client.MeandreClient;
 import org.meandre.client.TransmissionException;
 import org.meandre.core.repository.ExecutableComponentDescription;
@@ -67,8 +61,6 @@ import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.security.Role;
-import org.meandre.core.security.SecurityStoreException;
-import org.meandre.core.security.User;
 import org.seasr.meandre.workbench.client.Application;
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentDescription;
@@ -84,7 +76,6 @@ import org.seasr.meandre.workbench.server.beans.converters.IBeanConverter;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 /**
  * @author Boris Capitanu
@@ -389,73 +380,53 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public WBFlowDescription uploadFlow(WBFlowDescription wbFlow, boolean overwrite)
+    public boolean uploadFlow(WBFlowDescription wbFlow, boolean overwrite)
         throws SessionExpiredException, MeandreCommunicationException, CorruptedFlowException {
 
         FlowDescription flow = MeandreConverter.WBFlowDescriptionConverter.convert(wbFlow);
 
-        String normalizedFlowURI = flow.getFlowComponent().getURI();
-        if (!normalizedFlowURI.endsWith("/")) normalizedFlowURI += "/";
+        String flowURI = flow.getFlowComponent().getURI();
+        System.out.println("Uploading flow " + flowURI);
 
-        System.out.println("Uploading flow: flowURI=" + normalizedFlowURI + "   desiredURI=" + wbFlow.getDesiredURI());
+        String execStepMsg = "";
+        try {
+            Model flowModel = flow.getModel();
 
-        if (!normalizedFlowURI.equals(wbFlow.getDesiredURI())) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            flow.getModel().write(baos, "N-TRIPLE");
-            String sModel = baos.toString().replaceAll(
-                    "<" + flow.getFlowComponent().getURI(),
-                    "<" + wbFlow.getDesiredURI());
-            Model flowModel = ModelFactory.createDefaultModel();
+            String fName = flowURI.replaceAll(":|/", "_");
+            String tempFolder = System.getProperty("java.io.tmpdir");
+            if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
+                tempFolder += System.getProperty("file.separator");
 
-            String execStepMsg = null;
-            try {
-                // START DEBUG
-                String fName = wbFlow.getDesiredURI().replaceAll(":|/", "_");
-                String tempFolder = System.getProperty("java.io.tmpdir");
-                if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
-                    tempFolder += System.getProperty("file.separator");
+            FileOutputStream ntStream = new FileOutputStream(tempFolder + fName + ".nt");
+            flowModel.write(ntStream, "N-TRIPLE");
+            ntStream.close();
 
-                FileWriter fw = new FileWriter(tempFolder + fName + ".nt");
-                fw.write(sModel);
-                fw.close();
-                // END DEBUG
+            FileOutputStream ttlStream = new FileOutputStream(tempFolder + fName + ".ttl");
+            flowModel.write(ttlStream, "TTL");
+            ttlStream.close();
 
-                execStepMsg = "STEP 1: Reading flow model";
-                flowModel.read(new StringReader(sModel), null, "N-TRIPLE");
+            execStepMsg = "STEP1: Creating RepositoryImpl from flow model";
+            RepositoryImpl repository = new RepositoryImpl(flowModel);
+            execStepMsg = "STEP2: Retrieving available flows";
+            Set<FlowDescription> flows = repository.getAvailableFlowDescriptions();
+            execStepMsg = "STEP3: Getting flow";
+            flow = flows.iterator().next();
+            if (flow == null)
+                throw new CorruptedFlowException("The flow obtained is null!");
+        }
+        catch (Exception e) {
 
-                // START DEBUG
-                FileOutputStream modelStream = new FileOutputStream(tempFolder + fName + ".ttl");
-                flowModel.write(modelStream, "TTL");
-                modelStream.close();
-                System.out.println("Model for flow " + wbFlow.getDesiredURI() + " written successfully in file " + tempFolder + fName);
-                // END DEBUG
+            CorruptedFlowException corruptedFlowException = (execStepMsg != null) ?
+                    new CorruptedFlowException(execStepMsg, e) : (CorruptedFlowException) e;
 
-                execStepMsg = "STEP 2: Creating RepositoryImpl(flowModel) - flowModel.isEmpty()=" + flowModel.isEmpty();
-                RepositoryImpl repository = new RepositoryImpl(flowModel);
-
-                execStepMsg = "STEP 3: Retrieving flows";
-                Set<FlowDescription> flows = repository.getAvailableFlowDescriptions();
-                execStepMsg = "STEP 4: Obtaining flow description - flows.size()=" + flows.size();
-                flow = flows.iterator().next();
-                execStepMsg = null;
-
-                if (flow == null)
-                    throw new CorruptedFlowException("The flow obtained from STEP 4 is null!");
-            }
-            catch (Exception e) {
-
-                CorruptedFlowException corruptedFlowException = (execStepMsg != null) ?
-                        new CorruptedFlowException(execStepMsg, e) : (CorruptedFlowException) e;
-
-                System.out.println("uploadFlow: " + Application.formatException(corruptedFlowException));
-                throw corruptedFlowException;
-            }
+            System.out.println("uploadFlow: " + Application.formatException(corruptedFlowException));
+            throw corruptedFlowException;
         }
 
         try {
             getClient().uploadFlow(flow, overwrite);
 
-            return MeandreConverter.FlowDescriptionConverter.convert(flow);
+            return true;
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
