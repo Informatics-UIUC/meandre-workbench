@@ -136,6 +136,7 @@ public class RepositoryPanel extends Panel {
         private final Set<ComponentsGridActionListener> _actionListeners =
             new HashSet<ComponentsGridActionListener>();
         private WBExecutableComponentDescription _selectedComponent = null;
+        private final GridSearchPlugin _gridSearch;
 
         public ComponentsGrid() {
             GroupingView gridView = new GroupingView();
@@ -212,8 +213,8 @@ public class RepositoryPanel extends Panel {
             final Toolbar topToolbar = new Toolbar();
             topToolbar.addFill();
 
-            final GridSearchPlugin gridSearch = new GridSearchPlugin(GridSearchPlugin.TOP);
-            gridSearch.setMode(GridSearchPlugin.LOCAL);
+            _gridSearch = new GridSearchPlugin(GridSearchPlugin.TOP);
+            _gridSearch.setMode(GridSearchPlugin.LOCAL);
 
             setTopToolbar(topToolbar);
             setSelectionModel(selectionModel);
@@ -228,7 +229,11 @@ public class RepositoryPanel extends Panel {
             setTitle("Components", "icon-components");
             setEnableDragDrop(true);
             setDdGroup("ddComponents");
-            addPlugin(gridSearch);
+            addPlugin(_gridSearch);
+        }
+
+        public void clearSearch() {
+            _gridSearch.setSearchText("");
         }
 
         public void setMask(String message) {
@@ -257,6 +262,7 @@ public class RepositoryPanel extends Panel {
         private final Set<FlowsGridActionListener> _actionListeners =
             new HashSet<FlowsGridActionListener>();
         private WBFlowDescription _selectedFlow = null;
+        private final GridSearchPlugin _gridSearch;
 
         public FlowsGrid() {
             GroupingView gridView = new GroupingView();
@@ -335,8 +341,8 @@ public class RepositoryPanel extends Panel {
             final Toolbar topToolbar = new Toolbar();
             topToolbar.addFill();
 
-            final GridSearchPlugin gridSearch = new GridSearchPlugin(GridSearchPlugin.TOP);
-            gridSearch.setMode(GridSearchPlugin.LOCAL);
+            _gridSearch = new GridSearchPlugin(GridSearchPlugin.TOP);
+            _gridSearch.setMode(GridSearchPlugin.LOCAL);
 
             setTopToolbar(topToolbar);
             setSelectionModel(selectionModel);
@@ -349,7 +355,11 @@ public class RepositoryPanel extends Panel {
             setBorder(false);
             setStripeRows(true);
             setTitle("Flows", "icon-flows");
-            addPlugin(gridSearch);
+            addPlugin(_gridSearch);
+        }
+
+        public void clearSearch() {
+            _gridSearch.setSearchText("");
         }
 
         public void setMask(String message) {
