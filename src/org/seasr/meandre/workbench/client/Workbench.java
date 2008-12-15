@@ -623,8 +623,6 @@ public class Workbench extends Application {
              */
             @Override
             public void onFlowSave(final WBFlowDescription flow, final AsyncCallback<WBFlowDescription> callback) {
-                // TODO check if the flow already exists and present overwrite message
-
                 // update the flow details
                 flow.setCreator(_session.getUserName());
                 flow.setCreationDate(new Date());
