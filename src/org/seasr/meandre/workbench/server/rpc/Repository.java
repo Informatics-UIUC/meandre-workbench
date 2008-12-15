@@ -43,9 +43,12 @@
 package org.seasr.meandre.workbench.server.rpc;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -92,6 +95,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                 return url.toString();
             }
         };
+
+    private final Map<String, InputStream> _flowConsoles = new HashMap<String, InputStream>();
 
     ///////////////
     // Workbench //
@@ -480,10 +485,51 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     // Execution //
     ///////////////
 
-    public String runFlow(String flowURL, boolean verbose)
+    public boolean runFlow(String flowURL, String token, boolean verbose)
         throws SessionExpiredException, MeandreCommunicationException {
 
-        throw new RuntimeException("Not yet implemented");
+        if (_flowConsoles.containsKey(flowURL)) return false;
+
+        try {
+            _flowConsoles.put(flowURL, getClient().runFlowStreamOutput(flowURL, token, verbose));
+            return true;
+        }
+        catch (TransmissionException e) {
+            throw new MeandreCommunicationException(e);
+        }
+    }
+
+    public String retrieveFlowOutput(String flowURL)
+        throws MeandreCommunicationException {
+
+        InputStream consoleStream = _flowConsoles.get(flowURL);
+        if (consoleStream == null)
+            throw new MeandreCommunicationException(flowURL + " has not been executed");
+
+        try {
+            int bufferSize = 1000;
+
+            byte[] data = new byte[bufferSize];
+            int nRead = consoleStream.read(data);
+
+            if (nRead == -1) {
+                // EOF detected
+                _flowConsoles.remove(flowURL);
+                return null;
+            }
+
+            try {
+                return new String(data, 0, nRead);
+            }
+            catch (Exception ex) {
+                throw new MeandreCommunicationException("Cannot create string from stream", ex);
+            }
+        }
+        catch (IOException e) {
+            _flowConsoles.remove(flowURL);
+
+            throw new MeandreCommunicationException(e);
+        }
     }
 
     public Map<String, String> retrieveRunningFlows()

@@ -174,18 +174,16 @@ public class WorkspaceTab extends Panel {
             }
         });
 
-        final ToolbarButton btnRunFlow = new ToolbarButton("Run flow");
-        btnRunFlow.setIconCls("icon-flow-run");
-        btnRunFlow.addListener(new ButtonListenerAdapter() {
+        _btnRunFlow.setIconCls("icon-flow-run");
+        _btnRunFlow.addListener(new ButtonListenerAdapter() {
             @Override
             public void onClick(Button button, EventObject e) {
                 runFlow();
             }
         });
 
-        final ToolbarButton btnStopFlow = new ToolbarButton("Stop flow");
-        btnStopFlow.setIconCls("icon-flow-stop");
-        btnStopFlow.addListener(new ButtonListenerAdapter() {
+        _btnStopFlow.setIconCls("icon-flow-stop");
+        _btnStopFlow.addListener(new ButtonListenerAdapter() {
             @Override
             public void onClick(Button button, EventObject e) {
                 for (WorkspaceActionListener listener : _actionListeners)
@@ -198,8 +196,8 @@ public class WorkspaceTab extends Panel {
         toolbar.addSeparator();
         toolbar.addButton(_btnRemoveComponent);
         toolbar.addFill();
-        toolbar.addButton(btnRunFlow);
-        toolbar.addButton(btnStopFlow);
+        toolbar.addButton(_btnRunFlow);
+        toolbar.addButton(_btnStopFlow);
 
         setTopToolbar(toolbar);
 
@@ -258,6 +256,16 @@ public class WorkspaceTab extends Panel {
                 return true;
             }
         };
+    }
+
+    public void enableRunFlow() {
+        _btnRunFlow.enable();
+        _btnStopFlow.disable();
+    }
+
+    public void disableRunFlow() {
+        _btnRunFlow.disable();
+        _btnStopFlow.enable();
     }
 
     public void loadFlow(final WBFlowDescription flow) {
@@ -996,6 +1004,8 @@ public class WorkspaceTab extends Panel {
 
     private static int _webUICounter = 0;
     private WBWebUIInfo _webUIInfo = null;
+    private final ToolbarButton _btnRunFlow = new ToolbarButton("Run flow");
+    private final ToolbarButton _btnStopFlow = new ToolbarButton("Stop flow");
     public void openWebUI() {
 //        WebUI webUI = new WebUI(_wbFlow.getName(), webUIInfo);
 //        webUI.show();

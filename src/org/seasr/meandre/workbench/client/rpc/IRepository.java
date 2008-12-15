@@ -389,13 +389,23 @@ public interface IRepository extends RemoteService {
      * Starts execution of a flow
      *
      * @param flowURL The flow id
-     * @param verbose true to capture output, false otherwise
-     * @return The execution output
+     * @param verbose true to includddde execution statistics in the flow output, false otherwise
+     * @return true whether the flow has started executing, false otherwise
      * @throws SessionExpiredException Thrown if the user's session has expired
      * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
      */
-    public String runFlow(String flowURL, boolean verbose)
+    public boolean runFlow(String flowURL, String token, boolean verbose)
         throws SessionExpiredException, MeandreCommunicationException;
+
+    /**
+     * Retrieves available console output as a flow executes
+     *
+     * @param flowURL The flow id for which output should be retrieved
+     * @return The execution output
+     * @throws MeandreCommunicationException Thrown if a problem occurs retrieving the output from the executing flow
+     */
+    public String retrieveFlowOutput(String flowURL)
+        throws MeandreCommunicationException;
 
     /**
      * Retrieves the running flows
