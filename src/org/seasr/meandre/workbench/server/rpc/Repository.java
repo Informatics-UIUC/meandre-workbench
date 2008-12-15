@@ -97,6 +97,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         };
 
     private final Map<String, InputStream> _flowConsoles = new HashMap<String, InputStream>();
+    private String _userName, _password, _hostName;
+    private int _port;
 
     ///////////////
     // Workbench //
@@ -114,7 +116,12 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         HttpSession session = getHttpSession();
         assert (session != null);
 
-        if (session.getAttribute("client") == null) {
+        _userName = userName;
+        _password = password;
+        _hostName = hostName;
+        _port = port;
+
+        if (session.getAttribute("session") == null) {
             session.setMaxInactiveInterval(SESSION_TIMEOUT);
             //session.setMaxInactiveInterval(40);  // For testing
 
@@ -138,7 +145,6 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                 WBSession wbSession =
                     new WBSession(session.getId(), userName, password, userRoles, hostName, port);
 
-                session.setAttribute("client", client);
                 session.setAttribute("session", wbSession);
 
                 return wbSession;
@@ -549,7 +555,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
 
         try {
             JSONObject joWebUIInfo = getClient().retrieveWebUIInfo(token);
-            return (joWebUIInfo != null && joWebUIInfo.has("hostname")) ?
+            return (joWebUIInfo != null && joWebUIInfo.has("port") && joWebUIInfo.getInt("port") > 0) ?
                 new WBWebUIInfo(
                         joWebUIInfo.getString("hostname"),
                         joWebUIInfo.getInt("port"),
@@ -634,7 +640,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         HttpSession session = getHttpSession();
         assert(session != null);
 
-        if (session.getAttribute("client") == null)
+        if (session.getAttribute("session") == null)
             throw new SessionExpiredException();
 
         return session;
@@ -643,7 +649,12 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     private MeandreClient getClient()
         throws SessionExpiredException {
 
-        return (MeandreClient) checkSession().getAttribute("client");
+        checkSession();
+
+        MeandreClient client = new MeandreClient(_hostName, _port);
+        client.setCredentials(_userName, _password);
+
+        return client;
     }
 
     private QueryableRepository getRepository()

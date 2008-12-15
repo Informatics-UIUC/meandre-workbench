@@ -723,7 +723,7 @@ public class Workbench extends Application {
                         };
 
                         if (flowHasWebUI(flow)) {
-                            Log.debug("Flow should have a WebUI - looking for one (timeout: " + WEBUI_TIMEOUT/1000 + " seconds)...");
+                            outputPanel.print("Flow should have a WebUI - looking for one (timeout: " + WEBUI_TIMEOUT/1000 + " seconds)...\n");
 
                             // wait to receive the WebUI info for the component
                             Timer webUITimer = new Timer() {
@@ -737,8 +737,8 @@ public class Workbench extends Application {
                                         Long timeNow = new Date().getTime();
                                         // give up if we waited long enough
                                         if (timeNow - startTime > WEBUI_TIMEOUT) {
-                                            Log.debug("WebUI retrieve timeout");
-                                            cancel();
+                                            outputPanel.print("WebUI retrieve timeout\n\n");
+                                            //cancel();
                                             resultsTimer.schedule(1);
                                             return;
                                         }
@@ -755,10 +755,10 @@ public class Workbench extends Application {
                                                 return;
                                             }
 
-                                            cancel();
+                                            //cancel();
 
-                                            Log.info("Found WebUI: " + webUIInfo.getWebUIUrl() + " (" +
-                                                    webUIInfo.getURI() + ") token: " + webUIInfo.getToken());
+                                            outputPanel.print("Found WebUI: " + webUIInfo.getWebUIUrl() + " (" +
+                                                    webUIInfo.getURI() + ") token: " + webUIInfo.getToken() + "\n\n");
 
                                             flowTab.setWebUIInfo(webUIInfo);
                                             flowTab.openWebUI();
@@ -803,6 +803,7 @@ public class Workbench extends Application {
                     @Override
                     public void onSuccess(Boolean success) {
                         workspaceTab.setWebUIInfo(null);
+                        workspaceTab.enableRunFlow();
                         Application.showMessage("Abort Flow", "Request successfully dispatched", MessageBox.INFO);
                     }
 
