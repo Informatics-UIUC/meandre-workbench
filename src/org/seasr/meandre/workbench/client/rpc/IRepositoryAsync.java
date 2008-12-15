@@ -276,7 +276,6 @@ public interface IRepositoryAsync {
      * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
      * @throws CorruptedFlowException Thrown if the repository state on the server is corrupted
      */
-    // TODO: change return type to boolean once refactoring is done
     public void uploadFlow(WBFlowDescription flow, boolean overwrite, AsyncCallback<Boolean> callback);
 
     /**
@@ -332,12 +331,21 @@ public interface IRepositoryAsync {
      * Starts execution of a flow
      *
      * @param flowURL The flow id
-     * @param verbose true to capture output, false otherwise
-     * @return The execution output
+     * @param verbose true to includddde execution statistics in the flow output, false otherwise
+     * @return true whether the flow has started executing, false otherwise
      * @throws SessionExpiredException Thrown if the user's session has expired
      * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
      */
-    public void runFlow(String flowURL, boolean verbose, AsyncCallback<String> callback);
+    public void runFlow(String flowURL, String token, boolean verbose, AsyncCallback<Boolean> callback);
+
+    /**
+     * Retrieves available console output as a flow executes
+     *
+     * @param flowURL The flow id for which output should be retrieved
+     * @return The execution output
+     * @throws MeandreCommunicationException Thrown if a problem occurs retrieving the output from the executing flow
+     */
+    public void retrieveFlowOutput(String flowURL, AsyncCallback<String> callback);
 
     /**
      * Retrieves the running flows

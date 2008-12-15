@@ -53,7 +53,7 @@ public class OutputPanel extends Panel {
 
     public OutputPanel() {
         setHeight(200);
-        setCollapsible(false);
+        setCollapsible(true);
         setLayout(new CardLayout());
         setTitle("Output");
         setActiveItem(0);

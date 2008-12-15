@@ -74,6 +74,7 @@ public class DetailsPanel extends Panel {
     private final TabPanel _tabPanelBottom = new TabPanel();
     private final DocPanel _docPanel = new DocPanel();
     private final PropPanel _propPanel = new PropPanel();
+    private final RepositoryState _repositoryState = RepositoryState.getInstance();
 
     private WorkspaceTab _focusedTab = null;
 
@@ -189,7 +190,7 @@ public class DetailsPanel extends Panel {
         _focusedTab = tab;
 
         WBExecutableComponentDescription compDesc =
-            RepositoryState.getInstance().getComponent(component.getInstanceDescription().getExecutableComponent());
+            _repositoryState.getComponent(component.getInstanceDescription().getExecutableComponent());
         WBExecutableComponentInstanceDescription compInstanceDesc = component.getInstanceDescription();
         _propPanel.viewComponent(compInstanceDesc, compDesc.getProperties().getKeys());
         _docPanel.setHtml(getDocumentationHtml(compInstanceDesc));

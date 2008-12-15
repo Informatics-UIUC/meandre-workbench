@@ -68,8 +68,10 @@ import org.seasr.meandre.workbench.client.rpc.IRepositoryAsync;
 import org.seasr.meandre.workbench.client.widgets.AddLocationDialog;
 import org.seasr.meandre.workbench.client.widgets.Component;
 import org.seasr.meandre.workbench.client.widgets.CreditsDialog;
+import org.seasr.meandre.workbench.client.widgets.FlowOutputPanel;
 import org.seasr.meandre.workbench.client.widgets.LoginDialog;
 import org.seasr.meandre.workbench.client.widgets.MainPanel;
+import org.seasr.meandre.workbench.client.widgets.OutputPanel;
 import org.seasr.meandre.workbench.client.widgets.RepositoryPanel;
 import org.seasr.meandre.workbench.client.widgets.WorkspacePanel;
 import org.seasr.meandre.workbench.client.widgets.WorkspaceTab;
@@ -116,8 +118,6 @@ public class Workbench extends Application {
     private CreditsDialog _creditsDialog;
     private LoginDialog _loginDialog;
     private WBSession _session;
-    private String _meandreBaseURL;
-
     private static boolean _loggingOut = false;
 
     /**
@@ -212,10 +212,6 @@ public class Workbench extends Application {
      */
     protected void onLoginSuccess(WBSession session) {
         _session = session;
-
-        // constructs the base url used for invoking the execute flow service on the meandre server
-        _meandreBaseURL = "http://" + _session.getUserName() + ":" + _session.getPassword() +
-            "@" + _session.getHostName() + ":" + _session.getPort();
 
         // remove all visual elements
         RootPanel.get().clear();
@@ -623,8 +619,6 @@ public class Workbench extends Application {
              */
             @Override
             public void onFlowSave(final WBFlowDescription flow, final AsyncCallback<WBFlowDescription> callback) {
-                // TODO check if the flow already exists and present overwrite message
-
                 // update the flow details
                 flow.setCreator(_session.getUserName());
                 flow.setCreationDate(new Date());
@@ -683,88 +677,112 @@ public class Workbench extends Application {
              */
             @Override
             public void onFlowRun(final WorkspaceTab flowTab) {
-                WBFlowDescription flow = flowTab.getFlowDescription();
+                final WBFlowDescription flow = flowTab.getFlowDescription();
+                final String flowURI = flow.getFlowURI();
+                final FlowOutputPanel outputPanel = flowTab.getFlowOutputPanel();
 
-                // construct the URL used to execute the flow on the server
+                OutputPanel panel = _mainPanel.getWorkspacePanel().getOutputPanel();
+                if (panel.isCollapsed()) panel.setCollapsed(false);
+
+                flowTab.disableRunFlow();
+                outputPanel.clearResults();
+                Log.info("Running flow " + flowURI);
+
                 final String token = _session.getUserName() + "_" + new Date().getTime();
-                String meandreExecuteURL = _meandreBaseURL + "/services/execute/flow.txt";
-                String runFlowURL = meandreExecuteURL + "?uri=" + flow.getFlowURI() + "&statistics=true&token=" + token;
 
-                Log.info("Running flow " + runFlowURL);
-                // start the flow
-                flowTab.getFlowOutputPanel().setUrl(runFlowURL);
+                outputPanel.setMask("Executing flow, please wait...");
+                Repository.runFlow(flowURI, token, true, new WBCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean result) {
+                        Log.info("Flow " + flowURI + " started successfully");
 
-                boolean showWebUI = false;
+                        final Timer resultsTimer = new Timer() {
+                            @Override
+                            public void run() {
+                                Repository.retrieveFlowOutput(flowURI, new WBCallback<String>() {
+                                    @Override
+                                    public void onSuccess(String output) {
+                                        if (output == null) {
+                                            outputPanel.clearMask();
+                                            flowTab.enableRunFlow();
+                                            return;
+                                        }
 
-                // check if the flow contains any components that have a WebUI
-                for (WBExecutableComponentInstanceDescription compInstance : flow.getExecutableComponentInstances()) {
-                    WBExecutableComponentDescription compDesc = _repositoryState.getComponent(compInstance.getExecutableComponent());
-                    if (compDesc == null) {
-                        Log.error("Cannot retrieve ECD (" + compInstance.getExecutableComponent() +
-                                ") for instance " + compInstance.getExecutableComponentInstance() +
-                                " - ignoring error");
-                        continue;
-                    }
-                    if (compDesc.getMode().equals(WBExecutableComponentDescription.WEBUI_COMPONENT)) {
-                        boolean isConnected = false;
-                        for (WBConnectorDescription connector : flow.getConnectorDescriptions())
-                            if (connector.getTargetInstance().equals(compInstance.getExecutableComponentInstance())) {
-                                isConnected = true;
-                                break;
-                            }
-                        if (compDesc.getInputs().isEmpty() || isConnected) {
-                            showWebUI = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (showWebUI) {
-                    Log.debug("Flow should have a WebUI - looking for one (timeout: " + WEBUI_TIMEOUT/1000 + " seconds)...");
-
-                    // wait to receive the WebUI info for the component
-                    Timer timer = new Timer() {
-                        private Long startTime = null;
-
-                        @Override
-                        public void run() {
-                            if (startTime == null)
-                                startTime = new Date().getTime();
-                            else {
-                                Long timeNow = new Date().getTime();
-                                // give up if we waited long enough
-                                if (timeNow - startTime > WEBUI_TIMEOUT) {
-                                    Log.debug("WebUI retrieve timeout");
-                                    cancel();
-                                    return;
-                                }
-                            }
-
-                            Log.debug("Checking for WebUI");
-
-                            // check whether a WebUI is available (via RPC)
-                            Repository.retrieveWebUIInfo(token, new WBCallback<WBWebUIInfo>() {
-                                @Override
-                                public void onSuccess(WBWebUIInfo webUIInfo) {
-                                    if (webUIInfo == null) {
-                                        schedule(1000);
-                                        return;
+                                        outputPanel.print(output);
+                                        schedule(1);
                                     }
 
-                                    cancel();
+                                    @Override
+                                    public void onFailure(Throwable caught) {
+                                        super.onFailure(caught);
+                                        flowTab.enableRunFlow();
+                                        outputPanel.clearMask();
+                                    }
+                                });
+                            }
+                        };
 
-                                    Log.info("Found WebUI: " + webUIInfo.getWebUIUrl() + " (" +
-                                            webUIInfo.getURI() + ") token: " + webUIInfo.getToken());
+                        if (flowHasWebUI(flow)) {
+                            outputPanel.print("Flow should have a WebUI - looking for one (timeout: " + WEBUI_TIMEOUT/1000 + " seconds)...\n");
 
-                                    flowTab.setWebUIInfo(webUIInfo);
-                                    flowTab.openWebUI();
+                            // wait to receive the WebUI info for the component
+                            Timer webUITimer = new Timer() {
+                                private Long startTime = null;
+
+                                @Override
+                                public void run() {
+                                    if (startTime == null)
+                                        startTime = new Date().getTime();
+                                    else {
+                                        Long timeNow = new Date().getTime();
+                                        // give up if we waited long enough
+                                        if (timeNow - startTime > WEBUI_TIMEOUT) {
+                                            outputPanel.print("WebUI retrieve timeout\n\n");
+                                            //cancel();
+                                            resultsTimer.schedule(1);
+                                            return;
+                                        }
+                                    }
+
+                                    Log.debug("Checking for WebUI");
+
+                                    // check whether a WebUI is available (via RPC)
+                                    Repository.retrieveWebUIInfo(token, new WBCallback<WBWebUIInfo>() {
+                                        @Override
+                                        public void onSuccess(WBWebUIInfo webUIInfo) {
+                                            if (webUIInfo == null) {
+                                                schedule(1000);
+                                                return;
+                                            }
+
+                                            //cancel();
+
+                                            outputPanel.print("Found WebUI: " + webUIInfo.getWebUIUrl() + " (" +
+                                                    webUIInfo.getURI() + ") token: " + webUIInfo.getToken() + "\n\n");
+
+                                            flowTab.setWebUIInfo(webUIInfo);
+                                            flowTab.openWebUI();
+
+                                            resultsTimer.schedule(1);
+                                        }
+                                    });
                                 }
-                            });
-                        }
-                    };
+                            };
 
-                    timer.schedule(2000);
-                }
+                            webUITimer.schedule(2000);
+                        }
+                        else
+                            resultsTimer.schedule(1);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        super.onFailure(caught);
+                        flowTab.enableRunFlow();
+                        outputPanel.clearMask();
+                    }
+
+                });
             }
 
             /**
@@ -785,6 +803,7 @@ public class Workbench extends Application {
                     @Override
                     public void onSuccess(Boolean success) {
                         workspaceTab.setWebUIInfo(null);
+                        workspaceTab.enableRunFlow();
                         Application.showMessage("Abort Flow", "Request successfully dispatched", MessageBox.INFO);
                     }
 
@@ -948,5 +967,33 @@ public class Workbench extends Application {
      */
     private void resetDetails() {
         _mainPanel.getDetailsPanel().reset();
+    }
+
+    private boolean flowHasWebUI(WBFlowDescription flow) {
+        boolean showWebUI = false;
+
+        // check if the flow contains any components that have a WebUI
+        for (WBExecutableComponentInstanceDescription compInstance : flow.getExecutableComponentInstances()) {
+            WBExecutableComponentDescription compDesc = _repositoryState.getComponent(compInstance.getExecutableComponent());
+            if (compDesc == null) {
+                Log.error("Cannot retrieve ECD (" + compInstance.getExecutableComponent() +
+                        ") for instance " + compInstance.getExecutableComponentInstance() +
+                        " - ignoring error");
+                continue;
+            }
+            if (compDesc.getMode().equals(WBExecutableComponentDescription.WEBUI_COMPONENT)) {
+                boolean isConnected = false;
+                for (WBConnectorDescription connector : flow.getConnectorDescriptions())
+                    if (connector.getTargetInstance().equals(compInstance.getExecutableComponentInstance())) {
+                        isConnected = true;
+                        break;
+                    }
+                if (compDesc.getInputs().isEmpty() || isConnected) {
+                    showWebUI = true;
+                    break;
+                }
+            }
+        }
+        return showWebUI;
     }
 }
