@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.seasr.meandre.workbench.client.Application;
 import org.seasr.meandre.workbench.client.RepositoryState;
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBConnectorDescription;
@@ -125,6 +126,8 @@ public class WorkspaceTab extends Panel {
     private final ToolbarButton _btnSave = new ToolbarButton("Save");
     private final ToolbarButton _btnSaveAs = new ToolbarButton("Save As");
     private final ToolbarButton _btnRemoveComponent = new ToolbarButton("Remove");
+
+    private final RepositoryState _repositoryState = RepositoryState.getInstance();
 
 
     public WorkspaceTab(final WBFlowDescription flow) {
@@ -264,9 +267,8 @@ public class WorkspaceTab extends Panel {
         for (int i = 0; i < nInstances; i++) {
             WBExecutableComponentInstanceDescription compInstance = instances[i];
 
-            // attempt to retrieve the component description for this instance
             WBExecutableComponentDescription compDesc =
-                RepositoryState.getInstance().getComponent(compInstance.getExecutableComponent()); //TODO refactor
+                _repositoryState.getComponent(compInstance.getExecutableComponent());
 
             if (compDesc == null) {
                 Log.error("Could not find the component: " + compInstance.getExecutableComponent() + " - removing from flow");
@@ -310,9 +312,26 @@ public class WorkspaceTab extends Panel {
     }
 
     private void saveFlow(boolean saveAs, final AsyncCallback<WBFlowDescription> callback) {
-        if (_wbFlow.getName().length() == 0 || saveAs) {
+        if ((_wbFlow.getName().length() == 0 || saveAs)) {
             SaveFlowDialog saveDialog = new SaveFlowDialog(new SaveFlowListener() {
-                public void onSave(String name, String description, String rights, String baseURI, String tags) {
+                public void onSave(final String name, final String description, final String rights, final String baseURI, final String tags) {
+                    // Check whether the flow exists on the server
+                    String flowURI = baseURI + name.toLowerCase().replaceAll(" |\t|/|'", "-") + "/";
+                    if (_repositoryState.getFlow(flowURI) != null)
+                        Application.showMessage(
+                                "Overwrite",
+                                "A flow with the name '" + name + "' already exists on the server.<br/><b>Do you want to overwrite it?</b>",
+                                MessageBox.WARNING, MessageBox.YESNO, new PromptCallback() {
+                                    public void execute(String btnID, String text) {
+                                        if (btnID.equalsIgnoreCase("yes"))
+                                            saveFlow(name, description, rights, baseURI, tags, callback);
+                                    }
+                                });
+                    else
+                        saveFlow(name, description, rights, baseURI, tags, callback);
+                }
+
+                private void saveFlow(String name, String description, String rights, String baseURI, String tags, final AsyncCallback<WBFlowDescription> callback) {
                     _wbFlow.setName(name);
                     _wbFlow.setDescription(description);
                     _wbFlow.setRights(rights);
