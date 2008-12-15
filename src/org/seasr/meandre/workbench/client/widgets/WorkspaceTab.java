@@ -648,13 +648,13 @@ public class WorkspaceTab extends Panel {
                         return;
                     }
 
-                    _selectedPort.disconnect();
-                    port.disconnect();
-
                     final ComponentPort srcPort =
                         _selectedPort.getPortType() == PortType.OUTPUT ? _selectedPort : port;
                     final ComponentPort dstPort =
                         port.getPortType() == PortType.INPUT ? port : _selectedPort;
+
+                    srcPort.disconnect();  // cannot have two connections leaving an output port,
+                                           // but it's ok to have two connections coming into an input port
 
                     String baseURI = _wbFlow.getNormalizedFlowURI() + "connector/";
 

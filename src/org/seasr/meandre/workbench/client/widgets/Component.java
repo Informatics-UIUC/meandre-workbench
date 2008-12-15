@@ -58,7 +58,6 @@ import org.seasr.meandre.workbench.client.listeners.ComponentActionListener;
 
 import pl.balon.gwt.diagrams.client.connection.Connection;
 import pl.balon.gwt.diagrams.client.connection.RectilinearTwoEndedConnection;
-import pl.balon.gwt.diagrams.client.connection.TwoEndedConnection;
 import pl.balon.gwt.diagrams.client.connector.Connector;
 import pl.balon.gwt.diagrams.client.connector.Direction;
 import pl.balon.gwt.diagrams.client.connector.UIObjectConnector;
@@ -420,17 +419,24 @@ public class Component extends VerticalContainerPanel {
             port.updateConnection();
     }
 
-    public static RectilinearTwoEndedConnection getConnection(Connector connector) {
-        Collection<Connection> connections = connector.getConnections();
-        return connections.isEmpty() ? null : (RectilinearTwoEndedConnection) connections.iterator().next();
+    public static Collection<RectilinearTwoEndedConnection> getConnections(Connector connector) {
+        Collection<RectilinearTwoEndedConnection> connections = new HashSet<RectilinearTwoEndedConnection>();
+        for (Connection connection : connector.getConnections())
+            connections.add((RectilinearTwoEndedConnection) connection);
+
+        return connections.isEmpty() ? null : connections;
     }
 
-    public static UIObjectConnector getLinkedConnector(Connector connector) {
-        TwoEndedConnection connection = getConnection(connector);
-        if (connection == null) return null;
+    public static Collection<UIObjectConnector> getLinkedConnectors(Connector connector) {
+        Collection<RectilinearTwoEndedConnection> connections = getConnections(connector);
+        if (connections == null) return null;
 
-        return (UIObjectConnector) (connection.getSource() == connector ?
-                connection.getTarget() : connection.getSource());
+        Collection<UIObjectConnector> connectors = new HashSet<UIObjectConnector>();
+        for (RectilinearTwoEndedConnection connection : connections)
+            connectors.add((UIObjectConnector) (connection.getSource() == connector ?
+                connection.getTarget() : connection.getSource()));
+
+        return connectors;
     }
 
     private void raiseClick(EventObject e) {
@@ -511,13 +517,16 @@ public class Component extends VerticalContainerPanel {
                             highlight();
 
                             if (isConnected()) {
-                                RectilinearTwoEndedConnection connection = getConnection(_connector);
-                                connection.addLineStyleName("connection-highlight");
-                                ComponentPort linkedPort =
-                                    (ComponentPort) getLinkedConnector(_connector).getWrappedElement();
-                                linkedPort.highlight();
-                                if (e.isShiftKey())
-                                    linkedPort.showToolTip();
+                                Collection<RectilinearTwoEndedConnection> connections = getConnections(_connector);
+                                for (RectilinearTwoEndedConnection connection : connections) {
+                                    connection.addLineStyleName("connection-highlight");
+                                    for (UIObjectConnector connector : getLinkedConnectors(_connector)) {
+                                        ComponentPort linkedPort = (ComponentPort) connector.getWrappedElement();
+                                        linkedPort.highlight();
+                                        if (e.isShiftKey())
+                                            linkedPort.showToolTip();
+                                    }
+                                }
                             }
                         }
                     });
@@ -530,12 +539,15 @@ public class Component extends VerticalContainerPanel {
                             removeHighlight();
 
                             if (isConnected()) {
-                                RectilinearTwoEndedConnection connection = getConnection(_connector);
-                                connection.removeLineStyleName("connection-highlight");
-                                ComponentPort linkedPort =
-                                    (ComponentPort) getLinkedConnector(_connector).getWrappedElement();
-                                linkedPort.removeHighlight();
-                                linkedPort.hideToolTip();
+                                Collection<RectilinearTwoEndedConnection> connections = getConnections(_connector);
+                                for (RectilinearTwoEndedConnection connection : connections) {
+                                    connection.removeLineStyleName("connection-highlight");
+                                    for (UIObjectConnector connector : getLinkedConnectors(_connector)) {
+                                        ComponentPort linkedPort = (ComponentPort) connector.getWrappedElement();
+                                        linkedPort.removeHighlight();
+                                        linkedPort.hideToolTip();
+                                    }
+                                }
                             }
                         }
                      });
@@ -623,7 +635,7 @@ public class Component extends VerticalContainerPanel {
         }
 
         public boolean isConnected() {
-            return getConnection(_connector) != null;
+            return getConnections(_connector) != null;
         }
 
         public void disconnect() {
@@ -633,18 +645,23 @@ public class Component extends VerticalContainerPanel {
 
             if (!isConnected()) return;
 
-            ComponentPort otherPort =
-                (ComponentPort) getLinkedConnector(_connector).getWrappedElement();
-            otherPort.removeHighlight();
+            Collection<ComponentPort> otherPorts = new HashSet<ComponentPort>();
+            for (UIObjectConnector connector : getLinkedConnectors(_connector)) {
+                ComponentPort otherPort = (ComponentPort) connector.getWrappedElement();
+                otherPort.removeHighlight();
+                otherPorts.add(otherPort);
+            }
 
-            getConnection(_connector).remove();
+            for (RectilinearTwoEndedConnection connection : getConnections(_connector))
+                connection.remove();
 
             for (ComponentActionListener listener : _actionListeners)
-                listener.onPortDisconnected(this, otherPort);
+                for (ComponentPort port : otherPorts)
+                    listener.onPortDisconnected(this, port);
 
-            for (ComponentActionListener listener : otherPort.getComponent()._actionListeners)
-                listener.onPortDisconnected(otherPort, this);
-
+            for (ComponentPort port : otherPorts)
+                for (ComponentActionListener listener : port.getComponent()._actionListeners)
+                    listener.onPortDisconnected(port, this);
         }
 
         public void updateConnection() {
