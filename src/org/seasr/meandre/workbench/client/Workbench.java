@@ -43,6 +43,8 @@
 package org.seasr.meandre.workbench.client;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBConnectorDescription;
@@ -119,6 +121,8 @@ public class Workbench extends Application {
     private LoginDialog _loginDialog;
     private WBSession _session;
     private static boolean _loggingOut = false;
+
+    private Map<WBFlowDescription, String> _executionMap = new HashMap<WBFlowDescription, String>();
 
     /**
      * Called at application startup (from Application.java)
@@ -703,6 +707,8 @@ public class Workbench extends Application {
                                     @Override
                                     public void onSuccess(String output) {
                                         if (output == null) {
+                                            // Flow execution finished
+                                            flowTab.setWebUIInfo(null);
                                             flowTab.enableRunFlow();
                                             return;
                                         }
@@ -714,61 +720,45 @@ public class Workbench extends Application {
                                     @Override
                                     public void onFailure(Throwable caught) {
                                         super.onFailure(caught);
+                                        flowTab.setWebUIInfo(null);
                                         flowTab.enableRunFlow();
                                     }
                                 });
                             }
                         };
 
-                        if (flowHasWebUI(flow)) {
-                            outputPanel.print("Flow should have a WebUI - looking for one (timeout: " + WEBUI_TIMEOUT/1000 + " seconds)...\n");
 
-                            // wait to receive the WebUI info for the component
-                            Timer webUITimer = new Timer() {
-                                private Long startTime = null;
-
-                                @Override
-                                public void run() {
-                                    if (startTime == null)
-                                        startTime = new Date().getTime();
-                                    else {
-                                        Long timeNow = new Date().getTime();
-                                        // give up if we waited long enough
-                                        if (timeNow - startTime > WEBUI_TIMEOUT) {
-                                            outputPanel.print("WebUI retrieve timeout\n\n");
-                                            resultsTimer.schedule(1);
+                        // wait to receive the runtime info for the flow
+                        Timer webUITimer = new Timer() {
+                            @Override
+                            public void run() {
+                                Repository.retrieveWebUIInfo(token, new WBCallback<WBWebUIInfo>() {
+                                    @Override
+                                    public void onSuccess(WBWebUIInfo webUIInfo) {
+                                        if (webUIInfo == null) {
+                                            schedule(10);
                                             return;
                                         }
-                                    }
 
-                                    // check whether a WebUI is available (via RPC)
-                                    Repository.retrieveWebUIInfo(token, new WBCallback<WBWebUIInfo>() {
-                                        @Override
-                                        public void onSuccess(WBWebUIInfo webUIInfo) {
-                                            if (webUIInfo == null) {
-                                                schedule(1000);
-                                                return;
-                                            }
-
-                                            outputPanel.print("Found WebUI: " + webUIInfo.getWebUIUrl() + " (" +
-                                                    webUIInfo.getURI() + ") token: " + webUIInfo.getToken() + "\n\n");
-
-                                            flowTab.setWebUIInfo(webUIInfo);
+                                        flowTab.setWebUIInfo(webUIInfo);
+                                        if (flowHasWebUI(flow)) {
+                                            outputPanel.print("Displaying WebUI...\n");
                                             flowTab.openWebUI();
-
-                                            outputPanel.clearMask();
-                                            resultsTimer.schedule(1);
                                         }
-                                    });
-                                }
-                            };
 
-                            webUITimer.schedule(2000);
-                        }
-                        else {
-                            outputPanel.clearMask();
-                            resultsTimer.schedule(1);
-                        }
+                                        outputPanel.clearMask();
+                                        resultsTimer.schedule(1);
+                                    }
+                                });
+                            }
+                        };
+
+                        webUITimer.schedule(1);
+//                        }
+//                        else {
+//                            outputPanel.clearMask();
+//                            resultsTimer.schedule(1);
+//                        }
                     }
 
                     @Override

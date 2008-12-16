@@ -261,12 +261,10 @@ public class WorkspaceTab extends Panel {
 
     public void enableRunFlow() {
         _btnRunFlow.enable();
-        _btnStopFlow.disable();
     }
 
     public void disableRunFlow() {
         _btnRunFlow.disable();
-        _btnStopFlow.enable();
     }
 
     public void loadFlow(final WBFlowDescription flow) {
@@ -1037,6 +1035,11 @@ public class WorkspaceTab extends Panel {
     }
 
     public void setWebUIInfo(WBWebUIInfo webUI) {
+        if (webUI != null)
+            _btnStopFlow.enable();
+        else
+            _btnStopFlow.disable();
+
         _webUIInfo = webUI;
     }
 
