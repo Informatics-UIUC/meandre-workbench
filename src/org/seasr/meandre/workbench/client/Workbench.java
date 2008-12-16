@@ -68,6 +68,7 @@ import org.seasr.meandre.workbench.client.rpc.IRepositoryAsync;
 import org.seasr.meandre.workbench.client.widgets.AddLocationDialog;
 import org.seasr.meandre.workbench.client.widgets.Component;
 import org.seasr.meandre.workbench.client.widgets.CreditsDialog;
+import org.seasr.meandre.workbench.client.widgets.ErrorWindow;
 import org.seasr.meandre.workbench.client.widgets.FlowOutputPanel;
 import org.seasr.meandre.workbench.client.widgets.LoginDialog;
 import org.seasr.meandre.workbench.client.widgets.MainPanel;
@@ -675,6 +676,9 @@ public class Workbench extends Application {
              */
             @Override
             public void onFlowRun(final WorkspaceTab flowTab) {
+//                ErrorWindow errWin = new ErrorWindow("Error", "There is an error", new Exception("This is the exception text"));
+//                errWin.show();
+
                 final WBFlowDescription flow = flowTab.getFlowDescription();
                 final String flowURI = flow.getFlowURI();
                 final FlowOutputPanel outputPanel = flowTab.getFlowOutputPanel();
