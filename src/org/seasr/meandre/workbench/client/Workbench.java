@@ -682,7 +682,7 @@ public class Workbench extends Application {
                 final FlowOutputPanel outputPanel = flowTab.getFlowOutputPanel();
 
                 OutputPanel panel = _mainPanel.getWorkspacePanel().getOutputPanel();
-                if (panel.isCollapsed()) panel.setCollapsed(false);
+                if (panel.isCollapsed()) panel.expand();
 
                 flowTab.disableRunFlow();
                 outputPanel.clearResults();
@@ -703,7 +703,6 @@ public class Workbench extends Application {
                                     @Override
                                     public void onSuccess(String output) {
                                         if (output == null) {
-                                            outputPanel.clearMask();
                                             flowTab.enableRunFlow();
                                             return;
                                         }
@@ -716,7 +715,6 @@ public class Workbench extends Application {
                                     public void onFailure(Throwable caught) {
                                         super.onFailure(caught);
                                         flowTab.enableRunFlow();
-                                        outputPanel.clearMask();
                                     }
                                 });
                             }
@@ -738,13 +736,10 @@ public class Workbench extends Application {
                                         // give up if we waited long enough
                                         if (timeNow - startTime > WEBUI_TIMEOUT) {
                                             outputPanel.print("WebUI retrieve timeout\n\n");
-                                            //cancel();
                                             resultsTimer.schedule(1);
                                             return;
                                         }
                                     }
-
-                                    Log.debug("Checking for WebUI");
 
                                     // check whether a WebUI is available (via RPC)
                                     Repository.retrieveWebUIInfo(token, new WBCallback<WBWebUIInfo>() {
@@ -755,14 +750,13 @@ public class Workbench extends Application {
                                                 return;
                                             }
 
-                                            //cancel();
-
                                             outputPanel.print("Found WebUI: " + webUIInfo.getWebUIUrl() + " (" +
                                                     webUIInfo.getURI() + ") token: " + webUIInfo.getToken() + "\n\n");
 
                                             flowTab.setWebUIInfo(webUIInfo);
                                             flowTab.openWebUI();
 
+                                            outputPanel.clearMask();
                                             resultsTimer.schedule(1);
                                         }
                                     });
@@ -771,8 +765,10 @@ public class Workbench extends Application {
 
                             webUITimer.schedule(2000);
                         }
-                        else
+                        else {
+                            outputPanel.clearMask();
                             resultsTimer.schedule(1);
+                        }
                     }
 
                     @Override

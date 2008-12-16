@@ -42,6 +42,7 @@
 
 package org.seasr.meandre.workbench.client.widgets;
 
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Frame;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.form.TextArea;
@@ -82,9 +83,14 @@ public class FlowOutputPanel extends Panel {
 
     public void print(String s) {
         _outputTextArea.setValue(_outputTextArea.getText() + s);
+        scrollToBottom(_outputTextArea.getElement());
     }
 
     public void clearResults() {
         _outputTextArea.setValue("");
     }
+
+    public static native void scrollToBottom(Element el) /*-{
+        el.scrollTop = el.scrollHeight;
+    }-*/;
 }
