@@ -64,7 +64,6 @@ import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.security.Role;
-import org.seasr.meandre.workbench.client.Application;
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBFlowDescription;
@@ -430,7 +429,6 @@ public class Repository extends RemoteServiceServlet implements IRepository {
             CorruptedFlowException corruptedFlowException = (execStepMsg != null) ?
                     new CorruptedFlowException(execStepMsg, e) : (CorruptedFlowException) e;
 
-            System.out.println("uploadFlow: " + Application.formatException(corruptedFlowException));
             throw corruptedFlowException;
         }
 

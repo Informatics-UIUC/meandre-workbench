@@ -43,8 +43,6 @@
 package org.seasr.meandre.workbench.client;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBConnectorDescription;
@@ -109,8 +107,6 @@ import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
  */
 public class Workbench extends Application {
 
-    private final static int WEBUI_TIMEOUT = 30000;  // 30 second timeout waiting to retrieve WebUI info
-
     private static Workbench _workbench;
     private static final IRepositoryAsync Repository = IRepository.Util.getInstance();
 
@@ -121,8 +117,6 @@ public class Workbench extends Application {
     private LoginDialog _loginDialog;
     private WBSession _session;
     private static boolean _loggingOut = false;
-
-    private Map<WBFlowDescription, String> _executionMap = new HashMap<WBFlowDescription, String>();
 
     /**
      * Called at application startup (from Application.java)
@@ -741,10 +735,9 @@ public class Workbench extends Application {
                                         }
 
                                         flowTab.setWebUIInfo(webUIInfo);
-                                        if (flowHasWebUI(flow)) {
-                                            outputPanel.print("Displaying WebUI...\n");
+
+                                        if (flowHasWebUI(flow))
                                             flowTab.openWebUI();
-                                        }
 
                                         outputPanel.clearMask();
                                         resultsTimer.schedule(1);
@@ -754,11 +747,6 @@ public class Workbench extends Application {
                         };
 
                         webUITimer.schedule(1);
-//                        }
-//                        else {
-//                            outputPanel.clearMask();
-//                            resultsTimer.schedule(1);
-//                        }
                     }
 
                     @Override

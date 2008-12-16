@@ -114,7 +114,7 @@
         <copy file="${src.bootstrap.dir}/workbench-jetty.xml" todir="${dist.dir}/bootstrap" />
 
         <copy todir="${dist.dir}/bootstrap/lib">
-            <path refid="bootstrap.classpath"/>
+            <fileset dir="${lib.bootstrap.dir}"/>
         </copy>
 
         <war destfile="${war.file}" webxml="${web.xml}">
