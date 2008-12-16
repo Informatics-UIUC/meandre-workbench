@@ -104,7 +104,7 @@ public abstract class Application implements EntryPoint {
 
     /**
      * The functional entry point of the application
-     * (to be overriden by main application)
+     * (to be overridden by main application)
      */
     protected abstract void onLoad();
 
