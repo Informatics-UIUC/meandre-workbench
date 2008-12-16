@@ -178,6 +178,9 @@ public class WorkspaceTab extends Panel {
         _btnRunFlow.addListener(new ButtonListenerAdapter() {
             @Override
             public void onClick(Button button, EventObject e) {
+                if (_componentMap.size() == 0)
+                    return;
+
                 runFlow();
             }
         });
