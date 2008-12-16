@@ -183,6 +183,7 @@ public class WorkspaceTab extends Panel {
         });
 
         _btnStopFlow.setIconCls("icon-flow-stop");
+        _btnStopFlow.disable();
         _btnStopFlow.addListener(new ButtonListenerAdapter() {
             @Override
             public void onClick(Button button, EventObject e) {
@@ -533,7 +534,8 @@ public class WorkspaceTab extends Panel {
 
         MessageBox.show(new MessageBoxConfig() {
             {
-                _parent.setActiveTab(WorkspaceTab.this);
+                if (_parent.getActiveTab() != WorkspaceTab.this)
+                    _parent.setActiveTab(WorkspaceTab.this);
 
                 setTitle(title);
                 setMsg(message);
