@@ -274,12 +274,19 @@ public class WorkspaceTab extends Panel {
         WBExecutableComponentInstanceDescription[] instances = new WBExecutableComponentInstanceDescription[nInstances];
         instances = flow.getExecutableComponentInstances().toArray(instances);
         for (int i = 0; i < nInstances; i++) {
-            WBExecutableComponentInstanceDescription compInstance = instances[i];
+            final WBExecutableComponentInstanceDescription compInstance = instances[i];
 
             WBExecutableComponentDescription compDesc =
                 _repositoryState.getComponent(compInstance.getExecutableComponent());
 
             if (compDesc == null) {
+                DeferredCommand.addCommand(new Command() {
+                    public void execute() {
+                        _outputPanel.print("Missing component: The component '" + compInstance.getName() + "' needed by this flow " +
+                                            "has not been found in the repository! Removing it...\n");
+                    }
+                });
+
                 Log.error("Could not find the component: " + compInstance.getExecutableComponent() + " - removing from flow");
                 flow.removeExecutableComponentInstance(compInstance);
                 setDirty();
@@ -999,6 +1006,15 @@ public class WorkspaceTab extends Panel {
     }
 
     public void checkValid() {
+        for (final Component component : _componentMap.values()) {
+            String compURI = component.getInstanceDescription().getExecutableComponent();
+            if (_repositoryState.getComponent(compURI) == null) {
+                // missing component
+                _outputPanel.print("Missing component: The component '" + component.getName() + "' needed by this flow " +
+                        "has been removed from the repository! It will also be removed from this flow...\n");
+                removeComponent(component);
+            }
+        }
         // check whether components have been removed
         // check whether connections make sense
         // check whether ports have been added/removed - update UI?
