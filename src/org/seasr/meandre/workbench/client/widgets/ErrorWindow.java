@@ -46,11 +46,19 @@ import org.seasr.meandre.workbench.client.Application;
 import org.seasr.meandre.workbench.client.exceptions.WBException;
 
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
+import com.gwtext.client.core.EventObject;
+import com.gwtext.client.core.Position;
+import com.gwtext.client.widgets.Button;
+import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.Window;
+import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import com.gwtext.client.widgets.event.WindowListenerAdapter;
 import com.gwtext.client.widgets.form.FieldSet;
+import com.gwtext.client.widgets.form.FormPanel;
+import com.gwtext.client.widgets.form.Label;
 import com.gwtext.client.widgets.form.TextArea;
+import com.gwtext.client.widgets.layout.FitLayout;
 import com.gwtext.client.widgets.layout.HorizontalLayout;
 import com.gwtext.client.widgets.layout.VerticalLayout;
 
@@ -61,7 +69,7 @@ import com.gwtext.client.widgets.layout.VerticalLayout;
 public class ErrorWindow extends Window {
 
     public ErrorWindow(Throwable throwable) {
-        this("Error", null, throwable);
+        this("Error", throwable);
     }
 
     public ErrorWindow(String title, Throwable throwable) {
@@ -69,17 +77,30 @@ public class ErrorWindow extends Window {
     }
 
     public ErrorWindow(String title, String message, Throwable throwable) {
+        this(title, message, throwable, null);
+    }
+
+    public ErrorWindow(String title, String message, Throwable throwable, final MessageBox.ConfirmCallback callback) {
         setTitle(title);
         setModal(true);
-        setWidth(500);
+        setShadow(false);
+        setLayout(new FitLayout());
+        setButtonAlign(Position.CENTER);
+        setPaddings(5);
+        setWidth(550);
+        setMinWidth(300);
         setAutoHeight(true);
 
         Panel hPanel = new Panel();
+        hPanel.setBaseCls("x-plain");
+        hPanel.setAutoWidth(true);
+        hPanel.setAutoHeight(true);
         hPanel.setLayout(new HorizontalLayout(10));
         hPanel.add(new Image("images/error32.png"));
 
         String errMsg = (message != null) ? message : throwable.getMessage();
-        Label lblMessage = new Label(errMsg, true);
+        Label lblMessage = new Label(errMsg);
+        lblMessage.setCls("msg-error");
         hPanel.add(lblMessage);
 
         String details = Application.formatException(throwable);
@@ -91,21 +112,49 @@ public class ErrorWindow extends Window {
         }
 
         TextArea txtDetails = new TextArea();
-        txtDetails.setAutoWidth(true);
-        txtDetails.setHeight(400);
+        txtDetails.setWidth("100%");
+        txtDetails.setHeight(200);
+        txtDetails.setHideLabel(true);
         txtDetails.setReadOnly(true);
         txtDetails.setValue(details);
 
         FieldSet fsDetails = new FieldSet("Details");
-        fsDetails.setCollapsible(true);
+        fsDetails.setAutoWidth(true);
         fsDetails.setAutoHeight(true);
+        fsDetails.setCollapsible(true);
+        fsDetails.setCollapsed(true);
         fsDetails.add(txtDetails);
 
         Panel vPanel = new Panel();
+        vPanel.setBaseCls("x-plain");
+        vPanel.setAutoWidth(true);
+        vPanel.setAutoHeight(true);
         vPanel.setLayout(new VerticalLayout(15));
         vPanel.add(hPanel);
         vPanel.add(fsDetails);
 
-        add(vPanel);
+        FormPanel formPanel = new FormPanel();
+        formPanel.setBaseCls("x-plain");
+        formPanel.setHideLabels(true);
+        formPanel.setAutoWidth(true);
+        formPanel.setAutoHeight(true);
+        formPanel.add(vPanel);
+
+        add(formPanel);
+
+        this.addListener(new WindowListenerAdapter() {
+            @Override
+            public void onClose(Panel panel) {
+                if (callback != null)
+                    callback.execute("OK");
+            }
+        });
+
+        addButton(new Button("OK", new ButtonListenerAdapter() {
+            @Override
+            public void onClick(Button button, EventObject e) {
+                close();
+            }
+        }));
     }
 }

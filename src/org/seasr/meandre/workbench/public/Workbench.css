@@ -143,6 +143,11 @@
 	border: 1px solid darkgray;
 }
 
+.msg-error {
+	font-family: arial, tahoma, helvetica, sans-serif;
+	font-size: 12px;
+}
+
 /** END MESSAGES **/
 
 
