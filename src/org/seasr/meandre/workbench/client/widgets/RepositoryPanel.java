@@ -54,6 +54,8 @@ import org.seasr.meandre.workbench.client.listeners.FlowsGridActionListener;
 import org.seasr.meandre.workbench.client.listeners.LocationsGridActionListener;
 import org.seasr.meandre.workbench.client.listeners.RefreshListener;
 
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Function;
 import com.gwtext.client.core.TextAlign;
@@ -469,5 +471,18 @@ public class RepositoryPanel extends Panel {
         public void setActionListener(LocationsGridActionListener listener) {
             _actionListener = listener;
         }
+
+        public void setMask(final String message) {
+            DeferredCommand.addCommand(new Command() {
+                public void execute() {
+                    LocationsGrid.this.getEl().mask(message);
+                }
+            });
+        }
+
+        public void clearMask() {
+            LocationsGrid.this.getEl().unmask();
+        }
+
     }
 }

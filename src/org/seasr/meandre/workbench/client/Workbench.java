@@ -452,9 +452,11 @@ public class Workbench extends Application {
             public void onAdd() {
                 AddLocationDialog addLocationDialog = new AddLocationDialog(new AddLocationListener() {
                     public void onAdd(final String description, final String url) {
+                        locationsPanel.setMask("Adding");
                         Repository.addLocation(url, description, new WBCallback<Boolean>() {
                             @Override
                             public void onSuccess(Boolean success) {
+                                locationsPanel.clearMask();
                                 if (success)
                                     refreshRepository(null);
                                 else
