@@ -86,6 +86,7 @@ import com.google.gwt.user.client.WindowCloseListener;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.gwtext.client.core.EventObject;
+import com.gwtext.client.core.Function;
 import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.MessageBoxConfig;
 import com.gwtext.client.widgets.Panel;
@@ -565,7 +566,12 @@ public class Workbench extends Application {
 
         new Viewport(_mainPanel);
 
-        refreshRepository(null);
+        refreshRepository(new ICommand<Boolean>() {
+            public void execute(Boolean args) {
+                // expand the flows section
+                _mainPanel.getRepositoryPanel().getFlowsPanel().expand();
+            }
+        });
     }
 
     /**
@@ -710,7 +716,7 @@ public class Workbench extends Application {
                                         }
 
                                         outputPanel.print(output);
-                                        schedule(1);
+                                        schedule(2000);
                                     }
 
                                     @Override
@@ -732,7 +738,7 @@ public class Workbench extends Application {
                                     @Override
                                     public void onSuccess(WBWebUIInfo webUIInfo) {
                                         if (webUIInfo == null) {
-                                            schedule(10);
+                                            schedule(1000);
                                             return;
                                         }
 
