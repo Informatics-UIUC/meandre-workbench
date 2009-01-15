@@ -54,6 +54,7 @@ import org.seasr.meandre.workbench.client.listeners.FlowsGridActionListener;
 import org.seasr.meandre.workbench.client.listeners.LocationsGridActionListener;
 import org.seasr.meandre.workbench.client.listeners.RefreshListener;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.gwtext.client.core.EventObject;
@@ -61,7 +62,6 @@ import com.gwtext.client.core.Function;
 import com.gwtext.client.core.TextAlign;
 import com.gwtext.client.data.Record;
 import com.gwtext.client.data.Store;
-import com.gwtext.client.util.DateUtil;
 import com.gwtext.client.util.Format;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.Panel;
@@ -91,6 +91,8 @@ public class RepositoryPanel extends Panel {
     private final ComponentsGrid _componentsPanel = new ComponentsGrid();
     private final FlowsGrid _flowsPanel = new FlowsGrid();
     private final LocationsGrid _locationsPanel = new LocationsGrid();
+
+    private static final DateTimeFormat dateFormatter = DateTimeFormat.getFormat("MMM d, yyyy");
 
     public RepositoryPanel() {
         setTitle("Repository");
@@ -170,7 +172,7 @@ public class RepositoryPanel extends Panel {
                 public String render(Object value, CellMetadata cellMetadata,
                         Record record, int rowIndex, int colNum, Store store) {
                     Date creationDate = (Date)value;
-                    return DateUtil.format(creationDate, "M j, Y");
+                    return dateFormatter.format(creationDate);
                 }
             });
 
@@ -296,7 +298,7 @@ public class RepositoryPanel extends Panel {
                 public String render(Object value, CellMetadata cellMetadata,
                         Record record, int rowIndex, int colNum, Store store) {
                     Date creationDate = (Date)value;
-                    return DateUtil.format(creationDate, "M j, Y");
+                    return dateFormatter.format(creationDate);
                 }
             });
 
