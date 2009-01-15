@@ -7,7 +7,6 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="lib/build/gwt-user.jar"/>
 	<classpathentry kind="lib" path="lib/build/gwt-log-2.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/build/gwtext-2.0.5.jar"/>
 	<classpathentry kind="lib" path="lib/build/gwtext-diagrams-0.2.jar"/>
 	<classpathentry kind="lib" path="lib/build/gwtextux-0.3.jar"/>
 	<classpathentry kind="lib" path="lib/deploy/gwt-servlet.jar">
@@ -75,5 +74,6 @@
 	<classpathentry kind="lib" path="lib/bootstrap/jetty-6.1.14.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/jetty-util-6.1.14.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/servlet-api-2.5-6.1.14.jar"/>
+	<classpathentry kind="lib" path="lib/build/gwtext-2.0.6.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
