@@ -48,6 +48,12 @@ package org.seasr.meandre.workbench.client.listeners;
  */
 public interface AddLocationListener {
 
+    /**
+     * Provides notification for when a new location is added
+     *
+     * @param description The location description
+     * @param url The location url
+     */
     public void onAdd(String description, String url);
 
 }

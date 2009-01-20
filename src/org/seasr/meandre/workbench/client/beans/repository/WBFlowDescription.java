@@ -87,9 +87,6 @@ public class WBFlowDescription implements IsSerializable, Cloneable {
     /** The tags linked to the flow */
     private WBTagsDescription tagDesc = null;
 
-    // Needs to be serialized - do not mark as final and/or transient
-    private String desiredBaseURI = null;
-
     /** Create an empty flow description instance
      *
      */
@@ -105,6 +102,11 @@ public class WBFlowDescription implements IsSerializable, Cloneable {
                 new HashSet<WBConnectorDescription>(),                      // setConnectorDescription
                 new WBTagsDescription()                                     // tagsDesc
                 );
+    }
+
+    public WBFlowDescription(String name, String baseURL) {
+        this();
+        this.sResFlowURI = baseURL + name.replaceAll(" |\t|/", "-") + "/";
     }
 
     /** Create a flow description instance
@@ -149,7 +151,35 @@ public class WBFlowDescription implements IsSerializable, Cloneable {
      *
      * @param sResURI The resource
      */
-    public void setFlowURI ( String sResURI ) {
+    private void setFlowURI ( String sResURI ) {
+        String oldFlowURI = this.sResFlowURI;
+
+        // update component instances
+        for (WBExecutableComponentInstanceDescription ecid : getExecutableComponentInstances()) {
+            String oldInstanceURI = ecid.getExecutableComponentInstance();
+            if (oldInstanceURI.startsWith(oldFlowURI)) {
+                ecid.setExecutableComponentInstance(sResURI + oldInstanceURI.substring(oldFlowURI.length()));
+                removeExecutableComponentInstance(oldInstanceURI);
+                addExecutableComponentInstance(ecid);
+            }
+        }
+
+        // update connector descriptions
+        for (WBConnectorDescription connector : getConnectorDescriptions()) {
+            String oldConnectorURI = connector.getConnector();
+            String oldSrcInstanceURI = connector.getSourceInstance();
+            String oldTargetInstanceURI = connector.getTargetInstance();
+
+            if (oldConnectorURI.startsWith(oldFlowURI))
+                connector.setConnector(sResURI + oldConnectorURI.substring(oldFlowURI.length()));
+
+            if (oldSrcInstanceURI.startsWith(oldFlowURI))
+                connector.setSourceInstance(sResURI + oldSrcInstanceURI.substring(oldFlowURI.length()));
+
+            if (oldTargetInstanceURI.startsWith(oldFlowURI))
+                connector.setTargetInstance(sResURI + oldTargetInstanceURI.substring(oldFlowURI.length()));
+        }
+
         sResFlowURI = sResURI;
     }
 
@@ -161,24 +191,33 @@ public class WBFlowDescription implements IsSerializable, Cloneable {
         return sResFlowURI;
     }
 
-    public String getDesiredURI() {
-        return getDesiredBaseURI() + getName().toLowerCase().replaceAll(" |\t", "-") + "/";
+    public String getNormalizedFlowURI() {
+        return (sResFlowURI.endsWith("/")) ? sResFlowURI : sResFlowURI + "/";
     }
 
-    public void setDesiredBaseURI(String uri) {
-        desiredBaseURI = uri;
+    public String getBaseURI() {
+        String uri = sResFlowURI;
+        while (uri.endsWith("/"))
+            uri = uri.substring(0, uri.length() - 1);
+
+        return uri.substring(0, uri.lastIndexOf('/') + 1);
     }
 
-    public String getDesiredBaseURI() {
-        return desiredBaseURI;
+    public void setBaseURI(String baseURI) {
+        if (!baseURI.endsWith("/")) baseURI += "/";
+
+        setFlowURI(baseURI + getFlowURI().substring(getBaseURI().length()));
     }
 
     /** Sets the components name.
      *
      * @param sName The name
      */
-    public void  setName( String sName) {
-        this.sName=sName;
+    public void setName( String sName ) {
+        if (this.sName == null || !this.sName.equals(sName)) {
+            this.sName=sName;
+            setFlowURI(getBaseURI() + sName.toLowerCase().replaceAll(" |\t|/|'", "-") + "/");
+        }
     }
 
     /** Returns the components name.
@@ -329,6 +368,9 @@ public class WBFlowDescription implements IsSerializable, Cloneable {
         return sName+" ("+sResFlowURI+")";
     }
 
+    /**
+     * Returns a deep copy of this object
+     */
     public WBFlowDescription clone() {
         Set<WBExecutableComponentInstanceDescription> execCompInstances =
             new HashSet<WBExecutableComponentInstanceDescription>();
@@ -339,7 +381,7 @@ public class WBFlowDescription implements IsSerializable, Cloneable {
         for (WBConnectorDescription connector : this.getConnectorDescriptions())
             connectorDescriptions.add(connector.clone());
 
-        WBFlowDescription flow = new WBFlowDescription(
+        return new WBFlowDescription(
                 this.sResFlowURI,
                 this.sName,
                 this.sDescription,
@@ -349,9 +391,5 @@ public class WBFlowDescription implements IsSerializable, Cloneable {
                 execCompInstances,
                 connectorDescriptions,
                 this.tagDesc.clone());
-
-        flow.setDesiredBaseURI(this.desiredBaseURI);
-
-        return flow;
     }
 }

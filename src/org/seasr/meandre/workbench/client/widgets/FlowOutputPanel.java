@@ -42,8 +42,9 @@
 
 package org.seasr.meandre.workbench.client.widgets;
 
-import com.google.gwt.user.client.ui.Frame;
+import com.google.gwt.user.client.Element;
 import com.gwtext.client.widgets.Panel;
+import com.gwtext.client.widgets.form.TextArea;
 import com.gwtext.client.widgets.layout.FitLayout;
 
 /**
@@ -51,20 +52,35 @@ import com.gwtext.client.widgets.layout.FitLayout;
  *
  */
 public class FlowOutputPanel extends Panel {
-    private final Frame _frame = new Frame();
+    private final TextArea _outputTextArea = new TextArea();
 
     public FlowOutputPanel() {
         setLayout(new FitLayout());
         setBorder(false);
 
-        add(_frame);
+        _outputTextArea.setReadOnly(true);
+
+        add(_outputTextArea);
     }
 
-    public void setUrl(String url) {
-        _frame.setUrl(url);
+    public void setMask(String message) {
+        getEl().mask(message);
     }
 
-    public String getUrl() {
-        return _frame.getUrl();
+    public void clearMask() {
+        getEl().unmask();
     }
+
+    public void print(String s) {
+        _outputTextArea.setValue(_outputTextArea.getText() + s);
+        scrollToBottom(_outputTextArea.getElement());
+    }
+
+    public void clearResults() {
+        _outputTextArea.setValue("");
+    }
+
+    public static native void scrollToBottom(Element el) /*-{
+        el.scrollTop = el.scrollHeight;
+    }-*/;
 }

@@ -45,6 +45,8 @@ package org.seasr.meandre.workbench.client.beans.execution;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
+ * Used to pass information about components with WebUIs through RPC
+ * 
  * @author Boris Capitanu
  *
  */
@@ -62,6 +64,14 @@ public class WBWebUIInfo implements IsSerializable {
         this(null, -1, null, null);
     }
 
+    /**
+     * Constructor
+     *
+     * @param hostName The hostname where the WebUI is running
+     * @param port The port where the WebUI can be accessed
+     * @param token The token for the executing instance
+     * @param uri
+     */
     public WBWebUIInfo(String hostName, int port, String token, String uri) {
         _hostName = hostName;
         _port = port;
@@ -69,14 +79,29 @@ public class WBWebUIInfo implements IsSerializable {
         _uri = uri;
     }
 
+    /**
+     * Returns the host name where the WebUI is running at
+     *
+     * @return The hostname where the WebUI is running at
+     */
     public String getHostName() {
         return _hostName;
     }
 
+    /**
+     * Returns the port where the WebUI can be accessed
+     *
+     * @return The port where the WebUI can be accessed
+     */
     public int getPort() {
         return _port;
     }
 
+    /**
+     * Returns the token for the executing instance
+     *
+     * @return The token for the executing instance
+     */
     public String getToken() {
         return _token;
     }
@@ -85,10 +110,20 @@ public class WBWebUIInfo implements IsSerializable {
         return _uri;
     }
 
+    /**
+     * Returns the complete URL to access the WebUI
+     *
+     * @return The complete URL where the WebUI can be accessed at
+     */
     public String getWebUIUrl() {
         return "http://" + _hostName + ":" + _port;
     }
 
+    /**
+     * Returns the abort url
+     *
+     * @return The abort url
+     */
     public String getAbortUrl() {
         return getWebUIUrl() + "/admin/abort.txt";
     }

@@ -46,6 +46,8 @@ import org.meandre.core.repository.ConnectorDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBConnectorDescription;
 
 /**
+ * Converts the Meandre ConnectorDescription bean to its workbench equivalent
+ *
  * @author Boris Capitanu
  *
  */

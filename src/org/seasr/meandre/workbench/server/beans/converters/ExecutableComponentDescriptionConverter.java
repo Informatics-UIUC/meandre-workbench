@@ -53,6 +53,8 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
+ * Converts the Meandre ExecutableComponentDescription bean to its workbench equivalent
+ *
  * @author Boris Capitanu
  *
  */

@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.seasr.meandre.workbench.client.RepositoryState;
 import org.seasr.meandre.workbench.client.beans.repository.WBDataPortDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentInstanceDescription;
@@ -73,6 +74,7 @@ public class DetailsPanel extends Panel {
     private final TabPanel _tabPanelBottom = new TabPanel();
     private final DocPanel _docPanel = new DocPanel();
     private final PropPanel _propPanel = new PropPanel();
+    private final RepositoryState _repositoryState = RepositoryState.getInstance();
 
     private WorkspaceTab _focusedTab = null;
 
@@ -187,7 +189,8 @@ public class DetailsPanel extends Panel {
     public void view(WorkspaceTab tab, Component component) {
         _focusedTab = tab;
 
-        WBExecutableComponentDescription compDesc = component.getExecutableComponentDescription();
+        WBExecutableComponentDescription compDesc =
+            _repositoryState.getComponent(component.getInstanceDescription().getExecutableComponent());
         WBExecutableComponentInstanceDescription compInstanceDesc = component.getInstanceDescription();
         _propPanel.viewComponent(compInstanceDesc, compDesc.getProperties().getKeys());
         _docPanel.setHtml(getDocumentationHtml(compInstanceDesc));
@@ -208,57 +211,73 @@ public class DetailsPanel extends Panel {
     }
 
     private String getDocumentationHtml(WBExecutableComponentInstanceDescription instance) {
+        WBExecutableComponentDescription comp =
+            RepositoryState.getInstance().getComponent(instance.getExecutableComponent());
+
         StringBuilder sb = new StringBuilder();
         sb.append("<div style='font-family: arial, tahoma, helvetica, sans-serif; font-size: 12px; margin: 4px;'>");
-        sb.append("<b style='font-size: 14px;'>").append(instance.getName()).append("</b><br/>");
+        sb.append("<b style='font-size: 14px;'>").append(instance.getName()).append("</b>");
+        if (comp == null)
+            sb.append(" <i style='color: red;'>(missing)</i>");
+        sb.append("<br/>");
         sb.append("<i style='font-size: 11px;'>").append(instance.getExecutableComponentInstance()).append("</i>");
         sb.append("<br/><br/>");
         sb.append("<p>");
 
-        WBExecutableComponentDescription comp = instance.getExecutableComponentDescription();
-        String tags = "";
-        for (String tag : comp.getTags().getTags())
-            tags += ", " + tag;
-        tags = "[" + tags.substring(2) + "]";
+        if (comp != null) {
+            String tags = "";
+            for (String tag : comp.getTags().getTags())
+                tags += ", " + tag;
+            tags = tags.substring(2);
 
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Tags:</b>&nbsp;&nbsp;").append(tags).append("<br/>");
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Creator:</b>&nbsp;&nbsp;").append(comp.getCreator()).append("<br/>");
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Date:</b>&nbsp;&nbsp;").append(comp.getCreationDate()).append("<br/>");
+            String location = comp.getLocation();
+            String implementation = "/implementation/";
+            int n = location.indexOf(implementation);
+            location = (n > 0) ? location.substring(n + implementation.length()) : null;
 
-        sb.append("</p><br/>");
-        sb.append("<p>");
-        sb.append("<b style='font-size: 13px;'><u>Description:</u></b><br/>");
-        sb.append("<div style='text-align: justify;'>").append(instance.getDescription()).append("</div>");
-        sb.append("</p><br/>");
-        sb.append("<p>");
-        sb.append("<b style='font-size: 13px;'><u>Rights:</u></b><br/>");
-        sb.append("<div style='text-align: justify;'>").append(comp.getRights()).append("</div>");
-        sb.append("</p><br/>");
-        sb.append("<p>");
-        sb.append("<b style='font-size: 13px'><u>Inputs:</u></b><br/>");
+            sb.append("<table border='0' cellspacing='5' style='font-size: 13px;'>");
+            sb.append("<tr><td align='right' valign='top'>").append("<b>Tags:</b></td><td>").append(tags).append("<td>");
+            sb.append("<tr><td align='right' valign='top'>").append("<b>Creator:</b></td><td>").append(comp.getCreator()).append("</td>");
+            sb.append("<tr><td align='right' valign='top'>").append("<b>Date:</b></td><td style='white-space: nowrap;'>").append(comp.getCreationDate()).append("</td>");
+            if (location != null)
+                sb.append("<tr><td align='right' valign='top'>").append("<b>Class:</b></td><td>").append(location).append("</td>");
+            sb.append("</table>");
 
-        if (!comp.getInputs().isEmpty())
-            for (WBDataPortDescription inputPort : comp.getInputs()) {
-                sb.append("<div style='border: 1px dotted gray; padding: 2px; margin-top: 4px;'>");
-                sb.append("<b>").append(inputPort.getName()).append("</b><br/");
-                sb.append("<i style='text-align: justify;'>").append(inputPort.getDescription()).append("</i><br/>");
-                sb.append("</div>");
-            }
-        else
-            sb.append("None<br/>");
+            sb.append("</p><br/>");
+            sb.append("<p>");
+            sb.append("<b style='font-size: 13px;'><u>Description:</u></b><br/>");
+            sb.append("<div style='text-align: justify;'>").append(instance.getDescription()).append("</div>");
+            sb.append("</p><br/>");
+            sb.append("<p>");
+            sb.append("<b style='font-size: 13px;'><u>Rights:</u></b><br/>");
+            sb.append("<div style='text-align: justify;'>").append(comp.getRights()).append("</div>");
+            sb.append("</p><br/>");
+            sb.append("<p>");
+            sb.append("<b style='font-size: 13px'><u>Inputs:</u></b><br/>");
 
-        sb.append("<br/>");
-        sb.append("<b style='font-size: 13px'><u>Outputs:</u></b><br/>");
+            if (!comp.getInputs().isEmpty())
+                for (WBDataPortDescription inputPort : comp.getInputs()) {
+                    sb.append("<div style='border: 1px dotted gray; padding: 2px; margin-top: 4px;'>");
+                    sb.append("<b>").append(inputPort.getName()).append("</b><br/");
+                    sb.append("<i style='text-align: justify;'>").append(inputPort.getDescription()).append("</i><br/>");
+                    sb.append("</div>");
+                }
+            else
+                sb.append("None<br/>");
 
-        if (!comp.getOutputs().isEmpty())
-            for (WBDataPortDescription outputPort : comp.getOutputs()) {
-                sb.append("<div style='border: 1px dotted gray; padding: 2px; margin-top: 4px;'>");
-                sb.append("<b>").append(outputPort.getName()).append("</b><br/");
-                sb.append("<i style='text-align: justify;'>").append(outputPort.getDescription()).append("</i><br/>");
-                sb.append("</div>");
-            }
-        else
-            sb.append("None<br/>");
+            sb.append("<br/>");
+            sb.append("<b style='font-size: 13px'><u>Outputs:</u></b><br/>");
+
+            if (!comp.getOutputs().isEmpty())
+                for (WBDataPortDescription outputPort : comp.getOutputs()) {
+                    sb.append("<div style='border: 1px dotted gray; padding: 2px; margin-top: 4px;'>");
+                    sb.append("<b>").append(outputPort.getName()).append("</b><br/");
+                    sb.append("<i style='text-align: justify;'>").append(outputPort.getDescription()).append("</i><br/>");
+                    sb.append("</div>");
+                }
+            else
+                sb.append("None<br/>");
+        }
 
         sb.append("</p>");
         sb.append("</div>");
@@ -271,17 +290,27 @@ public class DetailsPanel extends Panel {
         sb.append("<div style='font-family: arial, tahoma, helvetica, sans-serif; font-size: 12px; margin: 4px;'>");
         sb.append("<b style='font-size: 14px;'>").append(comp.getName()).append("</b><br/>");
         sb.append("<i style='font-size: 11px;'>").append(comp.getResourceURI()).append("</i>");
+
+        String location = comp.getLocation();
+        String implementation = "/implementation/";
+        int n = location.indexOf(implementation);
+        location = (n > 0) ? location.substring(n + implementation.length()) : null;
+
         sb.append("<br/><br/>");
         sb.append("<p>");
 
         String tags = "";
         for (String tag : comp.getTags().getTags())
             tags += ", " + tag;
-        tags = "[" + tags.substring(2) + "]";
+        tags = tags.substring(2);
 
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Tags:</b>&nbsp;&nbsp;").append(tags).append("<br/>");
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Creator:</b>&nbsp;&nbsp;").append(comp.getCreator()).append("<br/>");
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Date:</b>&nbsp;&nbsp;").append(comp.getCreationDate()).append("<br/>");
+        sb.append("<table border='0' cellspacing='5' style='font-size: 13px;'>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Tags:</b></td><td>").append(tags).append("<td>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Creator:</b></td><td>").append(comp.getCreator()).append("</td>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Date:</b></td><td style='white-space: nowrap;'>").append(comp.getCreationDate()).append("</td>");
+        if (location != null)
+            sb.append("<tr><td align='right' valign='top'>").append("<b>Class:</b></td><td>").append(location).append("</td>");
+        sb.append("</table>");
 
         sb.append("</p><br/>");
         sb.append("<p>");
@@ -335,11 +364,13 @@ public class DetailsPanel extends Panel {
         String tags = "";
         for (String tag : flow.getTags().getTags())
             tags += ", " + tag;
-        tags = "[" + tags.substring(2) + "]";
+        tags = tags.substring(2);
 
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Tags:</b>&nbsp;&nbsp;").append(tags).append("<br/>");
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Creator:</b>&nbsp;&nbsp;").append(flow.getCreator()).append("<br/>");
-        sb.append("<b style='width: 50px; text-align: right; font-weight: bold;'>Date:</b>&nbsp;&nbsp;").append(flow.getCreationDate()).append("<br/>");
+        sb.append("<table border='0' cellspacing='5' style='font-size: 13px;'>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Tags:</b></td><td>").append(tags).append("<td>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Creator:</b></td><td>").append(flow.getCreator()).append("</td>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Date:</b></td><td style='white-space: nowrap;'>").append(flow.getCreationDate()).append("</td>");
+        sb.append("</table>");
 
         sb.append("</p><br/>");
         sb.append("<p>");
@@ -354,7 +385,8 @@ public class DetailsPanel extends Panel {
         sb.append("<b style='font-size: 13px'><u>Components:</u></b><br/>");
         for (WBExecutableComponentInstanceDescription instance : flow.getExecutableComponentInstances()) {
             sb.append("<div style='border: 1px dotted gray; padding: 2px; margin-top: 4px;'>");
-            WBExecutableComponentDescription compDesc = instance.getExecutableComponentDescription();
+            WBExecutableComponentDescription compDesc =
+                RepositoryState.getInstance().getComponent(instance.getExecutableComponent());
             String imgName = compDesc != null ? compDesc.getRunnable() : "warning";
             sb.append("<img src='images/" + imgName + ".png'/> ");
             sb.append("<b>").append(instance.getName()).append("</b>");
@@ -363,16 +395,17 @@ public class DetailsPanel extends Panel {
             sb.append("<br/>");
             sb.append("<i style='font-size: 11px;'>").append(instance.getExecutableComponentInstance()).append("</i><br/>");
             sb.append("<br/>");
-            sb.append("<i>Properties:</i><br/>");
-            sb.append("<div style='margin-left: 10px;'>");
+            if (compDesc != null)  {
+                sb.append("<i>Properties:</i><br/>");
+                sb.append("<div style='margin-left: 10px;'>");
 
-            if (!compDesc.getProperties().getKeys().isEmpty())
-                for (String key : compDesc.getProperties().getKeys())
-                    sb.append("<b>" + key).append(":</b>&nbsp;&nbsp;<font color='blue'>").append(instance.getProperties().getValue(key)).append("</font><br/>");
-            else
-                sb.append("None<br/>");
-
-            sb.append("</div>");
+                if (!compDesc.getProperties().getKeys().isEmpty())
+                    for (String key : compDesc.getProperties().getKeys())
+                        sb.append("<b>" + key).append(":</b>&nbsp;&nbsp;<font color='blue'>").append(instance.getProperties().getValue(key)).append("</font><br/>");
+                else
+                    sb.append("None<br/>");
+                sb.append("</div>");
+            }
             sb.append("</div>");
         }
 

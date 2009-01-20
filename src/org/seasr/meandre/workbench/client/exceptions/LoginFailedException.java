@@ -42,6 +42,12 @@
 
 package org.seasr.meandre.workbench.client.exceptions;
 
+/**
+ * Describes a problem encountered while authenticating a user's credentials
+ *
+ * @author Boris Capitanu
+ *
+ */
 public class LoginFailedException extends WBException {
 
     private static final long serialVersionUID = 2705630486170670725L;

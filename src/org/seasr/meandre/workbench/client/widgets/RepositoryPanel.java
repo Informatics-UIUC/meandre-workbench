@@ -54,12 +54,14 @@ import org.seasr.meandre.workbench.client.listeners.FlowsGridActionListener;
 import org.seasr.meandre.workbench.client.listeners.LocationsGridActionListener;
 import org.seasr.meandre.workbench.client.listeners.RefreshListener;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Function;
 import com.gwtext.client.core.TextAlign;
 import com.gwtext.client.data.Record;
 import com.gwtext.client.data.Store;
-import com.gwtext.client.util.DateUtil;
 import com.gwtext.client.util.Format;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.Panel;
@@ -89,6 +91,8 @@ public class RepositoryPanel extends Panel {
     private final ComponentsGrid _componentsPanel = new ComponentsGrid();
     private final FlowsGrid _flowsPanel = new FlowsGrid();
     private final LocationsGrid _locationsPanel = new LocationsGrid();
+
+    private static final DateTimeFormat dateFormatter = DateTimeFormat.getFormat("MMM d, yyyy");
 
     public RepositoryPanel() {
         setTitle("Repository");
@@ -136,6 +140,7 @@ public class RepositoryPanel extends Panel {
         private final Set<ComponentsGridActionListener> _actionListeners =
             new HashSet<ComponentsGridActionListener>();
         private WBExecutableComponentDescription _selectedComponent = null;
+        private final GridSearchPlugin _gridSearch;
 
         public ComponentsGrid() {
             GroupingView gridView = new GroupingView();
@@ -167,7 +172,7 @@ public class RepositoryPanel extends Panel {
                 public String render(Object value, CellMetadata cellMetadata,
                         Record record, int rowIndex, int colNum, Store store) {
                     Date creationDate = (Date)value;
-                    return DateUtil.format(creationDate, "M j, Y");
+                    return dateFormatter.format(creationDate);
                 }
             });
 
@@ -212,8 +217,8 @@ public class RepositoryPanel extends Panel {
             final Toolbar topToolbar = new Toolbar();
             topToolbar.addFill();
 
-            final GridSearchPlugin gridSearch = new GridSearchPlugin(GridSearchPlugin.TOP);
-            gridSearch.setMode(GridSearchPlugin.LOCAL);
+            _gridSearch = new GridSearchPlugin(GridSearchPlugin.TOP);
+            _gridSearch.setMode(GridSearchPlugin.LOCAL);
 
             setTopToolbar(topToolbar);
             setSelectionModel(selectionModel);
@@ -228,7 +233,11 @@ public class RepositoryPanel extends Panel {
             setTitle("Components", "icon-components");
             setEnableDragDrop(true);
             setDdGroup("ddComponents");
-            addPlugin(gridSearch);
+            addPlugin(_gridSearch);
+        }
+
+        public void clearSearch() {
+            _gridSearch.setSearchText("");
         }
 
         public void setMask(String message) {
@@ -257,6 +266,7 @@ public class RepositoryPanel extends Panel {
         private final Set<FlowsGridActionListener> _actionListeners =
             new HashSet<FlowsGridActionListener>();
         private WBFlowDescription _selectedFlow = null;
+        private final GridSearchPlugin _gridSearch;
 
         public FlowsGrid() {
             GroupingView gridView = new GroupingView();
@@ -288,7 +298,7 @@ public class RepositoryPanel extends Panel {
                 public String render(Object value, CellMetadata cellMetadata,
                         Record record, int rowIndex, int colNum, Store store) {
                     Date creationDate = (Date)value;
-                    return DateUtil.format(creationDate, "M j, Y");
+                    return dateFormatter.format(creationDate);
                 }
             });
 
@@ -335,8 +345,8 @@ public class RepositoryPanel extends Panel {
             final Toolbar topToolbar = new Toolbar();
             topToolbar.addFill();
 
-            final GridSearchPlugin gridSearch = new GridSearchPlugin(GridSearchPlugin.TOP);
-            gridSearch.setMode(GridSearchPlugin.LOCAL);
+            _gridSearch = new GridSearchPlugin(GridSearchPlugin.TOP);
+            _gridSearch.setMode(GridSearchPlugin.LOCAL);
 
             setTopToolbar(topToolbar);
             setSelectionModel(selectionModel);
@@ -349,7 +359,11 @@ public class RepositoryPanel extends Panel {
             setBorder(false);
             setStripeRows(true);
             setTitle("Flows", "icon-flows");
-            addPlugin(gridSearch);
+            addPlugin(_gridSearch);
+        }
+
+        public void clearSearch() {
+            _gridSearch.setSearchText("");
         }
 
         public void setMask(String message) {
@@ -459,5 +473,18 @@ public class RepositoryPanel extends Panel {
         public void setActionListener(LocationsGridActionListener listener) {
             _actionListener = listener;
         }
+
+        public void setMask(final String message) {
+            DeferredCommand.addCommand(new Command() {
+                public void execute() {
+                    LocationsGrid.this.getEl().mask(message);
+                }
+            });
+        }
+
+        public void clearMask() {
+            LocationsGrid.this.getEl().unmask();
+        }
+
     }
 }

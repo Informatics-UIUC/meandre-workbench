@@ -42,14 +42,13 @@
 
 package org.seasr.meandre.workbench.server.rpc;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.StringReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.URL;
-import java.util.HashSet;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,7 +56,6 @@ import javax.servlet.http.HttpSession;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.meandre.client.MeandreAdminClient;
 import org.meandre.client.MeandreClient;
 import org.meandre.client.TransmissionException;
 import org.meandre.core.repository.ExecutableComponentDescription;
@@ -66,9 +64,6 @@ import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.security.Role;
-import org.meandre.core.security.SecurityStoreException;
-import org.meandre.core.security.User;
-import org.seasr.meandre.workbench.client.Application;
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBFlowDescription;
@@ -83,7 +78,6 @@ import org.seasr.meandre.workbench.server.beans.converters.IBeanConverter;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 /**
  * @author Boris Capitanu
@@ -94,12 +88,16 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     private static final long serialVersionUID = -1606693690185487714L;
     private static final int SESSION_TIMEOUT = 24 * 60 * 60;  // 24 hours
 
-    private static final IBeanConverter<URL, String> UrlStringConverter =
-        new IBeanConverter<URL, String>() {
-            public String convert(URL url) {
+    private static final IBeanConverter<URI, String> UriStringConverter =
+        new IBeanConverter<URI, String>() {
+            public String convert(URI url) {
                 return url.toString();
             }
         };
+
+    private final Map<String, InputStream> _flowConsoles = new HashMap<String, InputStream>();
+    private String _userName, _password, _hostName;
+    private int _port;
 
     ///////////////
     // Workbench //
@@ -117,7 +115,12 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         HttpSession session = getHttpSession();
         assert (session != null);
 
-        if (session.getAttribute("client") == null) {
+        _userName = userName;
+        _password = password;
+        _hostName = hostName;
+        _port = port;
+
+        if (session.getAttribute("session") == null) {
             session.setMaxInactiveInterval(SESSION_TIMEOUT);
             //session.setMaxInactiveInterval(40);  // For testing
 
@@ -133,15 +136,14 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                 MeandreClient client = new MeandreClient(hostName, port);
                 client.setCredentials(userName, password);
 
-				if(!client.hasRoleGranted(Role.WORKBENCH))
+                Set<String> userRoles = client.retrieveUserRoles();
+
+                if(!userRoles.contains(Role.WORKBENCH.getUrl()))
                     throw new LoginFailedException("Insufficient permissions");
 
-				Set<Role> userRoles = client.retrieveRoles();
-
                 WBSession wbSession =
-                    new WBSession(session.getId(), userName, password, getRolesAsString(userRoles), hostName, port);
+                    new WBSession(session.getId(), userName, password, userRoles, hostName, port);
 
-                session.setAttribute("client", client);
                 session.setAttribute("session", wbSession);
 
                 return wbSession;
@@ -236,8 +238,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            Set<URL> componentUrls = getClient().retrieveComponentUrls();
-            return MeandreConverter.convert(componentUrls, UrlStringConverter);
+            Set<URI> componentUrls = getClient().retrieveComponentUris();
+            return MeandreConverter.convert(componentUrls, UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -274,7 +276,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            return MeandreConverter.convert(getClient().retrieveFlowUrls(), UrlStringConverter);
+            return MeandreConverter.convert(getClient().retrieveFlowUris(), UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -344,8 +346,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            Set<URL> componentUrls = getClient().retrieveComponentsByTag(tag);
-            return MeandreConverter.convert(componentUrls, UrlStringConverter);
+            Set<URI> componentUrls = getClient().retrieveComponentsByTag(tag);
+            return MeandreConverter.convert(componentUrls, UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -356,8 +358,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            Set<URL> flowUrls = getClient().retrieveFlowsByTag(tag);
-            return MeandreConverter.convert(flowUrls, UrlStringConverter);
+            Set<URI> flowUrls = getClient().retrieveFlowsByTag(tag);
+            return MeandreConverter.convert(flowUrls, UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -368,8 +370,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            Set<URL> componentUrls = getClient().retrieveComponentUrlsByQuery(query);
-            return MeandreConverter.convert(componentUrls, UrlStringConverter);
+            Set<URI> componentUrls = getClient().retrieveComponentUrlsByQuery(query);
+            return MeandreConverter.convert(componentUrls, UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -380,81 +382,60 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            Set<URL> flowUrls = getClient().retrieveFlowUrlsByQuery(query);
-            return MeandreConverter.convert(flowUrls, UrlStringConverter);
+            Set<URI> flowUrls = getClient().retrieveFlowUrlsByQuery(query);
+            return MeandreConverter.convert(flowUrls, UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
         }
     }
 
-    public WBFlowDescription uploadFlow(WBFlowDescription wbFlow, boolean overwrite)
+    public boolean uploadFlow(WBFlowDescription wbFlow, boolean overwrite)
         throws SessionExpiredException, MeandreCommunicationException, CorruptedFlowException {
 
         FlowDescription flow = MeandreConverter.WBFlowDescriptionConverter.convert(wbFlow);
 
-        String normalizedFlowURI = flow.getFlowComponent().getURI();
-        if (!normalizedFlowURI.endsWith("/")) normalizedFlowURI += "/";
+        String flowURI = flow.getFlowComponent().getURI();
+        System.out.println("Uploading flow " + flowURI);
 
-        System.out.println("Uploading flow: flowURI=" + normalizedFlowURI + "   desiredURI=" + wbFlow.getDesiredURI());
+        String execStepMsg = "";
+        try {
+            Model flowModel = flow.getModel();
 
-        if (!normalizedFlowURI.equals(wbFlow.getDesiredURI())) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            flow.getModel().write(baos, "N-TRIPLE");
-            String sModel = baos.toString().replaceAll(
-                    "<" + flow.getFlowComponent().getURI(),
-                    "<" + wbFlow.getDesiredURI());
-            Model flowModel = ModelFactory.createDefaultModel();
+            String fName = flowURI.replaceAll(":|/", "_");
+            String tempFolder = System.getProperty("java.io.tmpdir");
+            if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
+                tempFolder += System.getProperty("file.separator");
 
-            String execStepMsg = null;
-            try {
-                // START DEBUG
-                String fName = wbFlow.getDesiredURI().replaceAll(":|/", "_");
-                String tempFolder = System.getProperty("java.io.tmpdir");
-                if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
-                    tempFolder += System.getProperty("file.separator");
+            FileOutputStream ntStream = new FileOutputStream(tempFolder + fName + ".nt");
+            flowModel.write(ntStream, "N-TRIPLE");
+            ntStream.close();
 
-                FileWriter fw = new FileWriter(tempFolder + fName + ".nt");
-                fw.write(sModel);
-                fw.close();
-                // END DEBUG
+            FileOutputStream ttlStream = new FileOutputStream(tempFolder + fName + ".ttl");
+            flowModel.write(ttlStream, "TTL");
+            ttlStream.close();
 
-                execStepMsg = "STEP 1: Reading flow model";
-                flowModel.read(new StringReader(sModel), null, "N-TRIPLE");
+            execStepMsg = "STEP1: Creating RepositoryImpl from flow model";
+            RepositoryImpl repository = new RepositoryImpl(flowModel);
+            execStepMsg = "STEP2: Retrieving available flows";
+            Set<FlowDescription> flows = repository.getAvailableFlowDescriptions();
+            execStepMsg = "STEP3: Getting flow";
+            flow = flows.iterator().next();
+            if (flow == null)
+                throw new CorruptedFlowException("The flow obtained is null!");
+        }
+        catch (Exception e) {
 
-                // START DEBUG
-                FileOutputStream modelStream = new FileOutputStream(tempFolder + fName + ".ttl");
-                flowModel.write(modelStream, "TTL");
-                modelStream.close();
-                System.out.println("Model for flow " + wbFlow.getDesiredURI() + " written successfully in file " + tempFolder + fName);
-                // END DEBUG
+            CorruptedFlowException corruptedFlowException = (execStepMsg != null) ?
+                    new CorruptedFlowException(execStepMsg, e) : (CorruptedFlowException) e;
 
-                execStepMsg = "STEP 2: Creating RepositoryImpl(flowModel) - flowModel.isEmpty()=" + flowModel.isEmpty();
-                RepositoryImpl repository = new RepositoryImpl(flowModel);
-
-                execStepMsg = "STEP 3: Retrieving flows";
-                Set<FlowDescription> flows = repository.getAvailableFlowDescriptions();
-                execStepMsg = "STEP 4: Obtaining flow description - flows.size()=" + flows.size();
-                flow = flows.iterator().next();
-                execStepMsg = null;
-
-                if (flow == null)
-                    throw new CorruptedFlowException("The flow obtained from STEP 4 is null!");
-            }
-            catch (Exception e) {
-
-                CorruptedFlowException corruptedFlowException = (execStepMsg != null) ?
-                        new CorruptedFlowException(execStepMsg, e) : (CorruptedFlowException) e;
-
-                System.out.println("uploadFlow: " + Application.formatException(corruptedFlowException));
-                throw corruptedFlowException;
-            }
+            throw corruptedFlowException;
         }
 
         try {
             getClient().uploadFlow(flow, overwrite);
 
-            return MeandreConverter.FlowDescriptionConverter.convert(flow);
+            return true;
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -508,18 +489,59 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     // Execution //
     ///////////////
 
-    public String runFlow(String flowURL, boolean verbose)
+    public boolean runFlow(String flowURL, String token, boolean verbose)
         throws SessionExpiredException, MeandreCommunicationException {
 
-        throw new RuntimeException("Not yet implemented");
+        if (_flowConsoles.containsKey(flowURL)) return false;
+
+        try {
+            _flowConsoles.put(flowURL, getClient().runFlowStreamOutput(flowURL, token, verbose));
+            return true;
+        }
+        catch (TransmissionException e) {
+            throw new MeandreCommunicationException(e);
+        }
+    }
+
+    public String retrieveFlowOutput(String flowURL)
+        throws MeandreCommunicationException {
+
+        InputStream consoleStream = _flowConsoles.get(flowURL);
+        if (consoleStream == null)
+            throw new MeandreCommunicationException(flowURL + " has not been executed");
+
+        try {
+            int bufferSize = 1000;
+
+            byte[] data = new byte[bufferSize];
+            int nRead = consoleStream.read(data);
+
+            if (nRead == -1) {
+                // EOF detected
+                _flowConsoles.remove(flowURL);
+                return null;
+            }
+
+            try {
+                return new String(data, 0, nRead);
+            }
+            catch (Exception ex) {
+                throw new MeandreCommunicationException("Cannot create string from stream", ex);
+            }
+        }
+        catch (IOException e) {
+            _flowConsoles.remove(flowURL);
+
+            throw new MeandreCommunicationException(e);
+        }
     }
 
     public Map<String, String> retrieveRunningFlows()
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
-            Map<URL, URL> runningFlowsMap = getClient().retrieveRunningFlows();
-            return MeandreConverter.convert(runningFlowsMap, UrlStringConverter, UrlStringConverter);
+            Map<URI, URI> runningFlowsMap = getClient().retrieveRunningFlows();
+            return MeandreConverter.convert(runningFlowsMap, UriStringConverter, UriStringConverter);
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -531,7 +553,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
 
         try {
             JSONObject joWebUIInfo = getClient().retrieveWebUIInfo(token);
-            return (joWebUIInfo != null && joWebUIInfo.has("hostname")) ?
+            return (joWebUIInfo != null && joWebUIInfo.has("port") && joWebUIInfo.getInt("port") > 0) ?
                 new WBWebUIInfo(
                         joWebUIInfo.getString("hostname"),
                         joWebUIInfo.getInt("port"),
@@ -616,7 +638,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         HttpSession session = getHttpSession();
         assert(session != null);
 
-        if (session.getAttribute("client") == null)
+        if (session.getAttribute("session") == null)
             throw new SessionExpiredException();
 
         return session;
@@ -625,7 +647,12 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     private MeandreClient getClient()
         throws SessionExpiredException {
 
-        return (MeandreClient) checkSession().getAttribute("client");
+        checkSession();
+
+        MeandreClient client = new MeandreClient(_hostName, _port);
+        client.setCredentials(_userName, _password);
+
+        return client;
     }
 
     private QueryableRepository getRepository()
@@ -652,14 +679,5 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
 
         return repository;
-    }
-
-    private Set<String> getRolesAsString(Set<Role> userRoles) {
-        Set<String> roles = new HashSet<String>(userRoles.size());
-
-        for (Role role : userRoles)
-            roles.add(role.getShortName());
-
-        return roles;
     }
 }

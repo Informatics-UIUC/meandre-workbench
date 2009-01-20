@@ -43,6 +43,8 @@
 package org.seasr.meandre.workbench.server.beans.converters;
 
 /**
+ * Generic converter interface
+ *
  * @author Boris Capitanu
  *
  */

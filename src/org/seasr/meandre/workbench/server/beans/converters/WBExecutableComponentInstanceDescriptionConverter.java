@@ -50,6 +50,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 /**
+ * Converts the workbench WBExecutableComponentInstanceDescription bean to the Meandre equivalent
+ *
  * @author Boris Capitanu
  *
  */

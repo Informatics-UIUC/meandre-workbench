@@ -42,7 +42,7 @@
 
 package org.seasr.meandre.workbench.client;
 
-import org.seasr.meandre.workbench.client.exceptions.WBException;
+import org.seasr.meandre.workbench.client.widgets.ErrorWindow;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -96,7 +96,7 @@ public abstract class Application implements EntryPoint {
 
             throwable = throwable.getCause();
             if (throwable != null)
-                text += "Caused by: ";
+                text += NEW_LINE + "Caused by: ";
         }
 
         return text;
@@ -104,7 +104,7 @@ public abstract class Application implements EntryPoint {
 
     /**
      * The functional entry point of the application
-     * (to be overriden by main application)
+     * (to be overridden by main application)
      */
     protected abstract void onLoad();
 
@@ -128,29 +128,8 @@ public abstract class Application implements EntryPoint {
      * @param throwable The exception that caused the error
      * @param callback A callback that indicates when the window was dismissed
      */
-    public static void showError(final String title, final String message, final Throwable throwable, final MessageBox.PromptCallback callback) {
-        MessageBox.hide(); // just in case any other MessageBox is showing
-        MessageBox.show(new MessageBoxConfig() {
-            {
-                String errMsg = "";
-                if (message != null) errMsg = message;
-                if (throwable != null) {
-                    if (throwable instanceof WBException) {
-                        String serverTrace = ((WBException)throwable).getServerTrace();
-                        errMsg += (serverTrace != null) ? serverTrace : formatException(throwable);
-                    }
-                    else
-                        errMsg += formatException(throwable);
-                }
-
-                setMsg(errMsg);
-                setIconCls(MessageBox.ERROR);
-                setButtons(MessageBox.OK);
-
-                if (title != null) setTitle(title);
-                if (callback != null) setCallback(callback);
-            }
-        });
+    public static void showError(final String title, final String message, final Throwable throwable, final MessageBox.ConfirmCallback callback) {
+        new ErrorWindow(title, message, throwable, callback).show();
     }
 
     public static void showMessage(String title, String message, String iconCls) {

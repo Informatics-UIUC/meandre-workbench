@@ -43,6 +43,9 @@
 package org.seasr.meandre.workbench.client;
 
 /**
+ * Interface used to piggyback commands to asynchronous events.
+ * This allows commands to be executed at the time when an synchronous callback is invoked.
+ * 
  * @author Boris Capitanu
  *
  */

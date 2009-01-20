@@ -46,6 +46,8 @@ import org.meandre.core.repository.LocationBean;
 import org.seasr.meandre.workbench.client.beans.repository.WBLocation;
 
 /**
+ * Converts the Meandre LocationBean bean to its workbench equivalent
+ *
  * @author Boris Capitanu
  *
  */

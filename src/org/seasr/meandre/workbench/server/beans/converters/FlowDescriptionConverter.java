@@ -47,6 +47,8 @@ import org.seasr.meandre.workbench.client.beans.repository.WBFlowDescription;
 import org.seasr.meandre.workbench.server.rpc.MeandreConverter;
 
 /**
+ * Converts the Meandre FlowDescription bean to its workbench equivalent
+ *
  * @author Boris Capitanu
  *
  */
@@ -54,9 +56,8 @@ public class FlowDescriptionConverter
     implements IBeanConverter<FlowDescription, WBFlowDescription> {
 
     public WBFlowDescription convert(FlowDescription fd) {
-        String uri = fd.getFlowComponent().getURI();
-        WBFlowDescription flow = new WBFlowDescription(
-                uri,
+        return new WBFlowDescription(
+                fd.getFlowComponent().getURI(),
                 fd.getName(),
                 fd.getDescription(),
                 fd.getRights(),
@@ -67,13 +68,6 @@ public class FlowDescriptionConverter
                 MeandreConverter.convert(fd.getConnectorDescriptions(),
                         MeandreConverter.ConnectorDescriptionConverter),
                 MeandreConverter.TagsDescriptionConverter.convert(fd.getTags()));
-
-        while (uri.endsWith("/"))
-            uri = uri.substring(0, uri.length() - 1);
-        uri = uri.substring(0, uri.lastIndexOf('/') + 1);
-        flow.setDesiredBaseURI(uri);
-
-        return flow;
     }
 
 }

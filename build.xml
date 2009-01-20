@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Meandre-Workbench" basedir="." default="dist">
-    <!-- Check whether Java 1.5 is being used -->
-    <condition property="jdk15">
+    <!-- Check whether Java 1.5 or Java 1.6 is being used -->
+    <condition property="jdk15or16">
+        <or>
             <contains string="${java.version}" substring="1.5"/>
+            <contains string="${java.version}" substring="1.6"/>
+        </or>
     </condition>
 
-    <fail unless="jdk15" 
-          message="This project requires Java 5. Please set JAVA_HOME to point to where JDK 1.5 is installed."/>
+    <fail unless="jdk15or16"
+          message="This project requires Java 5 or Java 6. Please set JAVA_HOME to point to where JDK is installed."/>
 
     <condition property="isMac">
         <os family="mac"/>
@@ -22,7 +25,7 @@
 
     <fail message="${ant.project.name} is only supported on Macintosh, Unix, and Windows systems">
         <condition>
-            <and> 
+            <and>
                 <not> <isset property="isMac"/> </not>
                 <not> <isset property="isUnix"/> </not>
                 <not> <isset property="isWindows"/> </not>
@@ -30,57 +33,51 @@
         </condition>
     </fail>
 
-    <property environment="env"/>
-<!--
-    <fail unless="env.GWT_HOME" 
-          message="Please set the GWT_HOME environment variable to point to where you downloaded GWT 1.5"/>
--->
     <property name="src.gwt.dir" value="${basedir}/src"/>
     <property name="src.bootstrap.dir" value="${basedir}/src-bootstrap"/>
     <property name="lib.bootstrap.dir" value="${basedir}/lib/bootstrap"/>
-    <property name="lib.buildonly.dir" value="${basedir}/lib/build-only-lib"/>
+    <property name="lib.deploy.dir" value="${basedir}/lib/deploy"/>
+    <property name="lib.compiler.dir" value="${basedir}/lib/compiler"/>
     <property name="build.dir" value="${basedir}/build"/>
     <property name="build.bootstrap.dir" value="${build.dir}/bootstrap"/>
     <property name="build.server.dir" value="${build.dir}/server"/>
     <property name="dist.dir" value="${basedir}/dist"/>
-    <property name="gwt.lib.dir" value="${basedir}/lib"/>
+    <property name="gwt.lib.dir" value="${basedir}/lib/build"/>
     <property name="gwt.output.dir" value="${build.dir}/gwtOutput"/>
     <property name="gwt.workbench" value="org.seasr.meandre.workbench.Workbench"/>
     <property name="bootstrap.class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
-    <property name="war.dir" value="${dist.dir}/war"/>
+    <property name="war.file" value="${dist.dir}/${ant.project.name}.war"/>
+    <property name="web.xml" value="${basedir}/www/WEB-INF/web.xml"/>
 
-    <path id="workbench.classpath">
-        <fileset dir="${lib.buildonly.dir}" includes="*.jar"/>
-        <fileset dir="${gwt.lib.dir}" includes="*.jar"/>
+    <path id="deploy.classpath">
+        <fileset dir="${lib.deploy.dir}" includes="*.jar"/>
     </path>
-    
-    <path id="dist.classpath">
-        <fileset dir="${war.dir}/WEB-INF/lib" includes="*.jar"/>
+
+    <path id="run.classpath">
         <fileset dir="${dist.dir}/bootstrap/lib" includes="*.jar"/>
         <pathelement location="${dist.dir}/bootstrap"/>
     </path>
 
     <path id="gwt_compile.classpath">
+        <fileset dir="${lib.compiler.dir}" includes="gwt-compiler.jar"/>
+        <fileset dir="${gwt.lib.dir}" includes="*.jar"/>
         <pathelement location="${src.gwt.dir}"/>
-        <pathelement location="${build.server.dir}"/>
-        <path refid="workbench.classpath"/>
+        <path refid="deploy.classpath"/>
     </path>
 
-    <path id="bootstrap_compile.classpath">
+    <path id="bootstrap.classpath">
         <fileset dir="${lib.bootstrap.dir}" includes="*.jar"/>
     </path>
 
     <target name="init">
         <tstamp/>
-        
+
         <mkdir dir="${build.bootstrap.dir}"/>
         <mkdir dir="${build.server.dir}"/>
         <mkdir dir="${gwt.output.dir}"/>
         <mkdir dir="${dist.dir}/bootstrap/lib"/>
-        <mkdir dir="${war.dir}/WEB-INF/classes"/>
-        <mkdir dir="${war.dir}/WEB-INF/lib"/>
     </target>
-    
+
     <target name="clean" description="-> removes auto-generated files/folders">
         <delete dir="${build.bootstrap.dir}"/>
         <delete dir="${build.server.dir}"/>
@@ -89,12 +86,9 @@
     </target>
 
     <target name="gwt_compile" depends="init" description="-> compiles the main GWT source tree">
-        <echo message="Using GWT from ${lib.buildonly.dir}"/>
-        
         <delete dir="${gwt.output.dir}"/>
         <java classname="com.google.gwt.dev.GWTCompiler" fork="yes" maxmemory="512m">
             <classpath refid="gwt_compile.classpath"/>
-            <!--<arg line="-out ${gwt.output.dir}"/>-->
             <arg value="-out"/>
             <arg value="${gwt.output.dir}"/>
             <arg value="$@"/>
@@ -107,68 +101,63 @@
     </target>
 
     <target name="bootstrap_compile" depends="init" description="-> compiles the bootstrapper">
-        <javac srcdir="${src.bootstrap.dir}" destdir="${build.bootstrap.dir}" classpathref="bootstrap_compile.classpath" debug="on" source="1.5"/>
+        <javac srcdir="${src.bootstrap.dir}" destdir="${build.bootstrap.dir}" classpathref="bootstrap.classpath" debug="on" source="1.5"/>
     </target>
 
     <target name="compile" depends="gwt_compile, server_compile, bootstrap_compile" description="-> compiles the entire project"/>
 
-    <target name="dist" depends="compile" description="-> creates distribution">
-        <copy todir="${war.dir}/WEB-INF/classes">
-            <fileset dir="${build.server.dir}"/>
-        </copy>
-        
-        <copy todir="${war.dir}/WEB-INF/lib">
-            <path refid="workbench.classpath"/>
-        </copy>
-                
-        <copy todir="${war.dir}">
-            <fileset dir="${gwt.output.dir}/${gwt.workbench}"/>
-        </copy>
-        
+    <target name="dist" depends="compile" description="-> creates WAR distribution">
         <copy todir="${dist.dir}/bootstrap">
             <fileset dir="${build.bootstrap.dir}"/>
         </copy>
-        
+
         <copy file="${src.bootstrap.dir}/workbench-jetty.xml" todir="${dist.dir}/bootstrap" />
-        
+
         <copy todir="${dist.dir}/bootstrap/lib">
-            <path refid="bootstrap_compile.classpath"/>
+            <fileset dir="${lib.bootstrap.dir}"/>
         </copy>
+
+        <war destfile="${war.file}" webxml="${web.xml}">
+            <fileset dir="${gwt.output.dir}/${gwt.workbench}"/>
+            <lib dir="${lib.deploy.dir}"/>
+            <classes dir="${build.server.dir}"/>
+        </war>
     </target>
 
     <target name="run" depends="dist" description="-> compiles and runs Meandre-Workbench">
         <antcall target="run-fast"/>
     </target>
-    
+
     <condition property="can.run-fast">
         <and>
-            <available file="${dist.dir}/bootstrap" type="dir"/>
-            <available file="${war.dir}" type="dir"/>
-            <available classname="${bootstrap.class}" classpathref="dist.classpath"/>
+            <available file="${war.file}"/>
+            <available file="${dist.dir}/bootstrap/workbench-jetty.xml"/>
+            <available classname="${bootstrap.class}" classpathref="run.classpath"/>
         </and>
     </condition>
-    
-    <target name="run-fast" depends="run-fast.check" if="can.run-fast" description="-> runs and already compiled Meandre-Workbech">
+
+    <target name="run-fast" depends="run-fast.check" if="can.run-fast" description="-> runs an already compiled Meandre-Workbech">
         <java classname="${bootstrap.class}" fork="yes" maxmemory="1024m">
-            <classpath refid="dist.classpath"/>
-            <arg value="${dist.dir}"/>
+            <classpath refid="run.classpath"/>
+            <arg value="${war.file}"/>
+            <arg value="${dist.dir}/bootstrap/workbench-jetty.xml"/>
         </java>
     </target>
-    
+
     <target name="run-fast.check" unless="can.run-fast">
         <echo message="Cannot perform run-fast - required files are missing. Performing full build..."/>
         <antcall target="dist"/>
-        
+
         <condition property="can.run-fast">
             <and>
-                <available file="${dist.dir}/bootstrap" type="dir"/>
-                <available file="${war.dir}" type="dir"/>
-                <available classname="${bootstrap.class}" classpathref="dist.classpath"/>
+                <available file="${war.file}"/>
+                <available file="${dist.dir}/bootstrap/workbench-jetty.xml"/>
+                <available classname="${bootstrap.class}" classpathref="run.classpath"/>
             </and>
         </condition>
     </target>
 
-</project> 
+</project>
 
 <!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
 <!-- vim:sw=4:softtabstop=4:expandtab

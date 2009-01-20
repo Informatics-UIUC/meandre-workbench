@@ -75,7 +75,7 @@ public class WorkspacePanel extends Panel {
 
         BorderLayoutData southLayoutData = new BorderLayoutData(RegionPosition.SOUTH);
         southLayoutData.setMinSize(100);
-        southLayoutData.setMaxSize(600); // TODO set based on window size
+        //southLayoutData.setMaxSize(600); // TODO set based on window size
         southLayoutData.setMargins(new Margins(0, 0, 0, 0));
         southLayoutData.setSplit(true);
 
