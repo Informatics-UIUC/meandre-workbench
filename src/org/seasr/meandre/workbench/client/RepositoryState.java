@@ -82,7 +82,9 @@ public class RepositoryState {
 
     // State stores
     private final Store _componentsStore = new GroupingStore();
+    private final Store _componentsStoreFull = new GroupingStore();
     private final Store _flowsStore = new GroupingStore();
+    private final Store _flowsStoreFull = new GroupingStore();
     private Store _locationsStore;
 
     private ArrayReader _compsReader;
@@ -139,6 +141,9 @@ public class RepositoryState {
 
         _componentsStore.setReader(_compsReader);
         _componentsStore.setSortInfo(new SortState("name", SortDir.ASC));
+
+        _componentsStoreFull.setReader(_compsReader);
+        _componentsStoreFull.setSortInfo(new SortState("name", SortDir.ASC));
     }
 
     /**
@@ -164,6 +169,9 @@ public class RepositoryState {
 
         _flowsStore.setReader(_flowsReader);
         _flowsStore.setSortInfo(new SortState("name", SortDir.ASC));
+
+        _flowsStoreFull.setReader(_flowsReader);
+        _flowsStoreFull.setSortInfo(new SortState("name", SortDir.ASC));
     }
 
     /**
@@ -200,9 +208,9 @@ public class RepositoryState {
      */
     public Set<WBExecutableComponentDescription> getComponents() {
         Set<WBExecutableComponentDescription> components =
-            new HashSet<WBExecutableComponentDescription>(_componentsStore.getCount());
+            new HashSet<WBExecutableComponentDescription>(_componentsStoreFull.getCount());
 
-        for (Record record : _componentsStore.getRecords())
+        for (Record record : _componentsStoreFull.getRecords())
             components.add(getComponent(record));
 
         return components;
@@ -215,7 +223,7 @@ public class RepositoryState {
      * @return The component sought, or null if none found
      */
     public WBExecutableComponentDescription getComponent(String compURI) {
-        WBExecutableComponentDescription component = getComponent(_componentsStore.getById(compURI));
+        WBExecutableComponentDescription component = getComponent(_componentsStoreFull.getById(compURI));
         if (component == null)
             Log.warn("The attempt to retrieve component " + compURI + " failed");
         return component;
@@ -247,9 +255,9 @@ public class RepositoryState {
      */
     public Set<WBFlowDescription> getFlows() {
         Set<WBFlowDescription> flows =
-            new HashSet<WBFlowDescription>(_flowsStore.getCount());
+            new HashSet<WBFlowDescription>(_flowsStoreFull.getCount());
 
-        for (Record record : _flowsStore.getRecords())
+        for (Record record : _flowsStoreFull.getRecords())
             flows.add(getFlow(record));
 
         return flows;
@@ -262,7 +270,7 @@ public class RepositoryState {
      * @return The flow sought, or null if none found
      */
     public WBFlowDescription getFlow(String flowURI) {
-        return getFlow(_flowsStore.getById(flowURI));
+        return getFlow(_flowsStoreFull.getById(flowURI));
     }
 
     /**
@@ -283,18 +291,19 @@ public class RepositoryState {
     public void addFlow(WBFlowDescription flow) {
         // check if the flow already exists
         Record storedFlow = _flowsStore.getById(flow.getFlowURI());
+        Record storedFlowFull = _flowsStoreFull.getById(flow.getFlowURI());
 
-        if (storedFlow != null) {
+        if (storedFlowFull != null) {
             // ...and if it does, remove it so it can be replaced
             Log.warn("Flow " + flow.getFlowURI() + " already exists in store - replacing...");
             _flowsStore.remove(storedFlow);
-            _flowsStore.commitChanges();
+            _flowsStoreFull.remove(storedFlowFull);
         }
         else
             Log.info("Adding flow " + flow.getFlowURI());
 
         // add the flow to the store
-        _flowsStore.addSorted(_flowsReader.getRecordDef().createRecord(flow.getFlowURI(), new Object[] {
+        Record newFlow = _flowsReader.getRecordDef().createRecord(flow.getFlowURI(), new Object[] {
             flow,
             flow.getFlowURI(),
             flow.getName(),
@@ -305,7 +314,23 @@ public class RepositoryState {
             flow.getExecutableComponentInstances(),
             flow.getConnectorDescriptions(),
             flow.getTags()
-        }));
+        });
+
+        Record newFlowFull = _flowsReader.getRecordDef().createRecord(flow.getFlowURI(), new Object[] {
+            flow,
+            flow.getFlowURI(),
+            flow.getName(),
+            flow.getDescription(),
+            flow.getRights(),
+            flow.getCreator(),
+            flow.getCreationDate(),
+            flow.getExecutableComponentInstances(),
+            flow.getConnectorDescriptions(),
+            flow.getTags()
+        });
+
+        _flowsStore.addSorted(newFlow);
+        _flowsStoreFull.addSorted(newFlowFull);
     }
 
     /**
@@ -448,8 +473,12 @@ public class RepositoryState {
             };
         }
 
-        _componentsStore.setDataProxy(new MemoryProxy(data));
+        MemoryProxy memoryProxy = new MemoryProxy(data);
+        _componentsStore.setDataProxy(memoryProxy);
         _componentsStore.load();
+
+        _componentsStoreFull.setDataProxy(memoryProxy);
+        _componentsStoreFull.load();
     }
 
     /**
@@ -476,8 +505,12 @@ public class RepositoryState {
             };
         }
 
-        _flowsStore.setDataProxy(new MemoryProxy(data));
+        MemoryProxy memoryProxy = new MemoryProxy(data);
+        _flowsStore.setDataProxy(memoryProxy);
         _flowsStore.load();
+
+        _flowsStoreFull.setDataProxy(memoryProxy);
+        _flowsStoreFull.load();
     }
 
     /**
