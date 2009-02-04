@@ -389,7 +389,8 @@ public interface IRepository extends RemoteService {
      * Starts execution of a flow
      *
      * @param flowURL The flow id
-     * @param verbose true to includddde execution statistics in the flow output, false otherwise
+     * @param token The execution token
+     * @param verbose true to include execution statistics in the flow output, false otherwise
      * @return true whether the flow has started executing, false otherwise
      * @throws SessionExpiredException Thrown if the user's session has expired
      * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
