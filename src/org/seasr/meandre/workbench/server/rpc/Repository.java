@@ -115,11 +115,6 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         HttpSession session = getHttpSession();
         assert (session != null);
 
-        _userName = userName;
-        _password = password;
-        _hostName = hostName;
-        _port = port;
-
         if (session.getAttribute("session") == null) {
             session.setMaxInactiveInterval(SESSION_TIMEOUT);
             //session.setMaxInactiveInterval(40);  // For testing
@@ -132,6 +127,11 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                     if (!remoteAddr.isLoopbackAddress())
                         hostName = remoteAddr.getCanonicalHostName();
                 }
+
+                _userName = userName;
+                _password = password;
+                _hostName = hostName;
+                _port = port;
 
                 MeandreClient client = new MeandreClient(hostName, port);
                 client.setCredentials(userName, password);
