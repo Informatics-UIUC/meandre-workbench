@@ -113,6 +113,8 @@ public class Workbench extends Application {
     private final RepositoryState _repositoryState = RepositoryState.getInstance();
     private MainPanel _mainPanel;
 
+    private static int WEBUI_INFO_RECV_TIMEOUT = 10000;  // 10 seconds
+
     private CreditsDialog _creditsDialog;
     private LoginDialog _loginDialog;
     private WBSession _session;
@@ -729,6 +731,8 @@ public class Workbench extends Application {
                         };
 
 
+                        final long lStartTime = new Date().getTime();
+
                         // wait to receive the runtime info for the flow
                         Timer webUITimer = new Timer() {
                             @Override
@@ -737,7 +741,14 @@ public class Workbench extends Application {
                                     @Override
                                     public void onSuccess(WBWebUIInfo webUIInfo) {
                                         if (webUIInfo == null) {
-                                            schedule(1000);
+                                            long lCurrentTime = new Date().getTime();
+                                            if (lCurrentTime - lStartTime > WEBUI_INFO_RECV_TIMEOUT) {
+                                                Log.warn("Timeout receiving the web UI info status!");
+                                                outputPanel.clearMask();
+                                                outputPanel.print("Timeout receiving the flow execution status... flow died?");
+                                                flowTab.enableRunFlow();
+                                            } else
+                                                schedule(1000);
                                             return;
                                         }
 
