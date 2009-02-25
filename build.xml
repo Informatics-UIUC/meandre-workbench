@@ -33,6 +33,8 @@
         </condition>
     </fail>
 
+    <property name="debug" value="false"/>
+
     <property name="src.gwt.dir" value="${basedir}/src"/>
     <property name="src.bootstrap.dir" value="${basedir}/src-bootstrap"/>
     <property name="lib.bootstrap.dir" value="${basedir}/lib/bootstrap"/>
@@ -138,6 +140,7 @@
 
     <target name="run-fast" depends="run-fast.check" if="can.run-fast" description="-> runs an already compiled Meandre-Workbech">
         <java classname="${bootstrap.class}" fork="yes" maxmemory="1024m">
+            <sysproperty key="org.seasr.meandre.workbench.debug" value="${debug}" />
             <classpath refid="run.classpath"/>
             <arg value="${war.file}"/>
             <arg value="${dist.dir}/bootstrap/workbench-jetty.xml"/>
