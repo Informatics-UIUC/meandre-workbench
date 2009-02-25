@@ -57,7 +57,7 @@ import org.seasr.meandre.workbench.client.exceptions.SessionExpiredException;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 /**
  * Defines the AJAX service interface for working with the Meandre server
@@ -65,9 +65,8 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
  * @author Boris Capitanu
  *
  */
+@RemoteServiceRelativePath("Repository")
 public interface IRepository extends RemoteService {
-
-    public static final String SERVICE_URI = "Repository";
 
     public static class Util {
         private static IRepositoryAsync _instance;
@@ -78,11 +77,8 @@ public interface IRepository extends RemoteService {
          * @return A singleton IRepositoryAsync object implementor
          */
         public static IRepositoryAsync getInstance() {
-            if (_instance == null) {
+            if (_instance == null)
                 _instance = (IRepositoryAsync) GWT.create(IRepository.class);
-                ServiceDefTarget target = (ServiceDefTarget) _instance;
-                target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
-            }
 
             return _instance;
         }
