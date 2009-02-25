@@ -398,38 +398,41 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         String flowURI = flow.getFlowComponent().getURI();
         System.out.println("Uploading flow " + flowURI);
 
-        String execStepMsg = "";
-        try {
-            Model flowModel = flow.getModel();
+        String debug = System.getProperty("org.seasr.meandre.workbench.debug");
+        if (debug != null && Boolean.parseBoolean(debug)) {
+            String execStepMsg = "";
+            try {
+                Model flowModel = flow.getModel();
 
-            String fName = flowURI.replaceAll(":|/", "_");
-            String tempFolder = System.getProperty("java.io.tmpdir");
-            if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
-                tempFolder += System.getProperty("file.separator");
+                String fName = flowURI.replaceAll(":|/", "_");
+                String tempFolder = System.getProperty("java.io.tmpdir");
+                if (!(tempFolder.endsWith("/") || tempFolder.endsWith("\\")))
+                    tempFolder += System.getProperty("file.separator");
 
-            FileOutputStream ntStream = new FileOutputStream(tempFolder + fName + ".nt");
-            flowModel.write(ntStream, "N-TRIPLE");
-            ntStream.close();
+                FileOutputStream ntStream = new FileOutputStream(tempFolder + fName + ".nt");
+                flowModel.write(ntStream, "N-TRIPLE");
+                ntStream.close();
 
-            FileOutputStream ttlStream = new FileOutputStream(tempFolder + fName + ".ttl");
-            flowModel.write(ttlStream, "TTL");
-            ttlStream.close();
+                FileOutputStream ttlStream = new FileOutputStream(tempFolder + fName + ".ttl");
+                flowModel.write(ttlStream, "TTL");
+                ttlStream.close();
 
-            execStepMsg = "STEP1: Creating RepositoryImpl from flow model";
-            RepositoryImpl repository = new RepositoryImpl(flowModel);
-            execStepMsg = "STEP2: Retrieving available flows";
-            Set<FlowDescription> flows = repository.getAvailableFlowDescriptions();
-            execStepMsg = "STEP3: Getting flow";
-            flow = flows.iterator().next();
-            if (flow == null)
-                throw new CorruptedFlowException("The flow obtained is null!");
-        }
-        catch (Exception e) {
+                execStepMsg = "STEP1: Creating RepositoryImpl from flow model";
+                RepositoryImpl repository = new RepositoryImpl(flowModel);
+                execStepMsg = "STEP2: Retrieving available flows";
+                Set<FlowDescription> flows = repository.getAvailableFlowDescriptions();
+                execStepMsg = "STEP3: Getting flow";
+                flow = flows.iterator().next();
+                if (flow == null)
+                    throw new CorruptedFlowException("The flow obtained is null!");
+            }
+            catch (Exception e) {
 
-            CorruptedFlowException corruptedFlowException = (execStepMsg != null) ?
-                    new CorruptedFlowException(execStepMsg, e) : (CorruptedFlowException) e;
+                CorruptedFlowException corruptedFlowException = (execStepMsg != null) ?
+                        new CorruptedFlowException(execStepMsg, e) : (CorruptedFlowException) e;
 
-            throw corruptedFlowException;
+                throw corruptedFlowException;
+            }
         }
 
         try {
