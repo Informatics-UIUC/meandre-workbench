@@ -1,38 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Meandre-Workbench" basedir="." default="dist">
-    <!-- Check whether Java 1.5 or Java 1.6 is being used -->
-    <condition property="jdk15or16">
-        <or>
-            <contains string="${java.version}" substring="1.5"/>
-            <contains string="${java.version}" substring="1.6"/>
-        </or>
+    <import file="common.xml" />
+
+    <svn failonerror="false">
+        <wcVersion path="${basedir}" prefix="svn.root."/>
+    </svn>
+
+    <condition property="svn_revision" value="${svn.root.revision.max-with-flags}" else="custom">
+        <isset property="svn.root.revision.max-with-flags"/>
     </condition>
 
-    <fail unless="jdk15or16"
-          message="This project requires Java 5 or Java 6. Please set JAVA_HOME to point to where JDK is installed."/>
-
-    <condition property="isMac">
-        <os family="mac"/>
-    </condition>
-
-    <condition property="isUnix">
-        <os family="unix"/>
-    </condition>
-
-    <condition property="isWindows">
-        <os family="windows"/>
-    </condition>
-
-    <fail message="${ant.project.name} is only supported on Macintosh, Unix, and Windows systems">
-        <condition>
-            <and>
-                <not> <isset property="isMac"/> </not>
-                <not> <isset property="isUnix"/> </not>
-                <not> <isset property="isWindows"/> </not>
-            </and>
-        </condition>
-    </fail>
-
+   <!--#################### Project Properties #########################-->
+    <property name="version" value="1.4.3"/>
     <property name="debug" value="false"/>
 
     <property name="src.gwt.dir" value="${basedir}/src"/>
@@ -48,8 +27,10 @@
     <property name="gwt.output.dir" value="${build.dir}/gwtOutput"/>
     <property name="gwt.workbench" value="org.seasr.meandre.workbench.Workbench"/>
     <property name="bootstrap.class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
-    <property name="war.file" value="${dist.dir}/${ant.project.name}.war"/>
     <property name="web.xml" value="${basedir}/www/WEB-INF/web.xml"/>
+    <property name="version.template" value="${basedir}/version.tpl"/>
+    <property name="version.file" value="${src.gwt.dir}/org/seasr/meandre/workbench/client/Version.java"/>
+    <property name="war.file" value="${dist.dir}/${ant.project.name}-${version}.${svn_revision}.war"/>
 
     <path id="deploy.classpath">
         <fileset dir="${lib.deploy.dir}" includes="*.jar"/>
@@ -71,13 +52,28 @@
         <fileset dir="${lib.bootstrap.dir}" includes="*.jar"/>
     </path>
 
-    <target name="init">
-        <tstamp/>
 
+    <!--######################### BUILD TARGETS ###########################-->
+
+    <target name="init">
+        <tstamp>
+            <format property="TIMESTAMP" pattern="MMM d, yyyy h:mm:ssa Z"/>
+        </tstamp>
+    </target>
+
+    <target name="prepare" depends="init" description="-> performs necessary preparation tasks for the build">
         <mkdir dir="${build.bootstrap.dir}"/>
         <mkdir dir="${build.server.dir}"/>
         <mkdir dir="${gwt.output.dir}"/>
         <mkdir dir="${dist.dir}/bootstrap/lib"/>
+
+	<copy file="${version.template}" toFile="${version.file}" overwrite="true">
+            <filterset>
+                <filter token="VERSION" value="${version}"/>
+                <filter token="REVISION" value="${svn_revision}"/>
+                <filter token="BUILD_DATE" value="${TIMESTAMP}"/>
+            </filterset>
+        </copy>
     </target>
 
     <target name="clean" description="-> removes auto-generated files/folders">
@@ -87,7 +83,7 @@
         <delete dir="${dist.dir}"/>
     </target>
 
-    <target name="gwt_compile" depends="init" description="-> compiles the main GWT source tree">
+    <target name="gwt_compile" depends="prepare" description="-> compiles the main GWT source tree">
         <delete dir="${gwt.output.dir}"/>
         <java classname="com.google.gwt.dev.GWTCompiler" fork="yes" maxmemory="512m">
             <classpath refid="gwt_compile.classpath"/>
@@ -98,11 +94,11 @@
         </java>
     </target>
 
-    <target name="server_compile" depends="init" description="-> compiles the server-side code">
+    <target name="server_compile" depends="prepare" description="-> compiles the server-side code">
         <javac srcdir="${src.gwt.dir}" destdir="${build.server.dir}" classpathref="gwt_compile.classpath" debug="on" source="1.5"/>
     </target>
 
-    <target name="bootstrap_compile" depends="init" description="-> compiles the bootstrapper">
+    <target name="bootstrap_compile" depends="prepare" description="-> compiles the bootstrapper">
         <javac srcdir="${src.bootstrap.dir}" destdir="${build.bootstrap.dir}" classpathref="bootstrap.classpath" debug="on" source="1.5"/>
     </target>
 
