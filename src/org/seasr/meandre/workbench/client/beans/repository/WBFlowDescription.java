@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -161,7 +162,9 @@ public class WBFlowDescription implements IsSerializable, Cloneable {
                 ecid.setExecutableComponentInstance(sResURI + oldInstanceURI.substring(oldFlowURI.length()));
                 removeExecutableComponentInstance(oldInstanceURI);
                 addExecutableComponentInstance(ecid);
-            }
+            } else
+                Log.warn("setFlowURI: the flow being saved ('" + sName + "') does not have proper RDF triple naming scheme; " +
+                        "expected to start with: '" + oldFlowURI + "'  actual: '" + oldInstanceURI + "'");
         }
 
         // update connector descriptions
