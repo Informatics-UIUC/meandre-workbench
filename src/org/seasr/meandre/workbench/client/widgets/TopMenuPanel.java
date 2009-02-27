@@ -42,9 +42,13 @@
 
 package org.seasr.meandre.workbench.client.widgets;
 
+import java.util.Date;
+
+import org.seasr.meandre.workbench.client.Version;
 import org.seasr.meandre.workbench.client.beans.session.WBSession;
 import org.seasr.meandre.workbench.client.listeners.MainPanelActionListener;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -98,9 +102,9 @@ public class TopMenuPanel extends ContainerPanel {
                 lblLoginInfo.setStyleName("top-header-menu-items");
                 lblLoginInfo.addStyleName("top-header-menu-loginInfo");
 
-                ToolTip tip = new ToolTip();
-                tip.setHtml("Meandre server running on " + session.getHostName() + " port " + session.getPort());
-                tip.applyTo(lblLoginInfo.getElement());
+                ToolTip tipServer = new ToolTip();
+                tipServer.setHtml("Meandre server running on " + session.getHostName() + " port " + session.getPort());
+                tipServer.applyTo(lblLoginInfo.getElement());
 
                 hpMenu.add(lblCredits);
                 hpMenu.add(lblSeparator1);
@@ -112,6 +116,19 @@ public class TopMenuPanel extends ContainerPanel {
                 Image imgLogo = new Image("images/meandre_logo.png");
                 //imgLogo.setStyleName("top-header-image-logo");
                 imgContainer.add(imgLogo);
+
+                String wbVersion = Version.getFullVersion();
+                Date wbBuildDate = Version.getBuildDate();
+
+                if (wbVersion != null) {
+                    ToolTip tipVersion = new ToolTip();
+                    tipVersion.setHtml("Meandre Workbench version " + wbVersion);
+                    if (wbBuildDate != null) {
+                        String buildDate = DateTimeFormat.getFormat("MMM dd, yyyy h:mm:ssa z").format(wbBuildDate);
+                        tipVersion.setHtml(tipVersion.getHtml() + "<br/>Built on " + buildDate);
+                    }
+                    tipVersion.applyTo(imgLogo.getElement());
+                }
 
                 this.add(imgLogo);
                 this.add(hpMenu);
