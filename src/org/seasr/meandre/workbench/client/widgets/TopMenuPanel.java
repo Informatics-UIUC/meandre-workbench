@@ -48,6 +48,7 @@ import org.seasr.meandre.workbench.client.Version;
 import org.seasr.meandre.workbench.client.beans.session.WBSession;
 import org.seasr.meandre.workbench.client.listeners.MainPanelActionListener;
 
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.HorizontalPanel;
