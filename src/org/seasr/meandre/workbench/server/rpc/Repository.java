@@ -96,8 +96,6 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         };
 
     private final Map<String, InputStream> _flowConsoles = new HashMap<String, InputStream>();
-    private String _userName, _password, _hostName;
-    private int _port;
 
     ///////////////
     // Workbench //
@@ -128,11 +126,6 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                         hostName = remoteAddr.getCanonicalHostName();
                 }
 
-                _userName = userName;
-                _password = password;
-                _hostName = hostName;
-                _port = port;
-
                 MeandreClient client = new MeandreClient(hostName, port);
                 client.setCredentials(userName, password);
 
@@ -144,6 +137,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                 WBSession wbSession =
                     new WBSession(session.getId(), userName, password, userRoles, hostName, port);
 
+                session.setAttribute("client", client);
                 session.setAttribute("session", wbSession);
 
                 return wbSession;
@@ -650,12 +644,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     private MeandreClient getClient()
         throws SessionExpiredException {
 
-        checkSession();
-
-        MeandreClient client = new MeandreClient(_hostName, _port);
-        client.setCredentials(_userName, _password);
-
-        return client;
+        return (MeandreClient) checkSession().getAttribute("client");
     }
 
     private QueryableRepository getRepository()
