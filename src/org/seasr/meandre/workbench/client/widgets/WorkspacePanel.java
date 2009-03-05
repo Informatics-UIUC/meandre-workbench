@@ -42,6 +42,7 @@
 
 package org.seasr.meandre.workbench.client.widgets;
 
+import org.seasr.meandre.workbench.client.listeners.ShowWebUIListener;
 import org.seasr.meandre.workbench.client.listeners.WorkspacePanelActionListener;
 
 import com.gwtext.client.core.EventCallback;
@@ -64,10 +65,10 @@ import com.gwtext.client.widgets.layout.BorderLayoutData;
  * @author Boris Capitanu
  *
  */
-public class WorkspacePanel extends Panel {
+public class WorkspacePanel extends Panel implements ShowWebUIListener {
     private final TabPanel _tabPanel = new TabPanel();
     private WorkspacePanelActionListener _actionListener = null;
-    private final OutputPanel _outputPanel = new OutputPanel();
+    private final OutputPanel _outputPanel = new OutputPanel(this);
 
 
     public WorkspacePanel() {
@@ -181,5 +182,10 @@ public class WorkspacePanel extends Panel {
             setClosable(false);
             addClass("x-unselectable");
         }
+    }
+
+
+    public void onShowWebUI() {
+        getActiveTab().openWebUI();
     }
 }

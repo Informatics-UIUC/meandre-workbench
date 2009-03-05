@@ -1021,16 +1021,18 @@ public class WorkspaceTab extends Panel {
         // check whether ports have been added/removed - update UI?
     }
 
-    private static int _webUICounter = 0;
     private WBWebUIInfo _webUIInfo = null;
     private final ToolbarButton _btnRunFlow = new ToolbarButton("Run flow");
     private final ToolbarButton _btnStopFlow = new ToolbarButton("Stop flow");
+
     public void openWebUI() {
-//        WebUI webUI = new WebUI(_wbFlow.getName(), webUIInfo);
-//        webUI.show();
-        String windowName = _wbFlow.getName().toLowerCase().replaceAll(" |\t", "_") + _webUICounter++;
-        Window.open(_webUIInfo.getWebUIUrl(), windowName,
-                "resizable=yes,scrollbars=yes,status=yes,location=no,chrome=yes,width=800,height=600,centerscreen=yes");
+        if (_webUIInfo == null) {
+            Application.showMessage("Show WebUI", "This flow is not currently executing!", MessageBox.WARNING);
+            return;
+        }
+
+        Window.open(_webUIInfo.getWebUIUrl(), _wbFlow.getFlowURI(),
+                "resizable,scrollbars,status,chrome,width=800,height=600,centerscreen");
     }
 
     public WBWebUIInfo getWebUIInfo() {

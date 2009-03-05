@@ -40,31 +40,10 @@
  * WITH THE SOFTWARE.
  */
 
-package org.seasr.meandre.workbench.client.widgets;
+package org.seasr.meandre.workbench.client.listeners;
 
-import org.seasr.meandre.workbench.client.listeners.ShowWebUIListener;
+public interface ShowWebUIListener {
 
-import com.gwtext.client.core.Function;
-import com.gwtext.client.widgets.Panel;
-import com.gwtext.client.widgets.Tool;
-import com.gwtext.client.widgets.layout.CardLayout;
+    public void onShowWebUI();
 
-/**
- * @author Boris Capitanu
- *
- */
-public class OutputPanel extends Panel {
-
-    public OutputPanel(final ShowWebUIListener listener) {
-        setHeight(200);
-        setCollapsible(true);
-        setLayout(new CardLayout());
-        setTitle("Output");
-        setActiveItem(0);
-        addTool(new Tool(Tool.RESTORE, new Function() {
-            public void execute() {
-                listener.onShowWebUI();
-            }
-        }, "Show WebUI"));
-    }
 }
