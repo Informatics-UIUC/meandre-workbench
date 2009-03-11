@@ -43,12 +43,14 @@
 package org.seasr.meandre.workbench.bootstrap;
 
 import java.io.File;
+import java.io.InputStream;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.SessionManager;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
+import org.seasr.meandre.workbench.bootstrap.utils.FileUtils;
 
 /**
  * @author Boris Capitanu
@@ -80,26 +82,47 @@ public class JettyBootstrapper {
      * @param args command line arguments
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
-        String wbWarFile = "Meandre-Workbench.war";
-        String wbJettyDescriptorFile = "workbench-jetty.xml";
+        String wbWarFileName = "Meandre-Workbench.war";
+        String wbJettyDescriptorFileName = "workbench-jetty.xml";
 
-        if (args.length == 2) {
-            wbWarFile = args[0];
-            wbJettyDescriptorFile = args[1];
-        } else {
-            System.err.println("No arguments specified - attempting to find required files...");
-            File warFile = new File(wbWarFile);
-            File descriptorFile = new File(wbJettyDescriptorFile);
+        Class clazz = new JettyBootstrapper().getClass();
+        InputStream warStream = clazz.getResourceAsStream("/" + wbWarFileName);
+        InputStream descriptorStream = clazz.getResourceAsStream("/" + wbJettyDescriptorFileName);
 
-            if (!warFile.exists() || !descriptorFile.exists()) {
-                System.err.println("Could not find " + wbWarFile + " or " + wbJettyDescriptorFile + " in current directory - exiting");
-                System.exit(-1);
+        if (warStream == null || descriptorStream == null) {
+            if (args.length == 2) {
+                wbWarFileName = args[0];
+                wbJettyDescriptorFileName = args[1];
+            } else {
+                System.err.println("No arguments specified - attempting to find required files...");
+                File warFile = new File(wbWarFileName);
+                File descriptorFile = new File(wbJettyDescriptorFileName);
+
+                if (!warFile.exists() || !descriptorFile.exists()) {
+                    System.err.println("Could not find " + wbWarFileName + " or " + wbJettyDescriptorFileName + " in current directory - exiting");
+                    System.exit(-1);
+                }
             }
+        } else {
+            System.out.println("Using bundled webapp.");
+
+            File warFile = File.createTempFile(wbWarFileName.substring(0, wbWarFileName.lastIndexOf('.') + 1), ".war");
+            File descriptorFile = File.createTempFile(wbJettyDescriptorFileName.substring(0, wbJettyDescriptorFileName.lastIndexOf('.') + 1), ".xml");
+
+            warFile.deleteOnExit();
+            descriptorFile.deleteOnExit();
+
+            FileUtils.copyFileFromStream(warStream, warFile);
+            FileUtils.copyFileFromStream(descriptorStream, descriptorFile);
+
+            wbWarFileName = warFile.getPath();
+            wbJettyDescriptorFileName = descriptorFile.getPath();
         }
 
-        System.out.println("Workbench WAR: " + wbWarFile);
-        System.out.println("Jetty descriptor: " + wbJettyDescriptorFile);
+        System.out.println("Workbench WAR: " + wbWarFileName);
+        System.out.println("Jetty descriptor: " + wbJettyDescriptorFileName);
         System.out.println("Using session cookie name: " + SESSION_COOKIE_NAME);
 
         Server server = new Server();
@@ -110,8 +133,8 @@ public class JettyBootstrapper {
 
         WebAppContext webapp = new WebAppContext();
         webapp.setContextPath("/");
-        webapp.setWar(wbWarFile);
-        webapp.setDefaultsDescriptor(wbJettyDescriptorFile);
+        webapp.setWar(wbWarFileName);
+        webapp.setDefaultsDescriptor(wbJettyDescriptorFileName);
 
         SessionManager sessionManager = webapp.getSessionHandler().getSessionManager();
         sessionManager.setSessionCookie(SESSION_COOKIE_NAME);

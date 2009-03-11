@@ -30,7 +30,8 @@
     <property name="web.xml" value="${basedir}/www/WEB-INF/web.xml"/>
     <property name="version.template" value="${basedir}/version.tpl"/>
     <property name="version.file" value="${src.gwt.dir}/org/seasr/meandre/workbench/client/Version.java"/>
-    <property name="war.file" value="${dist.dir}/${ant.project.name}-${version}.${svn_revision}.war"/>
+    <property name="workbench.war.file" value="${dist.dir}/${ant.project.name}-${version}.${svn_revision}.war"/>
+    <property name="workbench.jar.file" value="${dist.dir}/${ant.project.name}-${version}.${svn_revision}.jar"/>
 
     <path id="deploy.classpath">
         <fileset dir="${lib.deploy.dir}" includes="*.jar"/>
@@ -65,9 +66,9 @@
         <mkdir dir="${build.bootstrap.dir}"/>
         <mkdir dir="${build.server.dir}"/>
         <mkdir dir="${gwt.output.dir}"/>
-        <mkdir dir="${dist.dir}/bootstrap/lib"/>
+        <mkdir dir="${dist.dir}"/>
 
-	<copy file="${version.template}" toFile="${version.file}" overwrite="true">
+        <copy file="${version.template}" toFile="${version.file}" overwrite="true">
             <filterset>
                 <filter token="VERSION" value="${version}"/>
                 <filter token="REVISION" value="${svn_revision}"/>
@@ -104,22 +105,34 @@
 
     <target name="compile" depends="gwt_compile, server_compile, bootstrap_compile" description="-> compiles the entire project"/>
 
-    <target name="dist" depends="compile" description="-> creates WAR distribution">
-        <copy todir="${dist.dir}/bootstrap">
-            <fileset dir="${build.bootstrap.dir}"/>
-        </copy>
-
-        <copy file="${src.bootstrap.dir}/workbench-jetty.xml" todir="${dist.dir}/bootstrap" />
-
-        <copy todir="${dist.dir}/bootstrap/lib">
-            <fileset dir="${lib.bootstrap.dir}"/>
-        </copy>
-
-        <war destfile="${war.file}" webxml="${web.xml}">
+    <target name="dist" depends="compile" description="-> creates Workbench distribution">
+        <war destfile="${workbench.war.file}" webxml="${web.xml}">
             <fileset dir="${gwt.output.dir}/${gwt.workbench}"/>
             <lib dir="${lib.deploy.dir}"/>
             <classes dir="${build.server.dir}"/>
         </war>
+        
+        <property name="release.tmp.dir" value="${dist.dir}/release.tmp"/>
+        <mkdir dir="${release.tmp.dir}"/>
+        <copy file="${workbench.war.file}" toFile="${release.tmp.dir}/Meandre-Workbench.war"/>
+        <copy file="${src.bootstrap.dir}/workbench-jetty.xml" todir="${release.tmp.dir}"/>
+        <copy todir="${release.tmp.dir}" includeEmptyDirs="no">
+            <fileset dir="${build.bootstrap.dir}"/>
+        </copy>
+        <unjar dest="${release.tmp.dir}" overwrite="true">
+            <fileset dir="${lib.bootstrap.dir}" />
+        </unjar>
+        <delete dir="${release.tmp.dir}/META-INF"/>
+        <delete file="${release.tmp.dir}/LICENSE"/>
+        <jar destfile="${workbench.jar.file}">
+            <manifest>
+                <attribute name="Build-Version" value="${version}.${svn_revision}"/>
+                <attribute name="Build-Date" value="${TIMESTAMP}"/>
+                <attribute name="Main-Class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
+            </manifest>
+            <fileset dir="${release.tmp.dir}"/>
+        </jar>
+        <delete dir="${release.tmp.dir}"/>
     </target>
 
     <target name="run" depends="dist" description="-> compiles and runs Meandre-Workbench">
@@ -128,18 +141,14 @@
 
     <condition property="can.run-fast">
         <and>
-            <available file="${war.file}"/>
-            <available file="${dist.dir}/bootstrap/workbench-jetty.xml"/>
-            <available classname="${bootstrap.class}" classpathref="run.classpath"/>
+            <available file="${workbench.jar.file}"/>
+            <available classname="${bootstrap.class}" classpath="${workbench.jar.file}"/>
         </and>
     </condition>
 
     <target name="run-fast" depends="run-fast.check" if="can.run-fast" description="-> runs an already compiled Meandre-Workbech">
-        <java classname="${bootstrap.class}" fork="yes" maxmemory="1024m">
+        <java jar="${workbench.jar.file}" fork="yes" maxmemory="1024m">
             <sysproperty key="org.seasr.meandre.workbench.debug" value="${debug}" />
-            <classpath refid="run.classpath"/>
-            <arg value="${war.file}"/>
-            <arg value="${dist.dir}/bootstrap/workbench-jetty.xml"/>
         </java>
     </target>
 
@@ -149,9 +158,8 @@
 
         <condition property="can.run-fast">
             <and>
-                <available file="${war.file}"/>
-                <available file="${dist.dir}/bootstrap/workbench-jetty.xml"/>
-                <available classname="${bootstrap.class}" classpathref="run.classpath"/>
+                <available file="${workbench.jar.file}"/>
+                <available classname="${bootstrap.class}" classpath="${workbench.jar.file}"/>
             </and>
         </condition>
     </target>
