@@ -47,8 +47,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.meandre.core.repository.CorruptedDescriptionException;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class WBExecutableComponentDescription implements IsSerializable {
@@ -133,7 +131,6 @@ public class WBExecutableComponentDescription implements IsSerializable {
      * @param setOutputs The set of output data ports
      * @param pddProperties
      * @param tagDesc
-     * @throws CorruptedDescriptionException Either the wrong runnable, format, or firing policy are incorrect
      */
     public WBExecutableComponentDescription (
             String sResURI,
