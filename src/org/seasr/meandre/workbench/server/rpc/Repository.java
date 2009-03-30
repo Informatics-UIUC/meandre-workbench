@@ -69,11 +69,13 @@ import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponent
 import org.seasr.meandre.workbench.client.beans.repository.WBFlowDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBLocation;
 import org.seasr.meandre.workbench.client.beans.session.WBSession;
+import org.seasr.meandre.workbench.client.beans.session.WBVersion;
 import org.seasr.meandre.workbench.client.exceptions.CorruptedFlowException;
 import org.seasr.meandre.workbench.client.exceptions.LoginFailedException;
 import org.seasr.meandre.workbench.client.exceptions.MeandreCommunicationException;
 import org.seasr.meandre.workbench.client.exceptions.SessionExpiredException;
 import org.seasr.meandre.workbench.client.rpc.IRepository;
+import org.seasr.meandre.workbench.server.Version;
 import org.seasr.meandre.workbench.server.beans.converters.IBeanConverter;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -134,8 +136,10 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                 if(!userRoles.contains(Role.WORKBENCH.getUrl()))
                     throw new LoginFailedException("Insufficient permissions");
 
+                WBVersion wbVersion = new WBVersion(Version.getVersion(), Version.getRevision(), Version.getBuildDate());
+
                 WBSession wbSession =
-                    new WBSession(session.getId(), userName, password, userRoles, hostName, port);
+                    new WBSession(session.getId(), userName, password, userRoles, hostName, port, wbVersion);
 
                 session.setAttribute("client", client);
                 session.setAttribute("session", wbSession);

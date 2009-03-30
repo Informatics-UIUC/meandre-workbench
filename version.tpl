@@ -40,17 +40,22 @@
  * WITH THE SOFTWARE.
  */
 
-package org.seasr.meandre.workbench.client;
+package org.seasr.meandre.workbench.server;
 
+import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import com.google.gwt.i18n.client.DateTimeFormat;
+import java.util.jar.Manifest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class Version {
     // these macros will be replaced by ANT
     private static final String VERSION = "@VERSION@";
     private static final String REVISION = "@REVISION@";
-    private static final String BUILD_DATE = "@BUILD_DATE@";
+    
+    private static Date _buildDate = null;
 
     public static String getVersion() {
         if (VERSION.startsWith("@") && VERSION.endsWith("@"))
@@ -69,11 +74,33 @@ public class Version {
     }
 
     public static Date getBuildDate() {
-        if (BUILD_DATE.startsWith("@") && BUILD_DATE.endsWith("@"))
-            // ANT didn't do its job, return null
+       if (_buildDate != null) return _buildDate;
+       
+       String classContainer = Version.class.getProtectionDomain().getCodeSource().getLocation().toString();
+       String baseDir = null;
+       
+       try {
+           Pattern regex = Pattern.compile("^(.*)WEB-INF[/\\\\]classes.*$");
+           Matcher regexMatcher = regex.matcher(classContainer);
+           if (regexMatcher.find()) {
+               baseDir = regexMatcher.group(1);
+           } else
+               return null;
+       } catch (PatternSyntaxException ex) {
+           return null;
+       }
+
+       try {
+            Manifest manifest = new Manifest(new URL(baseDir + "META-INF" + File.separator + "MANIFEST.MF").openStream());
+            String buildDate = manifest.getMainAttributes().getValue("Build-Date");
+            _buildDate = new SimpleDateFormat("MMM d, yyyy h:mm:ssa Z").parse(buildDate);
+            
+            return _buildDate;
+        }
+        catch (Exception e) {
+            System.err.println("version: thrown exception: " + e);
             return null;
-        else
-            return DateTimeFormat.getFormat("MMM d, yyyy h:mm:ssa Z").parse(BUILD_DATE);
+        }
     }
 
     public static String getFullVersion() {

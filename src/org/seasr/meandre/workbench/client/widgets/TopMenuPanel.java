@@ -44,11 +44,9 @@ package org.seasr.meandre.workbench.client.widgets;
 
 import java.util.Date;
 
-import org.seasr.meandre.workbench.client.Version;
 import org.seasr.meandre.workbench.client.beans.session.WBSession;
 import org.seasr.meandre.workbench.client.listeners.MainPanelActionListener;
 
-import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -118,8 +116,8 @@ public class TopMenuPanel extends ContainerPanel {
                 //imgLogo.setStyleName("top-header-image-logo");
                 imgContainer.add(imgLogo);
 
-                String wbVersion = Version.getFullVersion();
-                Date wbBuildDate = Version.getBuildDate();
+                String wbVersion = session.getWBVersion().getFullVersion();
+                Date wbBuildDate = session.getWBVersion().getBuildDate();
 
                 if (wbVersion != null) {
                     ToolTip tipVersion = new ToolTip();

@@ -29,7 +29,7 @@
     <property name="bootstrap.class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
     <property name="web.xml" value="${basedir}/www/WEB-INF/web.xml"/>
     <property name="version.template" value="${basedir}/version.tpl"/>
-    <property name="version.file" value="${src.gwt.dir}/org/seasr/meandre/workbench/client/Version.java"/>
+    <property name="version.file" value="${src.gwt.dir}/org/seasr/meandre/workbench/server/Version.java"/>
     <property name="workbench.war.file" value="${dist.dir}/${ant.project.name}-${version}.${svn_revision}.war"/>
     <property name="workbench.jar.file" value="${dist.dir}/${ant.project.name}-${version}.${svn_revision}.jar"/>
 
@@ -72,7 +72,6 @@
             <filterset>
                 <filter token="VERSION" value="${version}"/>
                 <filter token="REVISION" value="${svn_revision}"/>
-                <filter token="BUILD_DATE" value="${TIMESTAMP}"/>
             </filterset>
         </copy>
     </target>
@@ -110,8 +109,12 @@
             <fileset dir="${gwt.output.dir}/${gwt.workbench}"/>
             <lib dir="${lib.deploy.dir}"/>
             <classes dir="${build.server.dir}"/>
+        	<manifest>
+                <attribute name="Build-Version" value="${version}.${svn_revision}"/>
+        	    <attribute name="Build-Date" value="${TIMESTAMP}"/>
+        	</manifest>
         </war>
-        
+
         <property name="release.tmp.dir" value="${dist.dir}/release.tmp"/>
         <mkdir dir="${release.tmp.dir}"/>
         <copy file="${workbench.war.file}" toFile="${release.tmp.dir}/Meandre-Workbench.war"/>

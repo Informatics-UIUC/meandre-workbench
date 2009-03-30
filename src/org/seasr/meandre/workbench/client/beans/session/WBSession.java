@@ -62,6 +62,7 @@ public class WBSession implements IsSerializable {
     private Date _date;
     private String _hostName;
     private int _port;
+    private WBVersion _wbVersion;
 
     /**
      * Empty constructor - not used - needed by GWT
@@ -78,7 +79,7 @@ public class WBSession implements IsSerializable {
      * @param hostName The host name
      * @param port The port number
      */
-    public WBSession(String sid, String userName, String password, Set<String> userRoles, String hostName, int port) {
+    public WBSession(String sid, String userName, String password, Set<String> userRoles, String hostName, int port, WBVersion version) {
         _sid = sid;
         _userName = userName;
         _password = password;
@@ -86,6 +87,7 @@ public class WBSession implements IsSerializable {
         _hostName = hostName;
         _port = port;
         _date = new Date();
+        _wbVersion = version;
     }
 
     /**
@@ -150,5 +152,14 @@ public class WBSession implements IsSerializable {
      */
     public int getPort() {
         return _port;
+    }
+
+    /**
+     * Returns the Workbench version information
+     *
+     * @return The Workbench version information
+     */
+    public WBVersion getWBVersion() {
+        return _wbVersion;
     }
 }
