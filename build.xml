@@ -1,164 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Meandre-Workbench" basedir="." default="dist">
-    <import file="common.xml" />
-
-    <svn failonerror="false">
-        <wcVersion path="${basedir}" prefix="svn.root."/>
-    </svn>
-
-    <condition property="svn_revision" value="${svn.root.revision.max-with-flags}" else="custom">
-        <isset property="svn.root.revision.max-with-flags"/>
+<project name="Meandre-Workbench" default="dist" xmlns:ivy="antlib:org.apache.ivy.ant">
+    <!-- Check whether Java 1.5 or Java 1.6 is being used -->
+    <condition property="jdk15+">
+        <or>
+            <contains string="${java.version}" substring="1.5"/>
+            <contains string="${java.version}" substring="1.6"/>
+        </or>
     </condition>
-
-   <!--#################### Project Properties #########################-->
-    <property name="version" value="1.4.3"/>
+    
+    <fail unless="jdk15+"
+        message="This project requires at least Java 5. Please set JAVA_HOME to point to where the JDK is installed."/>
+    
+    <!-- here is the version of ivy we will use. change this property to try a newer version if you want -->
+    <property name="ivy.install.version" value="2.0.0" />
+    <property name="ivy.jar.dir" value="${basedir}/ivy" />
+    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+    
+    <!--#################### Project Properties #########################-->
+    <property name="version" value="1.4.4"/>
     <property name="debug" value="false"/>
-
+    
     <property name="src.gwt.dir" value="${basedir}/src"/>
     <property name="src.bootstrap.dir" value="${basedir}/src-bootstrap"/>
-    <property name="lib.bootstrap.dir" value="${basedir}/lib/bootstrap"/>
-    <property name="lib.deploy.dir" value="${basedir}/lib/deploy"/>
-    <property name="lib.compiler.dir" value="${basedir}/lib/compiler"/>
-    <property name="build.dir" value="${basedir}/build"/>
-    <property name="build.bootstrap.dir" value="${build.dir}/bootstrap"/>
+    
+    <property name="build.dir" value="${basedir}/build" />
     <property name="build.server.dir" value="${build.dir}/server"/>
+    <property name="build.bootstrap.dir" value="${build.dir}/bootstrap"/>
+    <property name="build.gwtOutput.dir" value="${build.dir}/gwtOutput"/>
+    
+    <property name="lib.dir" value="${basedir}/lib"/>
     <property name="dist.dir" value="${basedir}/dist"/>
-    <property name="gwt.lib.dir" value="${basedir}/lib/build"/>
-    <property name="gwt.output.dir" value="${build.dir}/gwtOutput"/>
+    <property name="doc.dir" value="${basedir}/javadoc"/>
+    
     <property name="gwt.workbench" value="org.seasr.meandre.workbench.Workbench"/>
     <property name="bootstrap.class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
     <property name="web.xml" value="${basedir}/www/WEB-INF/web.xml"/>
+    
     <property name="version.template" value="${basedir}/version.tpl"/>
     <property name="version.file" value="${src.gwt.dir}/org/seasr/meandre/workbench/server/Version.java"/>
-    <property name="workbench.war.file" value="${dist.dir}/${ant.project.name}-${version}.${svn_revision}.war"/>
-    <property name="workbench.jar.file" value="${dist.dir}/${ant.project.name}-${version}.${svn_revision}.jar"/>
-
-    <path id="deploy.classpath">
-        <fileset dir="${lib.deploy.dir}" includes="*.jar"/>
-    </path>
-
-    <path id="run.classpath">
-        <fileset dir="${dist.dir}/bootstrap/lib" includes="*.jar"/>
-        <pathelement location="${dist.dir}/bootstrap"/>
-    </path>
-
-    <path id="gwt_compile.classpath">
-        <fileset dir="${lib.compiler.dir}" includes="gwt-compiler.jar"/>
-        <fileset dir="${gwt.lib.dir}" includes="*.jar"/>
-        <pathelement location="${src.gwt.dir}"/>
-        <path refid="deploy.classpath"/>
-    </path>
-
-    <path id="bootstrap.classpath">
-        <fileset dir="${lib.bootstrap.dir}" includes="*.jar"/>
-    </path>
-
-
+ 
+    
     <!--######################### BUILD TARGETS ###########################-->
-
+    
+    <target name="download-ivy" unless="skip.download">
+        <mkdir dir="${ivy.jar.dir}"/>
+        <!-- download Ivy from web site so that it can be used even without any special installation -->
+        <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+            dest="${ivy.jar.file}" usetimestamp="true"/>
+    </target>
+ 
+    <target name="install-ivy" depends="download-ivy">
+        <!-- try to load ivy here from local ivy dir, in case the user has not already dropped
+            it into ant's lib dir (note that the latter copy will always take precedence).
+            We will not fail as long as local lib dir exists (it may be empty) and
+            ivy is in at least one of ant's lib dir or the local lib dir. -->
+        <path id="ivy.lib.path">
+            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+        <ivy:configure file="ivysettings.xml"/>
+    </target>    
+    
+    <target name="install-svnant" depends="install-ivy">
+        <ivy:cachepath pathid="svnant.classpath" conf="svntask"/>
+        <typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
+    </target>
+    
+    <target name="resolve" depends="install-ivy">
+        <ivy:resolve showprogress="false"/>
+    </target>
+    
+    <target name="retrieve" depends="install-ivy">
+        <mkdir dir="${lib.dir}"/>
+        <ivy:retrieve pattern="${lib.dir}/[artifact].[ext]" sync="true" symlink="true" type="jar"/>
+    </target>
+    
     <target name="init">
+        <mkdir dir="${build.bootstrap.dir}"/>
+        <mkdir dir="${build.server.dir}"/>
+        <mkdir dir="${build.gwtOutput.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+    </target>
+    
+    <target name="clean" description="-> removes auto-generated files/folders">
+        <delete dir="${build.dir}"/>
+        <delete dir="${lib.dir}"/>
+        <delete dir="${dist.dir}"/>
+        <delete dir="${doc.dir}"/>
+    </target>
+    
+    <target name="clean-ivy" description="-> removes the ivy installation">
+        <delete dir="${ivy.jar.dir}"/>
+    </target>
+    
+    <target name="clean-cache" depends="install-ivy" description="-> cleans the ivy cache">
+        <ivy:cleancache />
+    </target>
+    
+    <target name="clean-all" depends="clean, clean-cache, clean-ivy" description="-> cleans everything"/>
+    
+    <target name="get-version" depends="install-svnant">
+        <svn failonerror="false">
+            <wcVersion path="${basedir}" prefix="svn.root."/>
+        </svn>
+        
+        <condition property="svn_revision" value="${svn.root.revision.max-with-flags}" else="custom">
+            <isset property="svn.root.revision.max-with-flags"/>
+        </condition>
+        
         <tstamp>
             <format property="TIMESTAMP" pattern="MMM d, yyyy h:mm:ssa Z"/>
         </tstamp>
-    </target>
-
-    <target name="prepare" depends="init" description="-> performs necessary preparation tasks for the build">
-        <mkdir dir="${build.bootstrap.dir}"/>
-        <mkdir dir="${build.server.dir}"/>
-        <mkdir dir="${gwt.output.dir}"/>
-        <mkdir dir="${dist.dir}"/>
-
-        <copy file="${version.template}" toFile="${version.file}" overwrite="true">
-            <filterset>
-                <filter token="VERSION" value="${version}"/>
-                <filter token="REVISION" value="${svn_revision}"/>
-            </filterset>
-        </copy>
-    </target>
-
-    <target name="clean" description="-> removes auto-generated files/folders">
-        <delete dir="${build.bootstrap.dir}"/>
-        <delete dir="${build.server.dir}"/>
-        <delete dir="${gwt.output.dir}"/>
-        <delete dir="${dist.dir}"/>
-    </target>
-
-    <target name="gwt_compile" depends="prepare" description="-> compiles the main GWT source tree">
-        <delete dir="${gwt.output.dir}"/>
-        <java classname="com.google.gwt.dev.GWTCompiler" fork="yes" maxmemory="512m">
-            <classpath refid="gwt_compile.classpath"/>
-            <arg value="-out"/>
-            <arg value="${gwt.output.dir}"/>
-            <arg value="$@"/>
-            <arg value="${gwt.workbench}"/>
-        </java>
-    </target>
-
-    <target name="server_compile" depends="prepare" description="-> compiles the server-side code">
-        <javac srcdir="${src.gwt.dir}" destdir="${build.server.dir}" classpathref="gwt_compile.classpath" debug="on" source="1.5"/>
-    </target>
-
-    <target name="bootstrap_compile" depends="prepare" description="-> compiles the bootstrapper">
-        <javac srcdir="${src.bootstrap.dir}" destdir="${build.bootstrap.dir}" classpathref="bootstrap.classpath" debug="on" source="1.5"/>
-    </target>
-
-    <target name="compile" depends="gwt_compile, server_compile, bootstrap_compile" description="-> compiles the entire project"/>
-
-    <target name="dist" depends="compile" description="-> creates Workbench distribution">
-        <war destfile="${workbench.war.file}" webxml="${web.xml}">
-            <fileset dir="${gwt.output.dir}/${gwt.workbench}"/>
-            <lib dir="${lib.deploy.dir}"/>
-            <classes dir="${build.server.dir}"/>
-        	<manifest>
-                <attribute name="Build-Version" value="${version}.${svn_revision}"/>
-        	    <attribute name="Build-Date" value="${TIMESTAMP}"/>
-        	</manifest>
-        </war>
-
-        <property name="release.tmp.dir" value="${dist.dir}/release.tmp"/>
-        <mkdir dir="${release.tmp.dir}"/>
-        <copy file="${workbench.war.file}" toFile="${release.tmp.dir}/Meandre-Workbench.war"/>
-        <copy file="${src.bootstrap.dir}/workbench-jetty.xml" todir="${release.tmp.dir}"/>
-        <copy todir="${release.tmp.dir}" includeEmptyDirs="no">
-            <fileset dir="${build.bootstrap.dir}"/>
-        </copy>
-        <unjar dest="${release.tmp.dir}" overwrite="true">
-            <fileset dir="${lib.bootstrap.dir}" />
-        </unjar>
-        <delete dir="${release.tmp.dir}/META-INF"/>
-        <delete file="${release.tmp.dir}/LICENSE"/>
-        <jar destfile="${workbench.jar.file}">
-            <manifest>
-                <attribute name="Build-Version" value="${version}.${svn_revision}"/>
-                <attribute name="Build-Date" value="${TIMESTAMP}"/>
-                <attribute name="Main-Class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
-            </manifest>
-            <fileset dir="${release.tmp.dir}"/>
-        </jar>
-        <delete dir="${release.tmp.dir}"/>
-    </target>
-
-    <target name="run" depends="dist" description="-> compiles and runs Meandre-Workbench">
-        <antcall target="run-fast"/>
-    </target>
-
-    <condition property="can.run-fast">
-        <and>
-            <available file="${workbench.jar.file}"/>
-            <available classname="${bootstrap.class}" classpath="${workbench.jar.file}"/>
-        </and>
-    </condition>
-
-    <target name="run-fast" depends="run-fast.check" if="can.run-fast" description="-> runs an already compiled Meandre-Workbech">
-        <java jar="${workbench.jar.file}" fork="yes" maxmemory="1024m">
-            <sysproperty key="org.seasr.meandre.workbench.debug" value="${debug}" />
-        </java>
-    </target>
-
-    <target name="run-fast.check" unless="can.run-fast">
-        <echo message="Cannot perform run-fast - required files are missing. Performing full build..."/>
-        <antcall target="dist"/>
-
+        
+        <property name="version.full" value="${version}.${svn_revision}"/>
+        <property name="workbench.war.file" value="${dist.dir}/${ant.project.name}-${version.full}.war"/>
+        <property name="workbench.jar.file" value="${dist.dir}/${ant.project.name}-${version.full}.jar"/>
+        
         <condition property="can.run-fast">
             <and>
                 <available file="${workbench.jar.file}"/>
@@ -166,9 +123,154 @@
             </and>
         </condition>
     </target>
-
+    
+    <target name="check.version.upToDate">
+        <tempfile property="version.tmp" prefix="Version.java" suffix=".tmp" createfile="true" deleteonexit="true"/>
+        <copy file="${version.template}" toFile="${version.tmp}" overwrite="true">
+            <filterset>
+                <filter token="VERSION" value="${version}"/>
+                <filter token="REVISION" value="${svn_revision}"/>
+            </filterset>
+        </copy>
+        
+        <condition property="version.upToDate">
+            <filesmatch file1="${version.tmp}" file2="${version.file}"/>
+        </condition>
+    </target>
+    
+    <target name="update-version" depends="get-version, check.version.upToDate" unless="version.upToDate">
+        <echo message="${ant.project.name} version ${version.full}"></echo>
+        <copy file="${version.tmp}" tofile="${version.file}" overwrite="true"/>
+    </target>
+    
+    <target name="prepare" depends="resolve">
+        <ivy:cachepath pathid="compiler.classpath" conf="compiler"/>
+        <ivy:cachepath pathid="build.classpath" conf="build"/>   
+        <ivy:cachepath pathid="war.classpath" conf="war"/>
+        <ivy:cachepath pathid="bootstrap.classpath" conf="bootstrap"/>
+        <ivy:cachefileset setid="war.libs" type="jar" conf="war"/>
+        <ivy:cachefileset setid="bootstrap.libs" type="jar" conf="bootstrap"/>
+    </target>
+    
+    <target name="check.gwt.upToDate">
+        <uptodate targetfile="${build.gwtOutput.dir}/${gwt.workbench}/${gwt.workbench}.nocache.js" property="gwt.upToDate">
+            <srcfiles dir="${src.gwt.dir}" includes="**">
+                <exclude name="org/seasr/meandre/workbench/server/**"/>
+            </srcfiles>
+        </uptodate>
+    </target>
+    
+    <target name="gwt_compile" depends="init, prepare, check.gwt.upToDate" unless="gwt.upToDate" description="-> compiles the main GWT source tree">
+        <java classname="com.google.gwt.dev.GWTCompiler" fork="yes" maxmemory="512m">
+            <classpath>
+                <path refid="compiler.classpath"/>
+                <path refid="build.classpath"/>
+                <pathelement location="${src.gwt.dir}"/>
+            </classpath>
+            
+            <arg value="-out"/>
+            <arg value="${build.gwtOutput.dir}"/>
+            <arg value="$@"/>
+            <arg value="${gwt.workbench}"/>
+        </java>
+    </target>
+    
+    <target name="server_compile" depends="init, prepare, update-version" description="-> compiles the server-side code">
+        <javac source="1.5" srcdir="${src.gwt.dir}" destdir="${build.server.dir}">
+            <classpath>
+                <path refid="build.classpath"/>
+                <path refid="war.classpath"/>
+            </classpath>
+        </javac>
+    </target>
+    
+    <target name="bootstrap_compile" depends="init, prepare" description="-> compiles the bootstrapper">
+        <javac source="1.5" srcdir="${src.bootstrap.dir}" destdir="${build.bootstrap.dir}" classpathref="bootstrap.classpath"/>
+    </target>
+    
+    <target name="compile" depends="gwt_compile, server_compile, bootstrap_compile" description="-> compiles the entire project"/>
+    
+    <target name="dist-war" depends="gwt_compile, server_compile" description="-> creates Workbench WAR distribution">
+        <war destfile="${workbench.war.file}" webxml="${web.xml}">
+            <fileset dir="${build.gwtOutput.dir}/${gwt.workbench}"/>
+            <lib refid="war.libs"/>
+            <classes dir="${build.server.dir}"/>
+            <manifest>
+                <attribute name="Build-Version" value="${version.full}"/>
+                <attribute name="Build-Date" value="${TIMESTAMP}"/>
+            </manifest>
+        </war>
+    </target>
+    
+    <target name="dist-standalone" depends="dist-war, bootstrap_compile" description="-> creates Workbench standalone distribution">
+        <tempfile property="release.tmp.dir" destdir="${dist.dir}" prefix="release" suffix=".tmp"/>
+        <mkdir dir="${release.tmp.dir}"/>
+        <copy file="${workbench.war.file}" toFile="${release.tmp.dir}/Meandre-Workbench.war"/>
+        <copy file="${src.bootstrap.dir}/workbench-jetty.xml" todir="${release.tmp.dir}"/>
+        <copy todir="${release.tmp.dir}" includeEmptyDirs="no">
+            <fileset dir="${build.bootstrap.dir}"/>
+        </copy>
+        <unjar dest="${release.tmp.dir}">
+            <fileset refid="bootstrap.libs"/>
+        </unjar>
+        <delete dir="${release.tmp.dir}/META-INF" quiet="true"/>
+        <delete file="${release.tmp.dir}/LICENSE" quiet="true"/>
+        <jar destfile="${workbench.jar.file}">
+            <manifest>
+                <attribute name="Build-Version" value="${version.full}"/>
+                <attribute name="Build-Date" value="${TIMESTAMP}"/>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Main-Class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
+            </manifest>
+            <fileset dir="${release.tmp.dir}"/>
+        </jar>
+        <delete dir="${release.tmp.dir}"/>
+    </target>
+    
+    <target name="dist" depends="dist-war, dist-standalone" description="-> creates distribution suite"/>
+    
+    <target name="run" depends="get-version, check.can.run-fast" if="can.run-fast" description="-> launches the Workbech">
+        <java jar="${workbench.jar.file}" fork="yes" maxmemory="1024m">
+            <sysproperty key="org.seasr.meandre.workbench.debug" value="${debug}" />
+        </java>
+    </target>
+    
+    <target name="check.can.run-fast" unless="can.run-fast">
+        <echo message="Cannot perform run-fast - required files are missing. Performing full build..."/>
+        <antcall target="dist-standalone"/>
+        
+        <condition property="can.run-fast">
+            <and>
+                <available file="${workbench.jar.file}"/>
+                <available classname="${bootstrap.class}" classpath="${workbench.jar.file}"/>
+            </and>
+        </condition>
+    </target>
+    
+    <target name="release" depends="dist">
+        <ivy:publish 
+            resolver="seasr" 
+            pubrevision="${version}" 
+            overwrite="true"
+            artifactspattern="${dist.dir}/[artifact]-[revision].${svn_revision}.[ext]"/>
+    </target>
+    
+    <!--- Documentation (Javadocs) -->
+    <target name="javadoc" depends="prepare" description="-> generates the documentation">
+        <mkdir dir="${doc.dir}"/>
+        <javadoc
+            sourcepath="${src.gwt.dir}"
+            maxmemory="512m"
+            access="private"
+            windowtitle="Meandre Workbench"
+            author="true"
+            use="true"
+            destdir="${doc.dir}/">
+            <classpath>
+                <path refid="war.classpath"/>
+                <path refid="build.classpath"/>
+            </classpath>
+        </javadoc>
+    </target>
+    
 </project>
-
-<!-- DO NOT EDIT BELOW THIS LINE PLEASE -->
-<!-- vim:sw=4:softtabstop=4:expandtab
--->
