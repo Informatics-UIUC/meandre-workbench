@@ -61,9 +61,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/bootstrap/jsp-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/jsp-api-2.1.jar"/>
-	<classpathentry kind="lib" path="lib/bootstrap/jetty-6.1.14.jar"/>
-	<classpathentry kind="lib" path="lib/bootstrap/jetty-util-6.1.14.jar"/>
-	<classpathentry kind="lib" path="lib/bootstrap/servlet-api-2.5-6.1.14.jar"/>
 	<classpathentry kind="lib" path="lib/build/gwtext-2.0.6.jar">
 		<attributes>
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
@@ -79,5 +76,8 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/bootstrap/jetty-6.1.15.jar"/>
+	<classpathentry kind="lib" path="lib/bootstrap/jetty-util-6.1.15.jar"/>
+	<classpathentry kind="lib" path="lib/bootstrap/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
