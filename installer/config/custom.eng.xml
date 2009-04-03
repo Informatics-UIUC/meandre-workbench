@@ -1,0 +1,16 @@
+<langpack>
+    <!-- Installer settings -->
+    <str id="installer.reversetitle" txt="$APP_NAME $APP_VER Installation"/>
+    <str id="installer.quit.reversemessage" txt="Are you sure you want to cancel the installation?"/>
+    <str id="installer.quit.reversetitle" txt="$APP_NAME $APP_VER"/>
+        
+    <!-- Panels -->
+    <str id="HTMLLicencePanel.headline" txt="License Agreement"/>
+    <str id="InstallationGroupPanel.headline" txt="Installation Type"/>
+    <str id="UserInputPanel.headline" txt="Application Server"/>
+    
+    <str id="UserInputPanel.dir.nodirectory.message" txt="You must select a valid directory."/>
+    <str id="UserInputPanel.dir.nodirectory.caption" txt="No Directory Selected"/>
+    <str id="UserInputPanel.dir.notdirectory.message" txt="The directory you have chosen either does not exist or is not valid."/>
+    <str id="UserInputPanel.dir.notdirectory.caption" txt="Invalid Directory"/>
+</langpack>

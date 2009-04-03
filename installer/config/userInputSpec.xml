@@ -1,0 +1,9 @@
+<userInput>
+    <panel order="0">
+        <createForPack name="Workbench WAR"/>
+        <field id="input.appserver.deploy.dir" type="staticText" align="left" txt="Please select the deployment folder of your application server"/>
+        <field type="dir" align="left" variable="appserver.deploy.dir">
+          <spec txt="" size="30" set=""/>
+        </field>
+    </panel>
+</userInput>

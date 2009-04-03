@@ -19,6 +19,7 @@
     <!--#################### Project Properties #########################-->
     <property name="version" value="1.4.4"/>
     <property name="debug" value="false"/>
+    <property name="artifact.name.base" value="${ant.project.name}"/>
     
     <property name="src.gwt.dir" value="${basedir}/src"/>
     <property name="src.bootstrap.dir" value="${basedir}/src-bootstrap"/>
@@ -31,6 +32,7 @@
     <property name="lib.dir" value="${basedir}/lib"/>
     <property name="dist.dir" value="${basedir}/dist"/>
     <property name="doc.dir" value="${basedir}/javadoc"/>
+    <property name="installer.dir" value="${basedir}/installer"/>
     
     <property name="gwt.workbench" value="org.seasr.meandre.workbench.Workbench"/>
     <property name="bootstrap.class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
@@ -64,6 +66,12 @@
     <target name="install-svnant" depends="install-ivy">
         <ivy:cachepath pathid="svnant.classpath" conf="svntask"/>
         <typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
+    </target>
+    
+    <target name="install-izpack" depends="install-ivy">
+        <ivy:cachepath pathid="izpack.classpath" conf="izpack"/>
+        <!-- Allows us to use the IzPack Ant task to create the graphical installer -->
+        <taskdef name="IzPack" classpathref="izpack.classpath" classname="com.izforge.izpack.ant.IzPackTask"/>
     </target>
     
     <target name="resolve" depends="install-ivy">
@@ -113,13 +121,13 @@
         </tstamp>
         
         <property name="version.full" value="${version}.${svn_revision}"/>
-        <property name="workbench.war.file" value="${dist.dir}/${ant.project.name}-${version.full}.war"/>
-        <property name="workbench.jar.file" value="${dist.dir}/${ant.project.name}-${version.full}.jar"/>
+        <property name="workbench.war.file" value="${artifact.name.base}-${version.full}.war"/>
+        <property name="workbench.jar.file" value="${artifact.name.base}-${version.full}.jar"/>
         
         <condition property="can.run-fast">
             <and>
-                <available file="${workbench.jar.file}"/>
-                <available classname="${bootstrap.class}" classpath="${workbench.jar.file}"/>
+                <available file="${dist.dir}/${workbench.jar.file}"/>
+                <available classname="${bootstrap.class}" classpath="${dist.dir}/${workbench.jar.file}"/>
             </and>
         </condition>
     </target>
@@ -191,7 +199,7 @@
     <target name="compile" depends="gwt_compile, server_compile, bootstrap_compile" description="-> compiles the entire project"/>
     
     <target name="dist-war" depends="gwt_compile, server_compile" description="-> creates Workbench WAR distribution">
-        <war destfile="${workbench.war.file}" webxml="${web.xml}">
+        <war destfile="${dist.dir}/${workbench.war.file}" webxml="${web.xml}">
             <fileset dir="${build.gwtOutput.dir}/${gwt.workbench}"/>
             <lib refid="war.libs"/>
             <classes dir="${build.server.dir}"/>
@@ -205,7 +213,7 @@
     <target name="dist-standalone" depends="dist-war, bootstrap_compile" description="-> creates Workbench standalone distribution">
         <tempfile property="release.tmp.dir" destdir="${dist.dir}" prefix="release" suffix=".tmp"/>
         <mkdir dir="${release.tmp.dir}"/>
-        <copy file="${workbench.war.file}" toFile="${release.tmp.dir}/Meandre-Workbench.war"/>
+        <copy file="${dist.dir}/${workbench.war.file}" toFile="${release.tmp.dir}/Meandre-Workbench.war"/>
         <copy file="${src.bootstrap.dir}/workbench-jetty.xml" todir="${release.tmp.dir}"/>
         <copy todir="${release.tmp.dir}" includeEmptyDirs="no">
             <fileset dir="${build.bootstrap.dir}"/>
@@ -215,7 +223,7 @@
         </unjar>
         <delete dir="${release.tmp.dir}/META-INF" quiet="true"/>
         <delete file="${release.tmp.dir}/LICENSE" quiet="true"/>
-        <jar destfile="${workbench.jar.file}">
+        <jar destfile="${dist.dir}/${workbench.jar.file}">
             <manifest>
                 <attribute name="Build-Version" value="${version.full}"/>
                 <attribute name="Build-Date" value="${TIMESTAMP}"/>
@@ -227,10 +235,19 @@
         <delete dir="${release.tmp.dir}"/>
     </target>
     
-    <target name="dist" depends="dist-war, dist-standalone" description="-> creates distribution suite"/>
+    <target name="dist-installer" depends="dist-standalone, install-izpack" description="-> creates Workbench graphical installer">
+        <IzPack 
+            input="${installer.dir}/config/install.xml"
+            output="${dist.dir}/${artifact.name.base}-${version.full}-install.jar"
+            installerType="standard"
+            basedir="${installer.dir}"
+            inheritAll="true"/>
+    </target>
+    
+    <target name="dist" depends="dist-war, dist-standalone, dist-installer" description="-> creates distribution suite"/>
     
     <target name="run" depends="get-version, check.can.run-fast" if="can.run-fast" description="-> launches the Workbech">
-        <java jar="${workbench.jar.file}" fork="yes" maxmemory="1024m">
+        <java jar="${dist.dir}/${workbench.jar.file}" fork="yes" maxmemory="1024m">
             <sysproperty key="org.seasr.meandre.workbench.debug" value="${debug}" />
         </java>
     </target>
@@ -241,13 +258,13 @@
         
         <condition property="can.run-fast">
             <and>
-                <available file="${workbench.jar.file}"/>
-                <available classname="${bootstrap.class}" classpath="${workbench.jar.file}"/>
+                <available file="${dist.dir}/${workbench.jar.file}"/>
+                <available classname="${bootstrap.class}" classpath="${dist.dir}/${workbench.jar.file}"/>
             </and>
         </condition>
     </target>
     
-    <target name="release" depends="dist">
+    <target name="publish" depends="dist">
         <ivy:publish 
             resolver="seasr" 
             pubrevision="${version}" 

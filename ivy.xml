@@ -9,10 +9,11 @@
     
     <configurations>
         <conf name="svntask" description="for svn access" visibility="private"/>
+        <conf name="izpack" description="for building the graphical installer" visibility="private"/>
         <conf name="compiler" description="for compiling" visibility="private"/>
         <conf name="build" description="compilation only dependencies" visibility="private"/>
         <conf name="war" description="for deployment in existing application servers"/>
-        <conf name="bootstrap" description="for bootstrapping jetty"/>
+        <conf name="bootstrap" description="for bootstrapping jetty" visibility="private"/>
         <conf name="standalone" description="for standalone deployment" extends="war, bootstrap"/>
     </configurations>
     
@@ -35,23 +36,17 @@
         <dependency name="svnjavahl" rev="1.2.1" org="subclipse.tigris.org" transitive="false" conf="svntask->default"/>
         <dependency name="svnClientAdapter" rev="1.2.1" org="subclipse.tigris.org" transitive="false" conf="svntask->default"/>
         
+        <dependency name="izpack-standalone-compiler" rev="4.2.1" org="org.codehaus.izpack" conf="izpack->default"/>
+        
         <!-- ########### RUNTIME DEPENDENCIES ############## -->
         
         <!-- Meandre dependencies -->
         <dependency name="infrastructure" rev="1.4.3" org="org.seasr.meandre" conf="war->meandre-client; war->meandre-kernel"/>
- <!--       <dependency name="meandre-client" rev="1.4.3" org="infrastructure" conf="war->default"/>
-        <dependency name="meandre-kernel" rev="1.4.3" org="infrastructure" conf="war->default"/>-->
         
         <!-- External dependencies -->
-        <!--<dependency name="commons-codec" rev="1.3" org="commons-codec" transitive="false" conf="war->default"/>
-        <dependency name="commons-httpclient" rev="3.1" org="commons-httpclient" transitive="false" conf="war->default"/>
-        <dependency name="commons-logging" rev="1.1.1" org="commons-logging" transitive="false" conf="war->default"/>-->
         <dependency name="jena" rev="2.5.5" org="com.hp.hpl.jena" transitive="false" conf="war->default"/>
-        <!--<dependency name="arq" rev="2.5.0" org="com.hp.hpl.jena" transitive="false" conf="war->default"/>-->
         <dependency name="json-jena" rev="1.0" org="com.hp.hpl.jena" transitive="false" conf="war->default"/>
-        <!--<dependency name="lucene-core" rev="2.3.1" org="org.apache.lucene" transitive="false" conf="war->default"/>
-        <dependency name="xercesImpl" rev="2.9.1" org="xerces" transitive="false" conf="war->default"/>-->
-        <dependency name="log4j" rev="1.2.15" org="log4j" transitive="false" conf="war->default"/>
+<!--        <dependency name="log4j" rev="1.2.15" org="log4j" transitive="false" conf="war->default"/>-->
         
         <dependency name="gwt-servlet" rev="1.5.3" org="com.google.gwt" conf="war->default"/>
         

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<shortcuts>
+
+  <programGroup defaultName="SEASR/Meandre Workbench"
+  location="applications"/>
+
+  <shortcut
+     name="Meandre Workbench"
+     programGroup="yes"
+     desktop="yes"
+     applications="no"
+     startMenu="yes"
+     startup="no"
+     target="$INSTALL_PATH/bin/startWorkbench.sh"
+     commandLine=""
+     workingDirectory="$INSTALL_PATH"
+     description="Meandre Workbench"
+     iconFile="$INSTALL_PATH/images/workbench.png"
+     iconIndex="0"
+     type="Application"
+     encoding="UTF-8"
+     terminal="true"
+     KdeSubstUID="false"
+     initialState="normal">
+     <createForPack name="Workbench Application"/>
+   </shortcut>
+   
+</shortcuts>

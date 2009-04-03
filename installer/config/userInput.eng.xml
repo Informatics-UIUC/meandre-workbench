@@ -1,0 +1,3 @@
+<langpack>
+    <str id="input.appserver.deploy.dir" txt="Please select the deployment folder of your application server"/>
+</langpack>

@@ -1,0 +1,13 @@
+<langpack>
+    <!-- Packs -->
+    <str id="standalone" txt="Meandre Workbench"/>
+    <str id="standalone.description" txt="The Jetty-based standalone Meandre Workbench application"/>
+    
+    <str id="war" txt="Workbench WAR"/>
+    <str id="war.description" txt="Meandre Workbench WAR file for installation into an existing application server"/>
+
+    <str id="InstallationGroupPanel.group.Standalone" txt="Standalone installation"/>
+    <str id="InstallationGroupPanel.description.Standalone" txt="The Jetty-based standalone Meandre Workbench application."/>
+    <str id="InstallationGroupPanel.group.AppServer" txt="Install into an existing application server"/>
+    <str id="InstallationGroupPanel.description.AppServer" txt="WAR file deployment into an existing application server"/>
+</langpack>

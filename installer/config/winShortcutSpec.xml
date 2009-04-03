@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<shortcuts>
+  <skipIfNotSupported/>
+  
+  <programGroup defaultName="SEASR\Meandre Workbench"
+                location="applications"/>
+  <shortcut
+    name="Start Meandre Workbench"
+    target="$INSTALL_PATH\bin\startWorkbench.bat"
+    commandLine=""
+    workingDirectory="$INSTALL_PATH"
+    description="Start Meandre Workbench"
+    iconFile="$INSTALL_PATH\images\workbench.ico"
+    iconIndex="0"
+    initialState="noShow"
+    programGroup="yes"
+    desktop="yes"
+    applications="yes"
+    startMenu="no"
+    startup="no">
+
+    <createForPack name="Workbench Application"/>
+  </shortcut>
+  
+  <shortcut
+    name="Uninstall Meandre Workbench"
+    target="$INSTALL_PATH\bin\uninstallWorkbench.bat"
+    commandLine=""
+    description="Uninstall Meandre Workbench"
+    initialState="noShow"
+    programGroup="yes"
+    applications="yes"
+    desktop="no"
+    startMenu="no"
+    startup="no">
+    
+    <createForPack name="Workbench Application"/>
+  </shortcut>
+</shortcuts>
