@@ -32,29 +32,24 @@
         <dependency name="gwtext-diagrams" rev="0.2" org="com.google.code.gwtext-diagrams" conf="build->default"/>
         <dependency name="gwtextux" rev="0.3" org="com.google.code.gwtextux" conf="build->default"/>
         
-        <dependency name="svnant" rev="1.2.1" org="subclipse.tigris.org" transitive="false" conf="svntask->default"/>
-        <dependency name="svnjavahl" rev="1.2.1" org="subclipse.tigris.org" transitive="false" conf="svntask->default"/>
-        <dependency name="svnClientAdapter" rev="1.2.1" org="subclipse.tigris.org" transitive="false" conf="svntask->default"/>
+        <dependency name="svnant" rev="1.2.1" org="subclipse.tigris.org" conf="svntask->default"/>
+        <dependency name="svnjavahl" rev="1.2.1" org="subclipse.tigris.org" conf="svntask->default"/>
+        <dependency name="svnClientAdapter" rev="1.2.1" org="subclipse.tigris.org" conf="svntask->default"/>
         
         <dependency name="izpack-standalone-compiler" rev="4.2.1" org="org.codehaus.izpack" conf="izpack->default"/>
         
         <!-- ########### RUNTIME DEPENDENCIES ############## -->
         
         <!-- Meandre dependencies -->
-        <dependency name="infrastructure" rev="1.4.3" org="org.seasr.meandre" conf="war->meandre-client; war->meandre-kernel"/>
+        <dependency name="infrastructure" rev="latest.integration" org="org.seasr.meandre" conf="war->meandre-client; war->meandre-kernel"/>
         
         <!-- External dependencies -->
-        <dependency name="jena" rev="2.5.5" org="com.hp.hpl.jena" transitive="false" conf="war->default"/>
-        <dependency name="json-jena" rev="1.0" org="com.hp.hpl.jena" transitive="false" conf="war->default"/>
-<!--        <dependency name="log4j" rev="1.2.15" org="log4j" transitive="false" conf="war->default"/>-->
+        <dependency name="jena" rev="2.5.5" org="com.hp.hpl.jena" conf="war->default"/>
+        <dependency name="json-jena" rev="1.0" org="com.hp.hpl.jena" conf="war->default"/>
         
         <dependency name="gwt-servlet" rev="1.5.3" org="com.google.gwt" conf="war->default"/>
         
         <!-- Standalone dependencies -->
-        <dependency name="jetty" rev="6.1.15" org="org.mortbay.jetty" transitive="false" conf="bootstrap->default"/>
-        <dependency name="jetty-util" rev="6.1.15" org="org.mortbay.jetty" transitive="false" conf="bootstrap->default"/>
-        <dependency name="jsp-2.1" rev="6.1.14" org="org.mortbay.jetty" transitive="false" conf="bootstrap->default"/>
-        <dependency name="jsp-api-2.1" rev="6.1.14" org="org.mortbay.jetty" transitive="false" conf="bootstrap->default"/>
-        <dependency name="servlet-api-2.5" rev="6.1.14" org="org.mortbay.jetty" transitive="false" conf="bootstrap->default"/>
+        <dependency name="jetty" rev="6.1.15" org="org.mortbay.jetty" conf="bootstrap->default"/>
     </dependencies>
 </ivy-module>
