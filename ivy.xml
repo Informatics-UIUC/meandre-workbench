@@ -18,8 +18,8 @@
     </configurations>
     
     <publications>
-        <artifact name="${ant.project.name}" type="war" ext="war" conf="war"/>
-        <artifact name="${ant.project.name}" type="jar" ext="jar" conf="standalone"/>
+        <artifact name="${artifact.name.base}" type="war" ext="war" conf="war"/>
+        <artifact name="${artifact.name.base}" type="jar" ext="jar" conf="standalone"/>
     </publications>
     
     <dependencies>
