@@ -47,8 +47,12 @@
     <target name="download-ivy" unless="skip.download">
         <mkdir dir="${ivy.jar.dir}"/>
         <!-- download Ivy from web site so that it can be used even without any special installation -->
-        <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+        <get 
+            src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
             dest="${ivy.jar.file}" usetimestamp="true"/>
+        <get 
+            src="http://repo1.maven.org/maven2/com/jcraft/jsch/0.1.38/jsch-0.1.38.jar"
+            dest="${ivy.jar.dir}/jsch.jar" usetimestamp="true"/>
     </target>
  
     <target name="install-ivy" depends="download-ivy">
@@ -199,15 +203,22 @@
     <target name="compile" depends="gwt_compile, server_compile, bootstrap_compile" description="-> compiles the entire project"/>
     
     <target name="dist-war" depends="gwt_compile, server_compile" description="-> creates Workbench WAR distribution">
+        <tempfile property="war.tmp.dir" destdir="${dist.dir}" prefix="war" suffix=".tmp"/>
+        <mkdir dir="${war.tmp.dir}"/>
+        <copy todir="${war.tmp.dir}">
+            <fileset refid="war.libs"/>
+            <flattenmapper/>
+        </copy>
         <war destfile="${dist.dir}/${workbench.war.file}" webxml="${web.xml}">
             <fileset dir="${build.gwtOutput.dir}/${gwt.workbench}"/>
-            <lib refid="war.libs"/>
+            <lib dir="${war.tmp.dir}"/>
             <classes dir="${build.server.dir}"/>
             <manifest>
                 <attribute name="Build-Version" value="${version.full}"/>
                 <attribute name="Build-Date" value="${TIMESTAMP}"/>
             </manifest>
         </war>
+        <delete dir="${war.tmp.dir}"/>
     </target>
     
     <target name="dist-standalone" depends="dist-war, bootstrap_compile" description="-> creates Workbench standalone distribution">
@@ -265,12 +276,35 @@
     </target>
     
     <target name="publish" depends="dist">
+        <fail message="Error: ivy.repo.host and ivy.repo.path need to be set before attempting to publish.">
+            <condition>
+                <or>
+                    <not>
+                        <isset property="ivy.repo.host"/>
+                    </not>
+                    
+                    <not>
+                        <isset property="ivy.repo.host"/>
+                    </not>
+                </or>
+            </condition>
+        </fail>
+        
         <ivy:publish 
-            resolver="seasr" 
+            resolver="seasr-upload" 
             pubrevision="${version}" 
             overwrite="true"
             artifactspattern="${dist.dir}/[artifact]-[revision].${svn_revision}.[ext]"/>
     </target>
+    
+ <!--   <target name="create-ivy-rep" depends="install-ivy">
+        <ivy:install organisation="com.google.gwt" module="gwt-user" revision="1.5.3" from="ibiblio" to="internal" transitive="true" overwrite="true"/>
+        <ivy:install organisation="com.google.gwt" module="gwt-servlet" revision="1.5.3" from="ibiblio" to="internal" transitive="true" overwrite="true"/>
+        <ivy:install organisation="org.codehaus.izpack" module="izpack-standalone-compiler" revision="4.2.1" from="ibiblio" to="internal" transitive="true" overwrite="true"/>
+        <ivy:install organisation="com.hp.hpl.jena" module="jena" revision="2.5.5" from="ibiblio" to="internal" transitive="true" overwrite="true"/>
+        <ivy:install organisation="com.hp.hpl.jena" module="json-jena" revision="1.0" from="ibiblio" to="internal" transitive="true" overwrite="true"/>
+        <ivy:install organisation="org.mortbay.jetty" module="jetty" revision="6.1.15" from="ibiblio" to="internal" transitive="true" overwrite="true"/>
+    </target>-->
     
     <!--- Documentation (Javadocs) -->
     <target name="javadoc" depends="prepare" description="-> generates the documentation">

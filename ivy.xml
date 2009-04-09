@@ -44,7 +44,7 @@
         <dependency name="infrastructure" rev="latest.integration" org="org.seasr.meandre" conf="war->meandre-client; war->meandre-kernel"/>
         
         <!-- External dependencies -->
-        <dependency name="jena" rev="2.5.5" org="com.hp.hpl.jena" conf="war->default"/>
+        <dependency name="jena" rev="2.5.0.custom" org="com.hp.hpl.jena" conf="war->default"/>
         <dependency name="json-jena" rev="1.0" org="com.hp.hpl.jena" conf="war->default"/>
         
         <dependency name="gwt-servlet" rev="1.5.3" org="com.google.gwt" conf="war->default"/>
