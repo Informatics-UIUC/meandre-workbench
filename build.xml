@@ -20,6 +20,7 @@
     <property name="version" value="1.4.4"/>
     <property name="debug" value="false"/>
     <property name="artifact.name.base" value="${ant.project.name}"/>
+    <property name="infrastructure.rev" value="latest.integration"/>
     
     <property name="src.gwt.dir" value="${basedir}/src"/>
     <property name="src.bootstrap.dir" value="${basedir}/src-bootstrap"/>
