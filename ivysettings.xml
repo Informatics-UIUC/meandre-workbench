@@ -22,10 +22,10 @@
             <ibiblio name="ibiblio" m2compatible="true"/>
         </chain>
         
-        <sftp name="seasr-upload" host="${ivy.repo.host}">
+        <!--<sftp name="seasr-upload" host="${ivy.repo.host}">
             <ivy pattern="${ivy.repo.path}/[organisation]/[module]/ivys/ivy-[revision].xml"/>
             <artifact pattern="${ivy.repo.path}/[organisation]/[module]/[artifact]-[revision].[ext]"/>
-        </sftp>
+        </sftp>-->
         
         <!--<sftp name="dependencies-upload" host="${ivy.repo.host}">
             <ivy pattern="${ivy.repo.path}/[organisation]/[module]/ivys/ivy-[revision].xml"/>
