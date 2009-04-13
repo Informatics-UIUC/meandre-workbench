@@ -53,9 +53,6 @@
         <get 
             src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
             dest="${ivy.jar.file}" usetimestamp="true"/>
-        <!--<get 
-            src="http://repo1.maven.org/maven2/com/jcraft/jsch/0.1.38/jsch-0.1.38.jar"
-            dest="${ivy.jar.dir}/jsch.jar" usetimestamp="true"/>-->
     </target>
  
     <target name="install-ivy" depends="download-ivy">
@@ -278,37 +275,6 @@
         </condition>
     </target>
     
- <!--   <target name="publish" depends="dist">
-        <fail message="Error: ivy.repo.host and ivy.repo.path need to be set before attempting to publish.">
-            <condition>
-                <or>
-                    <not>
-                        <isset property="ivy.repo.host"/>
-                    </not>
-                    
-                    <not>
-                        <isset property="ivy.repo.host"/>
-                    </not>
-                </or>
-            </condition>
-        </fail>
-        
-        <ivy:publish 
-            resolver="seasr-upload" 
-            pubrevision="${version}" 
-            overwrite="true"
-            artifactspattern="${dist.dir}/[artifact]-[revision].${svn_revision}.[ext]"/>
-    </target>-->
-    
- <!--   <target name="create-ivy-rep" depends="install-ivy">
-        <ivy:install organisation="com.google.gwt" module="gwt-user" revision="1.5.3" from="ibiblio" to="internal" transitive="true" overwrite="true"/>
-        <ivy:install organisation="com.google.gwt" module="gwt-servlet" revision="1.5.3" from="ibiblio" to="internal" transitive="true" overwrite="true"/>
-        <ivy:install organisation="org.codehaus.izpack" module="izpack-standalone-compiler" revision="4.2.1" from="ibiblio" to="internal" transitive="true" overwrite="true"/>
-        <ivy:install organisation="com.hp.hpl.jena" module="jena" revision="2.5.5" from="ibiblio" to="internal" transitive="true" overwrite="true"/>
-        <ivy:install organisation="com.hp.hpl.jena" module="json-jena" revision="1.0" from="ibiblio" to="internal" transitive="true" overwrite="true"/>
-        <ivy:install organisation="org.mortbay.jetty" module="jetty" revision="6.1.15" from="ibiblio" to="internal" transitive="true" overwrite="true"/>
-    </target>-->
-    
     <!--- Documentation (Javadocs) -->
     <target name="javadoc" depends="prepare" description="-> generates the documentation">
         <mkdir dir="${doc.dir}"/>
@@ -326,5 +292,4 @@
             </classpath>
         </javadoc>
     </target>
-    
 </project>
