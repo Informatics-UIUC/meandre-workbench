@@ -222,28 +222,19 @@
     </target>
     
     <target name="dist-standalone" depends="dist-war, bootstrap_compile" description="-> creates Workbench standalone distribution">
-        <tempfile property="release.tmp.dir" destdir="${dist.dir}" prefix="release" suffix=".tmp"/>
-        <mkdir dir="${release.tmp.dir}"/>
-        <copy file="${dist.dir}/${workbench.war.file}" toFile="${release.tmp.dir}/Meandre-Workbench.war"/>
-        <copy file="${src.bootstrap.dir}/workbench-jetty.xml" todir="${release.tmp.dir}"/>
-        <copy todir="${release.tmp.dir}" includeEmptyDirs="no">
-            <fileset dir="${build.bootstrap.dir}"/>
-        </copy>
-        <unjar dest="${release.tmp.dir}">
-            <fileset refid="bootstrap.libs"/>
-        </unjar>
-        <delete dir="${release.tmp.dir}/META-INF" quiet="true"/>
-        <delete file="${release.tmp.dir}/LICENSE" quiet="true"/>
         <jar destfile="${dist.dir}/${workbench.jar.file}">
             <manifest>
                 <attribute name="Build-Version" value="${version.full}"/>
                 <attribute name="Build-Date" value="${TIMESTAMP}"/>
                 <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
+                <attribute name="Class-Path" value="."/>
             </manifest>
-            <fileset dir="${release.tmp.dir}"/>
+            <fileset dir="${build.bootstrap.dir}"/>
+            <fileset dir="${dist.dir}" includes="${workbench.war.file}"/>
+            <fileset dir="${src.bootstrap.dir}" includes="workbench-jetty.xml"/>
+            <zipgroupfileset refid="bootstrap.libs"/>
         </jar>
-        <delete dir="${release.tmp.dir}"/>
     </target>
     
     <target name="dist-installer" depends="dist-standalone, install-izpack" description="-> creates Workbench graphical installer">
