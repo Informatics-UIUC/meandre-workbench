@@ -69,8 +69,8 @@ public class AddLocationDialog extends Window {
         _fURL = new TextField("Location URL");
         _fURL.setAllowBlank(false);
         _fURL.setBlankText("The URL field cannot be blank");
-        _fURL.setRegexText("The specified URL is invalid");
-        _fURL.setRegex("^http(s?)://\\w+([_-]\\w+)*(\\.\\w+([_-]\\w+)*)*(:[\\d]{1,5})?((/\\w*\\.?\\w+([_-]\\w+)*)*)*$");
+//        _fURL.setRegexText("The specified URL is invalid");
+//        _fURL.setRegex("^http(s?)://\\w+([_-]\\w+)*(\\.\\w+([_-]\\w+)*)*(:[\\d]{1,5})?(((/\\w*\\.?)*\\w+([_-]\\w+)*)*)*$");
 
         _fDescription = new TextArea("Description");
         _fDescription.setAllowBlank(false);
