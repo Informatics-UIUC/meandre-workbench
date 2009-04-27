@@ -59,6 +59,7 @@ public class FlowOutputPanel extends Panel {
         setBorder(false);
 
         _outputTextArea.setReadOnly(true);
+        _outputTextArea.setCls("flow-output-console");
 
         add(_outputTextArea);
     }

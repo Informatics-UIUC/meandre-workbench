@@ -151,6 +151,15 @@
 /** END MESSAGES **/
 
 
+/** FLOW CONSOLE OUTPUT **/
+
+.flow-output-console {
+    font-family: Fixed, Courier New, Courier, monospace  !important;
+    font-size: 12px  !important;
+}
+
+/** END FLOW CONSOLE OUTPUT **/
+
 
 /** COMPONENT **/
 
