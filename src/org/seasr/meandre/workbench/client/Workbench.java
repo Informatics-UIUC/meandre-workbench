@@ -113,8 +113,6 @@ public class Workbench extends Application {
     private final RepositoryState _repositoryState = RepositoryState.getInstance();
     private MainPanel _mainPanel;
 
-    private static int WEBUI_INFO_RECV_TIMEOUT = 10000;  // 10 seconds
-
     private CreditsDialog _creditsDialog;
     private LoginDialog _loginDialog;
     private WBSession _session;
@@ -698,15 +696,32 @@ public class Workbench extends Application {
                 final String token = _session.getUserName() + "_" + new Date().getTime();
 
                 outputPanel.setMask("Executing flow, please wait...");
-                Repository.runFlow(flowURI, token, true, new WBCallback<Boolean>() {
+                Repository.runFlow(flowURI, token, true, new WBCallback<WBWebUIInfo>() {
                     @Override
-                    public void onSuccess(Boolean result) {
-                        Log.info("Flow " + flowURI + " started successfully");
+                    public void onSuccess(final WBWebUIInfo result) {
+                        if (result == null) {
+                            Log.warn("Flow " + flowURI + " did not start successfully");
+                            outputPanel.clearMask();
+                            outputPanel.print("Flow execution failed");
+                            flowTab.enableRunFlow();
+
+                            return;
+                        } else
+                            Log.info("Flow " + flowURI + " started successfully " +
+                            		"( id: " + result.getURI() + " webUI: " +
+                            		result.getWebUIUrl() + " )");
+
+                        flowTab.setWebUIInfo(result);
+
+                        if (flowHasWebUI(flow))
+                            flowTab.openWebUI();
+
+                        outputPanel.clearMask();
 
                         final Timer resultsTimer = new Timer() {
                             @Override
                             public void run() {
-                                Repository.retrieveFlowOutput(flowURI, new WBCallback<String>() {
+                                Repository.retrieveFlowOutput(result.getURI(), new WBCallback<String>() {
                                     @Override
                                     public void onSuccess(String output) {
                                         if (output == null) {
@@ -730,41 +745,7 @@ public class Workbench extends Application {
                             }
                         };
 
-
-                        final long lStartTime = new Date().getTime();
-
-                        // wait to receive the runtime info for the flow
-                        Timer webUITimer = new Timer() {
-                            @Override
-                            public void run() {
-                                Repository.retrieveWebUIInfo(token, new WBCallback<WBWebUIInfo>() {
-                                    @Override
-                                    public void onSuccess(WBWebUIInfo webUIInfo) {
-                                        if (webUIInfo == null) {
-                                            long lCurrentTime = new Date().getTime();
-                                            if (lCurrentTime - lStartTime > WEBUI_INFO_RECV_TIMEOUT) {
-                                                Log.warn("Timeout receiving the web UI info status!");
-                                                outputPanel.clearMask();
-                                                outputPanel.print("Timeout receiving the flow execution status... flow died?");
-                                                flowTab.enableRunFlow();
-                                            } else
-                                                schedule(1000);
-                                            return;
-                                        }
-
-                                        flowTab.setWebUIInfo(webUIInfo);
-
-                                        if (flowHasWebUI(flow))
-                                            flowTab.openWebUI();
-
-                                        outputPanel.clearMask();
-                                        resultsTimer.schedule(1);
-                                    }
-                                });
-                            }
-                        };
-
-                        webUITimer.schedule(1);
+                        resultsTimer.schedule(1);
                     }
 
                     @Override

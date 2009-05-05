@@ -333,11 +333,11 @@ public interface IRepositoryAsync {
      * @param flowURL The flow id
      * @param token The execution token
      * @param verbose true to include execution statistics in the flow output, false otherwise
-     * @return true whether the flow has started executing, false otherwise
+     * @return the status object describing the details of the running flow
      * @throws SessionExpiredException Thrown if the user's session has expired
      * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
      */
-    public void runFlow(String flowURL, String token, boolean verbose, AsyncCallback<Boolean> callback);
+    public void runFlow(String flowURL, String token, boolean verbose, AsyncCallback<WBWebUIInfo> callback);
 
     /**
      * Retrieves available console output as a flow executes

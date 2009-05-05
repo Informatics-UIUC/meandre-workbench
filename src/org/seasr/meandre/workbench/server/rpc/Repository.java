@@ -51,7 +51,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import javax.servlet.http.HttpSession;
 
 import org.json.JSONException;
@@ -490,36 +489,61 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     // Execution //
     ///////////////
 
-    public boolean runFlow(String flowURL, String token, boolean verbose)
+    public WBWebUIInfo runFlow(String flowURL, String token, boolean verbose)
         throws SessionExpiredException, MeandreCommunicationException {
 
-        if (_flowConsoles.containsKey(flowURL)) return false;
+        int TIMEOUT = 10000; // 10 seconds timeout waiting for flow execution status
+        int POLL_FREQ = 500; // poll for execution status every 500ms
 
         try {
-            _flowConsoles.put(flowURL, getClient().runFlowStreamOutput(flowURL, token, verbose));
-            return true;
+            InputStream flowInputStream = getClient().runFlowStreamOutput(flowURL, token, verbose);
+
+            int counter = 0;
+            WBWebUIInfo status = null;
+
+            try {
+                while ((status = retrieveWebUIInfo(token)) == null && counter < TIMEOUT) {
+                    Thread.sleep(POLL_FREQ);
+                    counter += POLL_FREQ;
+                }
+            }
+            catch (InterruptedException e) {
+                throw new MeandreCommunicationException(e);
+            }
+
+            if (counter >= TIMEOUT) {
+                System.out.println("runFlow: Timeout in trying to obtain the flow execution status");
+                return null;
+            }
+
+            if (status != null)
+                _flowConsoles.put(status.getURI(), flowInputStream);
+            else
+                System.out.println("runFlow: retrieveWebUIInfo returned null - flow died?");
+
+            return status;
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
         }
     }
 
-    public String retrieveFlowOutput(String flowURL)
+    public String retrieveFlowOutput(String flowExecutionInstanceId)
         throws MeandreCommunicationException {
 
-        InputStream consoleStream = _flowConsoles.get(flowURL);
+        InputStream consoleStream = _flowConsoles.get(flowExecutionInstanceId);
         if (consoleStream == null)
-            throw new MeandreCommunicationException(flowURL + " has not been executed");
+            throw new MeandreCommunicationException(flowExecutionInstanceId + " has not been executed");
 
         try {
-            int bufferSize = 1000;
+            int bufferSize = 1024*1024;
 
             byte[] data = new byte[bufferSize];
             int nRead = consoleStream.read(data);
 
-            if (nRead == -1) {
+            if (nRead < 0) {
                 // EOF detected
-                _flowConsoles.remove(flowURL);
+                _flowConsoles.remove(flowExecutionInstanceId);
                 return null;
             }
 
@@ -531,7 +555,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
             }
         }
         catch (IOException e) {
-            _flowConsoles.remove(flowURL);
+            _flowConsoles.remove(flowExecutionInstanceId);
 
             throw new MeandreCommunicationException(e);
         }
