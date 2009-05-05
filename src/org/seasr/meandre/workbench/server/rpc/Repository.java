@@ -578,7 +578,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
 
         try {
             JSONObject joWebUIInfo = getClient().retrieveWebUIInfo(token);
-            return (joWebUIInfo != null && joWebUIInfo.has("port") && joWebUIInfo.getInt("port") > 0) ?
+            return (joWebUIInfo != null && joWebUIInfo.has("uri") && !joWebUIInfo.getString("uri").startsWith("meandre://missing.uri")) ?
                 new WBWebUIInfo(
                         joWebUIInfo.getString("hostname"),
                         joWebUIInfo.getInt("port"),

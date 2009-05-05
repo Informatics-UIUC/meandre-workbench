@@ -164,6 +164,15 @@ public class WorkspaceTab extends Panel {
         _btnSave.addListener(btnSaveListener);
         _btnSaveAs.addListener(btnSaveListener);
 
+        ToolbarButton btnExport = new ToolbarButton("Export");
+        btnExport.addListener(new ButtonListenerAdapter() {
+            @Override
+            public void onClick(Button button, EventObject e) {
+                // TODO Auto-generated method stub
+                super.onClick(button, e);
+            }
+        });
+
         _btnRemoveComponent.setIconCls("icon-component-delete");
         _btnRemoveComponent.disable();
         _btnRemoveComponent.addListener(new ButtonListenerAdapter() {
@@ -197,6 +206,7 @@ public class WorkspaceTab extends Panel {
 
         toolbar.addButton(_btnSave);
         toolbar.addButton(_btnSaveAs);
+        toolbar.addButton(btnExport);
         toolbar.addSeparator();
         toolbar.addButton(_btnRemoveComponent);
         toolbar.addFill();
@@ -1040,7 +1050,7 @@ public class WorkspaceTab extends Panel {
     }
 
     public void setWebUIInfo(WBWebUIInfo webUI) {
-        if (webUI != null)
+        if (webUI != null && webUI.getPort() > 0)
             _btnStopFlow.enable();
         else
             _btnStopFlow.disable();
