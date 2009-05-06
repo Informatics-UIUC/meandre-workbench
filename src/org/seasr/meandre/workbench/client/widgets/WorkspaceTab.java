@@ -206,7 +206,7 @@ public class WorkspaceTab extends Panel {
 
         toolbar.addButton(_btnSave);
         toolbar.addButton(_btnSaveAs);
-        toolbar.addButton(btnExport);
+        //toolbar.addButton(btnExport);
         toolbar.addSeparator();
         toolbar.addButton(_btnRemoveComponent);
         toolbar.addFill();
