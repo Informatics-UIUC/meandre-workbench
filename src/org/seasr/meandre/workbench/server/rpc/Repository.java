@@ -530,6 +530,9 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
+    //TODO may need to start separate thread that retrieves the console output and uses
+    //     the producer-consumer scenario to feed the results to the client
+
     public String retrieveFlowOutput(String flowExecutionInstanceId)
         throws MeandreCommunicationException {
 
