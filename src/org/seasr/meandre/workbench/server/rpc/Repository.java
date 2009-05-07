@@ -48,6 +48,7 @@ import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -96,7 +97,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
             }
         };
 
-    private final Map<String, InputStream> _flowConsoles = new HashMap<String, InputStream>();
+    private final Map<String, InputStream> _flowConsoles =
+        Collections.synchronizedMap(new HashMap<String, InputStream>());
 
     ///////////////
     // Workbench //
