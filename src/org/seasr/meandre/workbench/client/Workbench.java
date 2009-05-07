@@ -80,9 +80,11 @@ import org.seasr.meandre.workbench.client.widgets.RepositoryPanel.FlowsGrid;
 import org.seasr.meandre.workbench.client.widgets.RepositoryPanel.LocationsGrid;
 
 import com.allen_sauer.gwt.log.client.Log;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.WindowCloseListener;
+import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.gwtext.client.core.EventObject;
@@ -116,7 +118,7 @@ public class Workbench extends Application {
     private CreditsDialog _creditsDialog;
     private LoginDialog _loginDialog;
     private WBSession _session;
-    private static boolean _loggingOut = false;
+    private static boolean _skipNavigateAwayPrompt = false;
 
     /**
      * Called at application startup (from Application.java)
@@ -131,7 +133,7 @@ public class Workbench extends Application {
                 String closingMsg = null;
 
                 // _loggingOut is set when user clicks the "logout" button - an intentional action
-                if (_mainPanel != null && !_loggingOut) {
+                if (_mainPanel != null && !_skipNavigateAwayPrompt) {
                     WorkspacePanel workspacePanel = _mainPanel.getWorkspacePanel();
                     boolean dirty = false;
                     for (WorkspaceTab tab : workspacePanel.getTabs())
@@ -142,6 +144,8 @@ public class Workbench extends Application {
                     if (dirty)
                         closingMsg = "You have unsaved changes which will be lost if you proceed!!!";
                 }
+
+                _skipNavigateAwayPrompt = false;
 
                 return closingMsg;
             }
@@ -616,6 +620,62 @@ public class Workbench extends Application {
                 resetDetails();
             }
 
+            @Override
+            public void onFlowExport(final WBFlowDescription flow, final String format) {
+                final String flowURI = flow.getFlowURI();
+
+                // show informative message to user
+                MessageBox.show(new MessageBoxConfig() {
+                    {
+                        setMsg("Exporting flow, please wait...");
+                        setProgressText("Exporting...");
+                        setWidth(300);
+                        setWait(true);
+                        setWaitConfig(new WaitConfig() {
+                            {
+                                setInterval(100);
+                            }
+                        });
+                    }
+                });
+
+                Repository.exportFlow(flowURI, format, new WBCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean success) {
+                        MessageBox.hide();
+
+                        if (!success) {
+                            Application.showError("Export failed", "There was a problem trying to export your flow");
+                            return;
+                        }
+
+                        String extra = null;
+                        String iconCls = MessageBox.INFO;
+
+                        if (format.equalsIgnoreCase("zz")) {
+                            extra = "<br/>Please remember to update the 'import' location!";
+                            iconCls = MessageBox.WARNING;
+                        }
+
+                        Application.showMessage("Export",
+                                "Your flow has been exported successfully." + ((extra != null) ? extra : ""),
+                                iconCls);
+
+                        _skipNavigateAwayPrompt = true;
+
+                        Location.assign(GWT.getModuleBaseURL() + "export_flow?uri=" + flowURI + "&name=" + flow.getName());
+                    }
+
+                    @Override
+                    public void onFailure(final Throwable caught) {
+                        MessageBox.hide();
+
+                        super.onFailure(caught);
+                    }
+
+                });
+            }
+
             /**
              * Saves/uploads a flow
              *
@@ -865,13 +925,13 @@ public class Workbench extends Application {
         Repository.logout(new WBCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {
-                _loggingOut = true;
+                _skipNavigateAwayPrompt = true;
                 reload();
             }
 
             @Override
             public void onSessionExpired() {
-                _loggingOut = true;
+                _skipNavigateAwayPrompt = true;
                 reload();
             }
         });

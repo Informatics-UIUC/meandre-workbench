@@ -91,6 +91,18 @@
 	background-image: url(images/save.png) !important;
 }
 
+.icon-flow-export {
+	background-image: url(images/export.png) !important;
+}
+
+.icon-flow-export-zigzag {
+	background-image: url(images/zigzag.png) !important;
+}
+
+.icon-flow-export-mau {
+	background-image: url(images/mau.gif) !important;
+}
+
 .icon-flow-saveas {
 	background-image: url(images/save_as.png) !important;
 }

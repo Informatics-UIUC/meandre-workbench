@@ -290,6 +290,17 @@ public interface IRepositoryAsync {
     public void uploadFlowBatch(Set<WBFlowDescription> flows, boolean overwrite, AsyncCallback<Boolean> callback);
 
     /**
+     * Exports a flow as ZigZag or MAU
+     *
+     * @param flowURI The flow uri
+     * @param format "zz" or "mau"
+     * @return true if the operation succeeded, false otherwise
+     * @throws SessionExpiredException Thrown if the user's session has expired
+     * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
+     */
+    public void exportFlow(String flowURI, String format, AsyncCallback<Boolean> callback);
+
+    /**
      * Removes a resource from the server
      *
      * @param resourceURL The resource url

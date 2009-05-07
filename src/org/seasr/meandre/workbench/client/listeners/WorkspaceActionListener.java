@@ -73,6 +73,7 @@ public interface WorkspaceActionListener {
 
     public void onFlowModified();
     public void onFlowSave(WBFlowDescription flow, AsyncCallback<WBFlowDescription> callback);
+    public void onFlowExport(WBFlowDescription flow, String format);
 
     public void onFlowRun(WorkspaceTab flowTab);
     public void onFlowStop(WBFlowDescription flow);

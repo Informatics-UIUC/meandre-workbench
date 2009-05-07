@@ -42,9 +42,11 @@
 
 package org.seasr.meandre.workbench.server.rpc;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.URI;
@@ -59,11 +61,17 @@ import org.json.JSONObject;
 import org.meandre.client.MeandreClient;
 import org.meandre.client.TransmissionException;
 import org.meandre.core.repository.ExecutableComponentDescription;
+import org.meandre.core.repository.ExecutableComponentInstanceDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.security.Role;
+import org.meandre.zigzag.console.NullOuputStream;
+import org.meandre.zigzag.parser.ParseException;
+import org.meandre.zigzag.semantic.FlowGenerator;
+import org.meandre.zigzag.transformations.FlowNotFoundException;
+import org.meandre.zigzag.transformations.RDF2ZZConverter;
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBFlowDescription;
@@ -80,6 +88,7 @@ import org.seasr.meandre.workbench.server.beans.converters.IBeanConverter;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 /**
  * @author Boris Capitanu
@@ -448,6 +457,61 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throws SessionExpiredException, MeandreCommunicationException {
 
         throw new RuntimeException("Not yet implemented");
+    }
+
+    public boolean exportFlow(String flowURI, String format)
+        throws SessionExpiredException, MeandreCommunicationException {
+
+        QueryableRepository repository = null;
+
+        try {
+            repository = getClient().retrieveRepository();
+        }
+        catch (TransmissionException e) {
+            throw new MeandreCommunicationException(e);
+        }
+
+        if (format.equalsIgnoreCase("zz")) {
+            try {
+                RDF2ZZConverter converter = new RDF2ZZConverter(repository);
+                String zzScript = converter.generateZZ(flowURI);
+                getHttpSession().setAttribute(flowURI, zzScript);
+                return true;
+            }
+            catch (FlowNotFoundException e) {
+                return false;
+            }
+        }
+
+        if (format.equalsIgnoreCase("mau")) {
+            try {
+                File tmpFile = File.createTempFile("mau", null);
+                tmpFile.deleteOnExit();
+
+                FlowDescription fd = repository.getAvailableFlowDescriptionsMap().get(flowURI);
+                Model model = ModelFactory.createDefaultModel();
+                model.add(fd.getModel());
+
+                for (ExecutableComponentInstanceDescription ecid : fd.getExecutableComponentInstances())
+                    model.add(repository.getExecutableComponentDescription(ecid.getExecutableComponent()).getModel());
+
+                FlowGenerator fg = new FlowGenerator();
+                fg.setPrintStream(new PrintStream(new NullOuputStream()));
+                fg.init(null);
+                fg.getRepository().refreshCache(model);
+                fg.generateMAUBlindlyToFile(tmpFile.getPath(), flowURI);
+                getHttpSession().setAttribute(flowURI, tmpFile);
+                return true;
+            }
+            catch (IOException e) {
+                throw new MeandreCommunicationException(e);
+            }
+            catch (ParseException e) {
+                return false;
+            }
+        }
+
+        throw new RuntimeException("Export format " + format + " unknown!");
     }
 
     public boolean removeResource(String resourceURL)

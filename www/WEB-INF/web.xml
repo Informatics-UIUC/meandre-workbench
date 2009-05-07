@@ -7,10 +7,22 @@
 		<servlet-class>
 		org.seasr.meandre.workbench.server.rpc.Repository</servlet-class>
 	</servlet>
+
+	<servlet>
+        <servlet-name>download</servlet-name>
+        <servlet-class>org.seasr.meandre.workbench.server.rpc.FileDownloadServlet</servlet-class>
+    </servlet>
+
 	<servlet-mapping>
 		<servlet-name>IRepository</servlet-name>
 		<url-pattern>/Repository</url-pattern>
 	</servlet-mapping>
+
+	<servlet-mapping>
+        <servlet-name>download</servlet-name>
+        <url-pattern>/export_flow</url-pattern>
+    </servlet-mapping>
+
 	<welcome-file-list>
 	    <welcome-file>index.html</welcome-file>
 		<welcome-file>Workbench.html</welcome-file>

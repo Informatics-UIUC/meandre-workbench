@@ -91,6 +91,9 @@ public class WorkspaceActionListenerAdapter implements WorkspaceActionListener {
     public void onFlowSave(WBFlowDescription flow, AsyncCallback<WBFlowDescription> callback) {
     }
 
+    public void onFlowExport(WBFlowDescription flow, String format) {
+    }
+
     public void onFlowRun(WorkspaceTab flowTab) {
     }
 

@@ -164,14 +164,42 @@ public class WorkspaceTab extends Panel {
         _btnSave.addListener(btnSaveListener);
         _btnSaveAs.addListener(btnSaveListener);
 
-        ToolbarButton btnExport = new ToolbarButton("Export");
-        btnExport.addListener(new ButtonListenerAdapter() {
+
+        Menu mnuExport = new Menu();
+        mnuExport.setShadow(true);
+        mnuExport.setMinWidth(10);
+
+        Item exportZZ = new Item("ZigZag", new BaseItemListenerAdapter() {
             @Override
-            public void onClick(Button button, EventObject e) {
-                // TODO Auto-generated method stub
-                super.onClick(button, e);
+            public void onClick(BaseItem item, EventObject e) {
+                if (_componentMap.size() == 0)
+                    return;
+
+                for (WorkspaceActionListener listener : _actionListeners) {
+                    listener.onFlowExport(_wbFlow, "zz");
+                }
             }
         });
+        exportZZ.setIconCls("icon-flow-export-zigzag");
+        mnuExport.addItem(exportZZ);
+
+        Item exportMAU = new Item("MAU", new BaseItemListenerAdapter() {
+            @Override
+            public void onClick(BaseItem item, EventObject e) {
+                if (_componentMap.size() == 0)
+                    return;
+
+                for (WorkspaceActionListener listener : _actionListeners) {
+                    listener.onFlowExport(_wbFlow, "mau");
+                }
+            }
+        });
+        exportMAU.setIconCls("icon-flow-export-mau");
+        mnuExport.addItem(exportMAU);
+
+        _btnExport = new ToolbarButton("Export");
+        _btnExport.setIconCls("icon-flow-export");
+        _btnExport.setMenu(mnuExport);
 
         _btnRemoveComponent.setIconCls("icon-component-delete");
         _btnRemoveComponent.disable();
@@ -206,7 +234,7 @@ public class WorkspaceTab extends Panel {
 
         toolbar.addButton(_btnSave);
         toolbar.addButton(_btnSaveAs);
-        //toolbar.addButton(btnExport);
+        toolbar.addButton(_btnExport);
         toolbar.addSeparator();
         toolbar.addButton(_btnRemoveComponent);
         toolbar.addFill();
@@ -492,6 +520,7 @@ public class WorkspaceTab extends Panel {
     public void setDirty() {
         if (isDirty()) return;
 
+        _btnExport.disable();
         _dirty = true;
 
         setTitle("*" + getTitle());
@@ -503,6 +532,7 @@ public class WorkspaceTab extends Panel {
     public void clearDirty() {
         if (!isDirty()) return;
 
+        _btnExport.enable();
         _dirty = false;
 
         setTitle(getTitle().substring(1));
@@ -1034,6 +1064,7 @@ public class WorkspaceTab extends Panel {
     private WBWebUIInfo _webUIInfo = null;
     private final ToolbarButton _btnRunFlow = new ToolbarButton("Run flow");
     private final ToolbarButton _btnStopFlow = new ToolbarButton("Stop flow");
+    private ToolbarButton _btnExport;
 
     public void openWebUI() {
         if (_webUIInfo == null) {

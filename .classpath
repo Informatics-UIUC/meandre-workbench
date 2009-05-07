@@ -65,18 +65,23 @@
 	<classpathentry kind="lib" path="lib/bootstrap/jetty-6.1.15.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/jetty-util-6.1.15.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/servlet-api-2.5-20081211.jar"/>
-	<classpathentry kind="lib" path="lib/deploy/meandre-client-1.4.4.jar">
-		<attributes>
-			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/deploy/meandre-kernel-1.4.4.jar">
-		<attributes>
-			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/bootstrap/jsap-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/core-3.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/meandre-executables-1.4.4.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/meandre-client-1.4.5pre.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/deploy/meandre-kernel-1.4.5pre.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/deploy/meandre-zigzag-1.4.5pre.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

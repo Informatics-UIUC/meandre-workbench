@@ -341,6 +341,18 @@ public interface IRepository extends RemoteService {
         throws SessionExpiredException, MeandreCommunicationException;
 
     /**
+     * Exports a flow as ZigZag or MAU
+     *
+     * @param flowURI The flow uri
+     * @param format "zz" or "mau"
+     * @return true if the operation succeeded, false otherwise
+     * @throws SessionExpiredException Thrown if the user's session has expired
+     * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
+     */
+    public boolean exportFlow(String flowURI, String format)
+        throws SessionExpiredException, MeandreCommunicationException;
+
+    /**
      * Removes a resource from the server
      *
      * @param resourceURL The resource url
