@@ -65,6 +65,7 @@ import com.gwtext.client.data.RecordDef;
 import com.gwtext.client.data.SortState;
 import com.gwtext.client.data.Store;
 import com.gwtext.client.data.StringFieldDef;
+import com.gwtext.client.widgets.MessageBox;
 
 /**
  * A singleton class that maintains the state of the repository.
@@ -451,6 +452,7 @@ public class RepositoryState {
     private void loadComponentsStore(Set<WBExecutableComponentDescription> components) {
         if (components.contains(null)) {
             Log.warn("'null' component retrieved - this could be an indication of a corrupt component!");
+            showRepositoryCorruptWarning("component");
             components.remove(null);
         }
 
@@ -494,6 +496,7 @@ public class RepositoryState {
     private void loadFlowsStore(Set<WBFlowDescription> flows) {
         if (flows.contains(null)) {
             Log.warn("'null' flow retrieved - this could be an indication of a corrupt flow!");
+            showRepositoryCorruptWarning("flow");
             flows.remove(null);
         }
 
@@ -535,6 +538,7 @@ public class RepositoryState {
     private void loadLocationsStore(Set<WBLocation> locations) {
         if (locations.contains(null)) {
             Log.warn("'null' location retrieved - this could be an indication of a corrupt repository!");
+            showRepositoryCorruptWarning("location");
             locations.remove(null);
         }
 
@@ -551,5 +555,15 @@ public class RepositoryState {
 
         _locationsStore.setDataProxy(new MemoryProxy(data));
         _locationsStore.load();
+    }
+
+    /**
+     * Shows a warning message to the user indicating that there is a good chance
+     * that the repository has become corrupted.
+     */
+    private void showRepositoryCorruptWarning(String target) {
+        Application.showMessage("Repository Problem", "A possible corrupted " + target + " was detected. " +
+                "This problem may cause the Workbench to run abnormally. Please correct the problem as soon as possible to minimize data loss.",
+                MessageBox.WARNING, MessageBox.OK);
     }
 }
