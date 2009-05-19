@@ -56,6 +56,8 @@ public class ExecutableComponentInstanceDescriptionConverter
     implements IBeanConverter<ExecutableComponentInstanceDescription, WBExecutableComponentInstanceDescription> {
 
     public WBExecutableComponentInstanceDescription convert(ExecutableComponentInstanceDescription ecid) {
+        if (ecid == null) return null;
+
         return new WBExecutableComponentInstanceDescription(
                 ecid.getExecutableComponentInstance().getURI(),
                 ecid.getExecutableComponent().getURI(),

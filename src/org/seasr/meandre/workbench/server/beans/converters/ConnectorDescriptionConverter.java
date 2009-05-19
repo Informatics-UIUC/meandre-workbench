@@ -55,6 +55,8 @@ public class ConnectorDescriptionConverter
     implements IBeanConverter<ConnectorDescription, WBConnectorDescription> {
 
     public WBConnectorDescription convert(ConnectorDescription connDesc) {
+        if (connDesc == null) return null;
+
         return new WBConnectorDescription(
                 connDesc.getConnector().getURI(),
                 connDesc.getSourceInstance().getURI(),

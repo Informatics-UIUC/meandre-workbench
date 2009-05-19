@@ -56,6 +56,8 @@ public class PropertiesDescriptionConverter
     implements IBeanConverter<PropertiesDescription, WBPropertiesDescription> {
 
     public WBPropertiesDescription convert(PropertiesDescription propDesc) {
+        if (propDesc == null) return null;
+
         return new WBPropertiesDescription(
                 MeandreConverter.convert(
                         propDesc.getValueMap(),

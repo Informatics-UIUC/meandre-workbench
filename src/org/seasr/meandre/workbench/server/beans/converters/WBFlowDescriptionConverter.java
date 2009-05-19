@@ -62,11 +62,13 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 public class WBFlowDescriptionConverter implements
         IBeanConverter<WBFlowDescription, FlowDescription> {
 
-    private static final Model _defMod = ModelFactory.createDefaultModel();
-
     public FlowDescription convert(WBFlowDescription wbFlow) {
+        if (wbFlow == null) return null;
+
+        Model model = ModelFactory.createDefaultModel();
+
         FlowDescription flow = new FlowDescription();
-        flow.setFlowComponent(_defMod.createResource(wbFlow.getFlowURI()));
+        flow.setFlowComponent(model.createResource(wbFlow.getFlowURI()));
         flow.setName(wbFlow.getName());
         flow.setDescription(wbFlow.getDescription());
         flow.setCreator(wbFlow.getCreator());

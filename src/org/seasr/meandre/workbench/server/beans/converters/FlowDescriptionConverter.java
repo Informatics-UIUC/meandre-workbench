@@ -56,6 +56,8 @@ public class FlowDescriptionConverter
     implements IBeanConverter<FlowDescription, WBFlowDescription> {
 
     public WBFlowDescription convert(FlowDescription fd) {
+        if (fd == null) return null;
+
         return new WBFlowDescription(
                 fd.getFlowComponent().getURI(),
                 fd.getName(),

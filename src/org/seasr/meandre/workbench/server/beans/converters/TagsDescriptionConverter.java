@@ -54,6 +54,8 @@ import org.seasr.meandre.workbench.client.beans.repository.WBTagsDescription;
 public class TagsDescriptionConverter implements IBeanConverter<TagsDescription, WBTagsDescription> {
 
     public WBTagsDescription convert(TagsDescription tagsDesc) {
+        if (tagsDesc == null) return null;
+
         return new WBTagsDescription(tagsDesc.getTags());
     }
 

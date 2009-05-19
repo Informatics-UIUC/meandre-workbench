@@ -57,6 +57,8 @@ public class WBPropertiesDescriptionConverter implements
         IBeanConverter<WBPropertiesDescription, PropertiesDescription> {
 
     public PropertiesDescription convert(WBPropertiesDescription wbPropDesc) {
+        if (wbPropDesc == null) return null;
+
         PropertiesDescription propDesc = new PropertiesDescription();
 
         for (Entry<String, String> entry : wbPropDesc.getValueMap().entrySet())

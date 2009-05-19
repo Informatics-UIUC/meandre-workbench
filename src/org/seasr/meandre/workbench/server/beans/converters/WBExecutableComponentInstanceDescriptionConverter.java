@@ -59,17 +59,19 @@ public class WBExecutableComponentInstanceDescriptionConverter
         implements
         IBeanConverter<WBExecutableComponentInstanceDescription, ExecutableComponentInstanceDescription> {
 
-    private static final Model _defMod = ModelFactory.createDefaultModel();
-
     public ExecutableComponentInstanceDescription convert(
             WBExecutableComponentInstanceDescription wbCompInstance) {
+
+        if (wbCompInstance == null) return null;
+
+        Model model = ModelFactory.createDefaultModel();
 
         ExecutableComponentInstanceDescription compInstance =
             new ExecutableComponentInstanceDescription();
         compInstance.setName(wbCompInstance.getName());
         compInstance.setDescription(wbCompInstance.getDescription());
-        compInstance.setExecutableComponent(_defMod.createResource(wbCompInstance.getExecutableComponent()));
-        compInstance.setExecutableComponentInstance(_defMod.createResource(wbCompInstance.getExecutableComponentInstance()));
+        compInstance.setExecutableComponent(model.createResource(wbCompInstance.getExecutableComponent()));
+        compInstance.setExecutableComponentInstance(model.createResource(wbCompInstance.getExecutableComponentInstance()));
         compInstance.setProperties(MeandreConverter.WBPropertiesDescriptionConverter.convert(wbCompInstance.getProperties()));
 
         return compInstance;

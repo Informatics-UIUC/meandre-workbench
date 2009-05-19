@@ -62,6 +62,8 @@ public class ExecutableComponentDescriptionConverter implements
         IBeanConverter<ExecutableComponentDescription, WBExecutableComponentDescription> {
 
     public WBExecutableComponentDescription convert(ExecutableComponentDescription compDesc) {
+        if (compDesc == null) return null;
+
         return
             new WBExecutableComponentDescription(
                 compDesc.getExecutableComponent().getURI(),
@@ -83,6 +85,8 @@ public class ExecutableComponentDescriptionConverter implements
     }
 
     private static Set<String> convertContexts(Set<RDFNode> contexts) {
+        if (contexts == null) return null;
+
         Set<String> contextsCopy = new HashSet<String>(contexts.size());
         for (RDFNode node : contexts) {
             if (node.isResource())

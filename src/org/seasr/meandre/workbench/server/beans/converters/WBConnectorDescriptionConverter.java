@@ -56,15 +56,17 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  */
 public class WBConnectorDescriptionConverter implements IBeanConverter<WBConnectorDescription, ConnectorDescription> {
 
-    private static final Model _defMod = ModelFactory.createDefaultModel();
-
     public ConnectorDescription convert(WBConnectorDescription wbConnector) {
+        if (wbConnector == null) return null;
+
+        Model model = ModelFactory.createDefaultModel();
+
         ConnectorDescription connectorDesc = new ConnectorDescription();
-        connectorDesc.setConnector(_defMod.createResource(wbConnector.getConnector()));
-        connectorDesc.setSourceInstance(_defMod.createResource(wbConnector.getSourceInstance()));
-        connectorDesc.setSourceInstanceDataPort(_defMod.createResource(wbConnector.getSourceInstanceDataPort()));
-        connectorDesc.setTargetInstance(_defMod.createResource(wbConnector.getTargetInstance()));
-        connectorDesc.setTargetInstanceDataPort(_defMod.createResource(wbConnector.getTargetInstanceDataPort()));
+        connectorDesc.setConnector(model.createResource(wbConnector.getConnector()));
+        connectorDesc.setSourceInstance(model.createResource(wbConnector.getSourceInstance()));
+        connectorDesc.setSourceInstanceDataPort(model.createResource(wbConnector.getSourceInstanceDataPort()));
+        connectorDesc.setTargetInstance(model.createResource(wbConnector.getTargetInstance()));
+        connectorDesc.setTargetInstanceDataPort(model.createResource(wbConnector.getTargetInstanceDataPort()));
 
         return connectorDesc;
     }

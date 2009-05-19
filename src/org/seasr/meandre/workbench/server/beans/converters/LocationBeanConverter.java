@@ -55,6 +55,8 @@ public class LocationBeanConverter
     implements IBeanConverter<LocationBean, WBLocation> {
 
     public WBLocation convert(LocationBean location) {
+        if (location == null) return null;
+
         return new WBLocation(location.getLocation(), location.getDescription());
     }
 

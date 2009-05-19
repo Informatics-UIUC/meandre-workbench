@@ -55,6 +55,8 @@ public class DataPortDescriptionConverter
     implements IBeanConverter<DataPortDescription, WBDataPortDescription> {
 
     public WBDataPortDescription convert(DataPortDescription dpd) {
+        if (dpd == null) return null;
+
         return new WBDataPortDescription(
                 dpd.getResource().getURI(),
                 dpd.getIdentifier(),
