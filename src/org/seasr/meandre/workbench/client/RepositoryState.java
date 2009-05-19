@@ -449,6 +449,11 @@ public class RepositoryState {
      * @param components The set of components to load into the store
      */
     private void loadComponentsStore(Set<WBExecutableComponentDescription> components) {
+        if (components.contains(null)) {
+            Log.warn("'null' component retrieved - this could be an indication of a corrupt component!");
+            components.remove(null);
+        }
+
         Object[][] data = new Object[components.size()][];
         int i = 0;
 
@@ -487,10 +492,19 @@ public class RepositoryState {
      * @param flows The set of flows to load into the store
      */
     private void loadFlowsStore(Set<WBFlowDescription> flows) {
+        if (flows.contains(null)) {
+            Log.warn("'null' flow retrieved - this could be an indication of a corrupt flow!");
+            flows.remove(null);
+        }
+
         Object[][] data = new Object[flows.size()][];
         int i = 0;
 
         for (WBFlowDescription flow : flows) {
+            if (flow == null) {
+                continue;
+            }
+
             data[i++] = new Object[] {
                     flow,
                     flow.getFlowURI(),
@@ -519,6 +533,11 @@ public class RepositoryState {
      * @param locations The set of locations to load into the store
      */
     private void loadLocationsStore(Set<WBLocation> locations) {
+        if (locations.contains(null)) {
+            Log.warn("'null' location retrieved - this could be an indication of a corrupt repository!");
+            locations.remove(null);
+        }
+
         Object[][] data = new Object[locations.size()][];
         int i = 0;
 
