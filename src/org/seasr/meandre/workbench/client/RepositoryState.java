@@ -562,8 +562,7 @@ public class RepositoryState {
      * that the repository has become corrupted.
      */
     private void showRepositoryCorruptWarning(String target) {
-        Application.showMessage("Repository Problem", "A possible corrupted " + target + " was detected. " +
-                "This problem may cause the Workbench to run abnormally. Please correct the problem as soon as possible to minimize data loss.",
+        Application.showMessage("Repository Problem", "A possible corrupted " + target + " was detected. Some " + target + "s will not be available.",
                 MessageBox.WARNING, MessageBox.OK);
     }
 }
