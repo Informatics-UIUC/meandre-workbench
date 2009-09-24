@@ -42,7 +42,7 @@
 
 package org.seasr.meandre.workbench.bootstrap;
 
-//import java.io.File;
+import java.io.File;
 import java.io.InputStream;
 
 import org.mortbay.jetty.Connector;
