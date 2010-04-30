@@ -3,7 +3,6 @@
     <wb-module deploy-name="Meandre-Workbench">
         <wb-resource deploy-path="/" source-path="/www"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <wb-resource deploy-path="/" source-path="/build/gwtOutput/org.seasr.meandre.workbench.Workbench"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src-bootstrap"/>
         <property name="context-root" value="Meandre-Workbench"/>
         <property name="java-output-path"/>

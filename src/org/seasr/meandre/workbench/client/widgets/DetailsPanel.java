@@ -45,6 +45,9 @@ package org.seasr.meandre.workbench.client.widgets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.seasr.meandre.workbench.client.RepositoryState;
 import org.seasr.meandre.workbench.client.beans.repository.WBDataPortDescription;
@@ -276,6 +279,21 @@ public class DetailsPanel extends Panel {
                     sb.append("</div>");
                 }
             else
+                sb.append("None<br/>");
+
+            sb.append("<br/>");
+            sb.append("<b style='font-size: 13px'><u>Properties:</u></b><br/>");
+
+            if (!comp.getProperties().getDescriptionMap().isEmpty()) {
+                SortedMap<String, String> descMap = new TreeMap<String, String>(comp.getProperties().getDescriptionMap());
+
+                for (Entry<String, String> entry : descMap.entrySet()) {
+                    sb.append("<div style='border: 1px dotted gray; padding: 2px; margin-top: 4px;'>");
+                    sb.append("<b>").append(entry.getKey()).append("</b><br/");
+                    sb.append("<i style='text-align: justify;'>").append(entry.getValue()).append("</i><br/>");
+                    sb.append("</div>");
+                }
+            } else
                 sb.append("None<br/>");
         }
 
