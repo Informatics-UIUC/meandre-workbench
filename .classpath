@@ -68,8 +68,8 @@
 	<classpathentry kind="lib" path="lib/bootstrap/jsap-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/core-3.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/meandre-executables-1.4.7.jar"/>
-	<classpathentry kind="lib" path="lib/deploy/meandre-client-1.4.7.jar"/>
-	<classpathentry kind="lib" path="lib/deploy/meandre-kernel-1.4.7.jar"/>
-	<classpathentry kind="lib" path="lib/deploy/meandre-zigzag-1.4.7.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/meandre-client-1.4.8.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/meandre-kernel-1.4.8.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/meandre-zigzag-1.4.8.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
