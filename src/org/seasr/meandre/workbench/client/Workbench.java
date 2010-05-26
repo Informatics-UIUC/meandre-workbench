@@ -109,6 +109,8 @@ import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
  */
 public class Workbench extends Application {
 
+    private static int TIMEOUT_RETRIEVE_FLOW_OUTPUT = 1000;  // in milliseconds
+
     private static Workbench _workbench;
     private static final IRepositoryAsync Repository = IRepository.Util.getInstance();
 
@@ -395,6 +397,7 @@ public class Workbench extends Application {
              *
              * @param flow The selected flow
              */
+            @Override
             public void onSelected(WBFlowDescription flow) {
                 workspacePanel.getActiveTab().clearSelection();
                 clearComponentsGridSelection();
@@ -705,6 +708,7 @@ public class Workbench extends Application {
 
                 // perform the upload to the server (via RPC)
                 Repository.uploadFlow(flow, true, new WBCallback<Boolean>() {
+                    @Override
                     public void onSuccess(Boolean success) {
                         _repositoryState.addFlow(flow.clone());
 
@@ -792,7 +796,7 @@ public class Workbench extends Application {
                                         }
 
                                         outputPanel.print(output);
-                                        schedule(2000);
+                                        schedule(TIMEOUT_RETRIEVE_FLOW_OUTPUT);
                                     }
 
                                     @Override

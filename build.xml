@@ -115,27 +115,17 @@
         	</manifest>
         </war>
 
-        <property name="release.tmp.dir" value="${dist.dir}/release.tmp"/>
-        <mkdir dir="${release.tmp.dir}"/>
-        <copy file="${workbench.war.file}" toFile="${release.tmp.dir}/Meandre-Workbench.war"/>
-        <copy file="${src.bootstrap.dir}/workbench-jetty.xml" todir="${release.tmp.dir}"/>
-        <copy todir="${release.tmp.dir}" includeEmptyDirs="no">
-            <fileset dir="${build.bootstrap.dir}"/>
-        </copy>
-        <unjar dest="${release.tmp.dir}" overwrite="true">
-            <fileset dir="${lib.bootstrap.dir}" />
-        </unjar>
-        <delete dir="${release.tmp.dir}/META-INF"/>
-        <delete file="${release.tmp.dir}/LICENSE"/>
         <jar destfile="${workbench.jar.file}">
+            <fileset dir="${build.bootstrap.dir}"/>
+        	<zipgroupfileset dir="${lib.bootstrap.dir}" includes="*.jar"/>
+        	<fileset file="${src.bootstrap.dir}/workbench-jetty.xml"/>
+        	<zipfileset file="${workbench.war.file}" fullpath="Meandre-Workbench.war"/>
             <manifest>
                 <attribute name="Build-Version" value="${version}.${svn_revision}"/>
                 <attribute name="Build-Date" value="${TIMESTAMP}"/>
                 <attribute name="Main-Class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
             </manifest>
-            <fileset dir="${release.tmp.dir}"/>
         </jar>
-        <delete dir="${release.tmp.dir}"/>
     </target>
 
     <target name="run" depends="dist" description="-> compiles and runs Meandre-Workbench">

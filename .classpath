@@ -62,14 +62,14 @@
 	<classpathentry kind="lib" path="lib/bootstrap/jsp-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/jsp-api-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/build/gwtext-2.0.6.jar"/>
-	<classpathentry kind="lib" path="lib/bootstrap/jetty-6.1.15.jar"/>
-	<classpathentry kind="lib" path="lib/bootstrap/jetty-util-6.1.15.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/jsap-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/core-3.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/bootstrap/meandre-executables-1.4.7.jar"/>
 	<classpathentry kind="lib" path="lib/deploy/meandre-client-1.4.8.jar"/>
 	<classpathentry kind="lib" path="lib/deploy/meandre-kernel-1.4.8.jar"/>
 	<classpathentry kind="lib" path="lib/deploy/meandre-zigzag-1.4.8.jar"/>
+	<classpathentry kind="lib" path="lib/bootstrap/jetty-6.1.24.jar"/>
+	<classpathentry kind="lib" path="lib/bootstrap/jetty-util-6.1.24.jar"/>
+	<classpathentry kind="lib" path="lib/bootstrap/meandre-executables-1.4.8.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
