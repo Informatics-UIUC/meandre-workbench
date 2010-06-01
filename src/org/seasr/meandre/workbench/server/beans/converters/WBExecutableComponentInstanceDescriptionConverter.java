@@ -69,7 +69,7 @@ public class WBExecutableComponentInstanceDescriptionConverter
         ExecutableComponentInstanceDescription compInstance =
             new ExecutableComponentInstanceDescription();
         compInstance.setName(wbCompInstance.getName());
-        compInstance.setDescription(wbCompInstance.getDescription());
+        //compInstance.setDescription(wbCompInstance.getDescription());  //TODO we don't want the description in the instance
         compInstance.setExecutableComponent(model.createResource(wbCompInstance.getExecutableComponent()));
         compInstance.setExecutableComponentInstance(model.createResource(wbCompInstance.getExecutableComponentInstance()));
         compInstance.setProperties(MeandreConverter.WBPropertiesDescriptionConverter.convert(wbCompInstance.getProperties()));

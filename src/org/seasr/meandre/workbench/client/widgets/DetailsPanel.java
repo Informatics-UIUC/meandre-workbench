@@ -249,7 +249,7 @@ public class DetailsPanel extends Panel {
             sb.append("</p><br/>");
             sb.append("<p>");
             sb.append("<b style='font-size: 13px;'><u>Description:</u></b><br/>");
-            sb.append("<div style='text-align: justify;'>").append(instance.getDescription()).append("</div>");
+            sb.append("<div style='text-align: justify;'>").append(comp.getDescription()).append("</div>");
             sb.append("</p><br/>");
             sb.append("<p>");
             sb.append("<b style='font-size: 13px;'><u>Rights:</u></b><br/>");
