@@ -110,8 +110,8 @@ public class WorkspaceTab extends Panel {
     private static int TAB_COUNTER = 1;
 
     private WBFlowDescription _wbFlow;
-    private Map<WBExecutableComponentInstanceDescription, Component> _componentMap;
-    private Map<AbstractConnection, WBConnectorDescription> _connectionMap;
+    private final Map<WBExecutableComponentInstanceDescription, Component> _componentMap;
+    private final Map<AbstractConnection, WBConnectorDescription> _connectionMap;
     private final Set<WorkspaceActionListener> _actionListeners = new HashSet<WorkspaceActionListener>();
     private final FlowOutputPanel _outputPanel = new FlowOutputPanel();
     private Component _selectedComponent = null;
@@ -119,7 +119,7 @@ public class WorkspaceTab extends Panel {
     private WorkspacePanel _parent = null;
     private boolean _dirty = false;
     private boolean _isClosing = false;
-    private boolean _isRunning = false;
+    private final boolean _isRunning = false;
     private int _componentCount = 0;
     private int _connectorCount = 0;
 
@@ -1064,7 +1064,7 @@ public class WorkspaceTab extends Panel {
     private WBWebUIInfo _webUIInfo = null;
     private final ToolbarButton _btnRunFlow = new ToolbarButton("Run flow");
     private final ToolbarButton _btnStopFlow = new ToolbarButton("Stop flow");
-    private ToolbarButton _btnExport;
+    private final ToolbarButton _btnExport;
 
     public void openWebUI() {
         if (_webUIInfo == null) {
@@ -1072,8 +1072,8 @@ public class WorkspaceTab extends Panel {
             return;
         }
 
-        Window.open(_webUIInfo.getWebUIUrl(), _wbFlow.getFlowURI(),
-                "resizable,scrollbars,status,chrome,width=800,height=600,centerscreen");
+        Window.open(_webUIInfo.getWebUIUrl(), String.valueOf(_wbFlow.getFlowURI().hashCode()),
+                "width=800,height=600,resizable=yes,scrollbars=yes,status=yes,centerscreen=yes");
     }
 
     public WBWebUIInfo getWebUIInfo() {

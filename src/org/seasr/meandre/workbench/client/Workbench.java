@@ -776,8 +776,11 @@ public class Workbench extends Application {
                             		result.getWebUIUrl() + " )");
 
                         flowTab.setWebUIInfo(result);
+                        Log.debug("Checking whether the flow contains any WebUI components...");
+                        boolean showWebUi = flowHasWebUI(flow);
+                        Log.debug("flowHasWebUI=" + showWebUi);
 
-                        if (flowHasWebUI(flow))
+                        if (showWebUi)
                             flowTab.openWebUI();
 
                         outputPanel.clearMask();
