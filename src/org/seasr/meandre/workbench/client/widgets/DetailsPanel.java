@@ -244,6 +244,7 @@ public class DetailsPanel extends Panel {
             sb.append("<tr><td align='right' valign='top'>").append("<b>Date:</b></td><td style='white-space: nowrap;'>").append(comp.getCreationDate()).append("</td>");
             if (location != null)
                 sb.append("<tr><td align='right' valign='top'>").append("<b>Class:</b></td><td>").append(location).append("</td>");
+            sb.append("<tr><td align='right' valign='top'>").append("<b>Firing Policy:</b></td><td>").append(comp.getFiringPolicy()).append("</td>");
             sb.append("</table>");
 
             sb.append("</p><br/>");
@@ -328,6 +329,7 @@ public class DetailsPanel extends Panel {
         sb.append("<tr><td align='right' valign='top'>").append("<b>Date:</b></td><td style='white-space: nowrap;'>").append(comp.getCreationDate()).append("</td>");
         if (location != null)
             sb.append("<tr><td align='right' valign='top'>").append("<b>Class:</b></td><td>").append(location).append("</td>");
+        sb.append("<tr><td align='right' valign='top'>").append("<b>Firing Policy:</b></td><td>").append(comp.getFiringPolicy()).append("</td>");
         sb.append("</table>");
 
         sb.append("</p><br/>");
