@@ -19,27 +19,7 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/deploy/commons-httpclient-3.1.jar">
-		<attributes>
-			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/deploy/commons-logging-1.1.1.jar">
-		<attributes>
-			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/deploy/jena-2.5.5.jar">
-		<attributes>
-			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/deploy/jena-arq-2.5.5.jar">
-		<attributes>
-			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/deploy/jena-json-2.5.5.jar">
 		<attributes>
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
@@ -65,11 +45,26 @@
 	<classpathentry kind="lib" path="lib/bootstrap/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/jsap-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/core-3.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/deploy/meandre-client-1.4.8.jar"/>
-	<classpathentry kind="lib" path="lib/deploy/meandre-kernel-1.4.8.jar"/>
-	<classpathentry kind="lib" path="lib/deploy/meandre-zigzag-1.4.8.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/jetty-6.1.24.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/jetty-util-6.1.24.jar"/>
 	<classpathentry kind="lib" path="lib/bootstrap/meandre-executables-1.4.8.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/apache-mime4j-0.6.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/arq-2.8.4.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/httpclient-4.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/httpcore-4.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/httpmime-4.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/icu4j-3.4.4.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/iri-0.8.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/jena-2.6.3.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/json.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/meandre-kernel-1.4.9.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/rdf2zz-1.4.9.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/seasr-commons.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/slf4j-api-1.5.8.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/slf4j-log4j12-1.5.8.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/stax-api-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/wstx-asl-3.2.9.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/meandre-client-1.4.9.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/meandre-zigzag-1.4.9.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

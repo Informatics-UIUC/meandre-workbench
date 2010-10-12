@@ -59,8 +59,8 @@ import javax.servlet.http.HttpSession;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.meandre.client.MeandreClient;
-import org.meandre.client.TransmissionException;
+import org.meandre.client.exceptions.TransmissionException;
+import org.meandre.client.v1.MeandreClient;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.ExecutableComponentInstanceDescription;
 import org.meandre.core.repository.FlowDescription;
