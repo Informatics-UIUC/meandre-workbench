@@ -42,7 +42,6 @@
 
 package org.seasr.meandre.workbench.client.rpc;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
@@ -417,16 +416,6 @@ public interface IRepository extends RemoteService {
         throws MeandreCommunicationException;
 
     /**
-     * Retrieves the running flows
-     *
-     * @return The map of running flows: flow id -> url where it is running
-     * @throws SessionExpiredException Thrown if the user's session has expired
-     * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
-     */
-    public Map<String, String> retrieveRunningFlows()
-        throws SessionExpiredException, MeandreCommunicationException;
-
-    /**
      * Retrieves the WebUI info object for a specific token
      *
      * @param token The runtime token
@@ -468,12 +457,12 @@ public interface IRepository extends RemoteService {
     /**
      * Attempts to abort an executing flow
      *
-     * @param runningFlowPort The port where the flow is running
+     * @param flowInfo The flow information
      * @return true if the abort request was successfuly dispatched, false otherwise
      * @throws SessionExpiredException Thrown if the user's session has expired
      * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
      */
-    public boolean abortFlow(int runningFlowPort)
+    public boolean abortFlow(WBWebUIInfo flowInfo)
         throws SessionExpiredException, MeandreCommunicationException;
 
     /**

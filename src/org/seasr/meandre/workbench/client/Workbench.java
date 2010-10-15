@@ -73,28 +73,28 @@ import org.seasr.meandre.workbench.client.widgets.LoginDialog;
 import org.seasr.meandre.workbench.client.widgets.MainPanel;
 import org.seasr.meandre.workbench.client.widgets.OutputPanel;
 import org.seasr.meandre.workbench.client.widgets.RepositoryPanel;
-import org.seasr.meandre.workbench.client.widgets.WorkspacePanel;
-import org.seasr.meandre.workbench.client.widgets.WorkspaceTab;
 import org.seasr.meandre.workbench.client.widgets.RepositoryPanel.ComponentsGrid;
 import org.seasr.meandre.workbench.client.widgets.RepositoryPanel.FlowsGrid;
 import org.seasr.meandre.workbench.client.widgets.RepositoryPanel.LocationsGrid;
+import org.seasr.meandre.workbench.client.widgets.WorkspacePanel;
+import org.seasr.meandre.workbench.client.widgets.WorkspaceTab;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.WindowCloseListener;
 import com.google.gwt.user.client.Window.Location;
+import com.google.gwt.user.client.WindowCloseListener;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.widgets.MessageBox;
+import com.gwtext.client.widgets.MessageBox.ConfirmCallback;
+import com.gwtext.client.widgets.MessageBox.PromptCallback;
 import com.gwtext.client.widgets.MessageBoxConfig;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.Viewport;
 import com.gwtext.client.widgets.WaitConfig;
-import com.gwtext.client.widgets.MessageBox.ConfirmCallback;
-import com.gwtext.client.widgets.MessageBox.PromptCallback;
 import com.gwtext.client.widgets.event.PanelListenerAdapter;
 import com.gwtext.client.widgets.menu.BaseItem;
 import com.gwtext.client.widgets.menu.Item;
@@ -839,7 +839,7 @@ public class Workbench extends Application {
                 }
 
                 // attempts to abort the flow (via RPC)
-                Repository.abortFlow(webUI.getPort(), new WBCallback<Boolean>() {
+                Repository.abortFlow(webUI, new WBCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
                         workspaceTab.setWebUIInfo(null);

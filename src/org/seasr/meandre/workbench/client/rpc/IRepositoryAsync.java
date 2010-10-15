@@ -42,7 +42,6 @@
 
 package org.seasr.meandre.workbench.client.rpc;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
@@ -50,6 +49,11 @@ import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponent
 import org.seasr.meandre.workbench.client.beans.repository.WBFlowDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBLocation;
 import org.seasr.meandre.workbench.client.beans.session.WBSession;
+import org.seasr.meandre.workbench.client.exceptions.CorruptedFlowException;
+import org.seasr.meandre.workbench.client.exceptions.LoginFailedException;
+import org.seasr.meandre.workbench.client.exceptions.MeandreCommunicationException;
+import org.seasr.meandre.workbench.client.exceptions.SessionExpiredException;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -360,15 +364,6 @@ public interface IRepositoryAsync {
     public void retrieveFlowOutput(String flowURL, AsyncCallback<String> callback);
 
     /**
-     * Retrieves the running flows
-     *
-     * @return The map of running flows: flow id -> url where it is running
-     * @throws SessionExpiredException Thrown if the user's session has expired
-     * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
-     */
-    public void retrieveRunningFlows(AsyncCallback<Map<String, String>> callback);
-
-    /**
      * Retrieves the WebUI info object for a specific token
      *
      * @param token The runtime token
@@ -407,12 +402,12 @@ public interface IRepositoryAsync {
     /**
      * Attempts to abort an executing flow
      *
-     * @param runningFlowPort The port where the flow is running
+     * @param flowInfo The flow information
      * @return true if the abort request was successfuly dispatched, false otherwise
      * @throws SessionExpiredException Thrown if the user's session has expired
      * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
      */
-    public void abortFlow(int runningFlowPort, AsyncCallback<Boolean> callback);
+    public void abortFlow(WBWebUIInfo flowInfo, AsyncCallback<Boolean> callback);
 
     /**
      * Retrieves statistics about a running flow

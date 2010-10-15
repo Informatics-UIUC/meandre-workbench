@@ -59,8 +59,9 @@ import javax.servlet.http.HttpSession;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.meandre.client.AbstractMeandreClient;
 import org.meandre.client.exceptions.TransmissionException;
-import org.meandre.client.v1.MeandreClient;
+import org.meandre.client.v2.MeandreClient;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.ExecutableComponentInstanceDescription;
 import org.meandre.core.repository.FlowDescription;
@@ -138,13 +139,14 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                     if (!remoteAddr.isLoopbackAddress())
                         hostName = remoteAddr.getCanonicalHostName();
                 }
-
-                MeandreClient client = new MeandreClient(hostName, port);
+                
+                AbstractMeandreClient client = AbstractMeandreClient.getClientForServer(hostName, port);
                 client.setCredentials(userName, password);
+                session.setAttribute("version", client.getServerVersion().split("=")[1].trim());
 
                 Set<String> userRoles = client.retrieveUserRoles();
 
-                if(!userRoles.contains(Role.WORKBENCH.getUrl()))
+                if (!(userRoles.contains(Role.WORKBENCH.getUrl()) || userRoles.contains("user")))
                     throw new LoginFailedException("Insufficient permissions");
 
                 WBVersion wbVersion = new WBVersion(Version.getVersion(), Version.getRevision(), Version.getBuildDate());
@@ -195,7 +197,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     public Set<WBLocation> retrieveLocations()
         throws SessionExpiredException, MeandreCommunicationException {
 
-        MeandreClient client = getClient();
+        AbstractMeandreClient client = getClient();
 
         try {
             Set<LocationBean> locations = client.retrieveLocations();
@@ -558,7 +560,16 @@ public class Repository extends RemoteServiceServlet implements IRepository {
 
     public WBWebUIInfo runFlow(String flowURL, String token, boolean verbose)
         throws SessionExpiredException, MeandreCommunicationException {
-
+        
+        if (getHttpSession().getAttribute("version").toString().startsWith("1.4"))
+            return runFlow14(flowURL, token, verbose);
+        else
+            return runFlow20(flowURL, token, verbose);
+    }
+    
+    private WBWebUIInfo runFlow14(String flowURL, String token, boolean verbose)
+        throws SessionExpiredException, MeandreCommunicationException {
+        
         int TIMEOUT = 10000; // 10 seconds timeout waiting for flow execution status
         int POLL_FREQ = 500; // poll for execution status every 500ms
 
@@ -594,6 +605,35 @@ public class Repository extends RemoteServiceServlet implements IRepository {
             throw new MeandreCommunicationException(e);
         }
     }
+    
+    private WBWebUIInfo runFlow20(String flowURL, String token, boolean verbose)
+        throws SessionExpiredException, MeandreCommunicationException {
+
+        int POLL_FREQ = 500; // poll for execution status every 500ms
+
+        MeandreClient clientv2 = (MeandreClient)getClient();
+        try {
+            String jobID = clientv2.submitJob(flowURL);
+            String status;
+            
+            // Wait for job to get to "Running" state
+            while (!(status = clientv2.retrieveJobStatus(jobID)).equals("Running")) {
+                if (status.equals("Aborted") || status.equals("Failed") || status.equals("Killed"))
+                    return null;
+                else
+                    Thread.sleep(POLL_FREQ);
+            }
+
+            // FIXME having a status of Running doesn't actually mean the flow is ready to serve requests;
+            //       the execution engine takes time to actually start the flow;  how to reliably detect when
+            //       flow is actually running?
+            
+            return new WBWebUIInfo(clientv2.getHostName(), clientv2.getPort()+1, token, jobID);
+        }
+        catch (Exception e) {
+            throw new MeandreCommunicationException(e);
+        }
+    }
 
     //TODO may need to start separate thread that retrieves the console output and uses
     //     the producer-consumer scenario to feed the results to the client
@@ -601,6 +641,28 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     public String retrieveFlowOutput(String flowExecutionInstanceId)
         throws MeandreCommunicationException {
 
+        if (getHttpSession().getAttribute("version").toString().startsWith("1.4"))
+            return retrieveFlowOutput14(flowExecutionInstanceId);
+        else
+            return retrieveFlowOutput20(flowExecutionInstanceId);
+    }
+
+    private String retrieveFlowOutput20(String jobID) throws MeandreCommunicationException {
+        try {
+            MeandreClient clientv2 = (MeandreClient)getClient();
+            String status = clientv2.retrieveJobStatus(jobID);
+            
+            if (status.equals("Aborted") || status.equals("Failed") || status.equals("Killed") || status.equals("Done"))
+                return null;
+            
+            return "";
+        }
+        catch (Exception e) {
+            throw new MeandreCommunicationException(e);
+        }
+    }
+
+    private String retrieveFlowOutput14(String flowExecutionInstanceId) throws MeandreCommunicationException {
         InputStream consoleStream = _flowConsoles.get(flowExecutionInstanceId);
         if (consoleStream == null)
             throw new MeandreCommunicationException(flowExecutionInstanceId + " has not been executed");
@@ -627,18 +689,6 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         catch (IOException e) {
             _flowConsoles.remove(flowExecutionInstanceId);
 
-            throw new MeandreCommunicationException(e);
-        }
-    }
-
-    public Map<String, String> retrieveRunningFlows()
-        throws SessionExpiredException, MeandreCommunicationException {
-
-        try {
-            Map<URI, URI> runningFlowsMap = getClient().retrieveRunningFlows();
-            return MeandreConverter.convert(runningFlowsMap, UriStringConverter, UriStringConverter);
-        }
-        catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
         }
     }
@@ -698,11 +748,28 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     // Admin of Running Flows //
     ////////////////////////////
 
-    public boolean abortFlow(int runningFlowPort)
+    public boolean abortFlow(WBWebUIInfo flowInfo)
         throws SessionExpiredException, MeandreCommunicationException {
+        
+        if (getHttpSession().getAttribute("version").toString().startsWith("1.4")) 
+            return abortFlow14(flowInfo);
+        else
+            return abortFlow20(flowInfo);
+    }
 
+    private boolean abortFlow20(WBWebUIInfo flowInfo) throws SessionExpiredException, MeandreCommunicationException {
+        MeandreClient clientv2 = (MeandreClient)getClient();
         try {
-            return getClient().abortFlow(runningFlowPort);
+            return clientv2.killJob(flowInfo.getURI());
+        }
+        catch (TransmissionException e) {
+            throw new MeandreCommunicationException(e);
+        }
+    }
+
+    private boolean abortFlow14(WBWebUIInfo flowInfo) throws SessionExpiredException, MeandreCommunicationException {
+        try {
+            return getClient().abortFlow(flowInfo.getPort());
         }
         catch (TransmissionException e) {
             throw new MeandreCommunicationException(e);
@@ -739,10 +806,10 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         return session;
     }
 
-    private MeandreClient getClient()
+    private AbstractMeandreClient getClient()
         throws SessionExpiredException {
 
-        return (MeandreClient) checkSession().getAttribute("client");
+        return (AbstractMeandreClient) checkSession().getAttribute("client");
     }
 
     private QueryableRepository getRepository()
