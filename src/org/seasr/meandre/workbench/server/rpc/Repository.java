@@ -140,8 +140,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                         hostName = remoteAddr.getCanonicalHostName();
                 }
                 
-                AbstractMeandreClient client = AbstractMeandreClient.getClientForServer(hostName, port);
-                client.setCredentials(userName, password);
+                AbstractMeandreClient client = AbstractMeandreClient.getClientForServer(hostName, port, userName, password);
                 session.setAttribute("version", client.getServerVersion().split("=")[1].trim());
 
                 Set<String> userRoles = client.retrieveUserRoles();
