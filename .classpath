@@ -59,12 +59,12 @@
 	<classpathentry kind="lib" path="lib/deploy/json.jar"/>
 	<classpathentry kind="lib" path="lib/deploy/meandre-kernel-1.4.9.jar"/>
 	<classpathentry kind="lib" path="lib/deploy/rdf2zz-1.4.9.jar"/>
-	<classpathentry kind="lib" path="lib/deploy/seasr-commons.jar"/>
 	<classpathentry kind="lib" path="lib/deploy/slf4j-api-1.5.8.jar"/>
 	<classpathentry kind="lib" path="lib/deploy/slf4j-log4j12-1.5.8.jar"/>
 	<classpathentry kind="lib" path="lib/deploy/stax-api-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/deploy/wstx-asl-3.2.9.jar"/>
 	<classpathentry kind="lib" path="lib/deploy/meandre-zigzag-1.4.9.jar"/>
-	<classpathentry kind="lib" path="lib/deploy/meandre-client.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/meandre-client-1.4.9.jar"/>
+	<classpathentry kind="lib" path="lib/deploy/seasr-commons-1.4.9.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
