@@ -883,8 +883,8 @@ public class WorkspaceTab extends Panel {
         WBPropertiesDescription compProps = compInstance.getProperties();
         if (compProps.getKeys().contains(COMP_LEFT_KEY) && compProps.getKeys().contains(COMP_TOP_KEY))
             return new int[] {
-                    Integer.parseInt(compProps.getValue(COMP_LEFT_KEY)),
-                    Integer.parseInt(compProps.getValue(COMP_TOP_KEY))
+                    (int) Double.parseDouble(compProps.getValue(COMP_LEFT_KEY)),
+                    (int) Double.parseDouble(compProps.getValue(COMP_TOP_KEY))
             };
         else {
             int[] xy = getRandomCompPosition();
@@ -960,9 +960,9 @@ public class WorkspaceTab extends Panel {
         return connection;
     }
 
-    private AbstractConnection createConnection(WBConnectorDescription connector) {
-        String srcCompInstanceURI = connector.getSourceInstance();
-        String dstCompInstanceURI = connector.getTargetInstance();
+    private AbstractConnection createConnection(final WBConnectorDescription connector) {
+        final String srcCompInstanceURI = connector.getSourceInstance();
+        final String dstCompInstanceURI = connector.getTargetInstance();
 
         Component srcComponent = getComponentForURI(srcCompInstanceURI);
         Component dstComponent = getComponentForURI(dstCompInstanceURI);
@@ -974,12 +974,20 @@ public class WorkspaceTab extends Panel {
             Log.error("Could not retrieve the " + msg + " component(s) for connector: " +
                     connector.getConnector() + " - ignoring");
             Log.error("Source: " + srcCompInstanceURI + "  Target: " + dstCompInstanceURI);
+            
+            final String msgConsole = msg;
+            DeferredCommand.addCommand(new Command() {
+                public void execute() {
+                    _outputPanel.print("Could not retrieve the " + msgConsole + " component(s) for connector: " +
+                            connector.getConnector() + " - ignoring; Source: " + srcCompInstanceURI + "  Target: " + dstCompInstanceURI);
+                }
+            });
 
             return null;
         }
 
-        String srcDataPort = connector.getSourceInstanceDataPort();
-        String dstDataPort = connector.getTargetInstanceDataPort();
+        final String srcDataPort = connector.getSourceInstanceDataPort();
+        final String dstDataPort = connector.getTargetInstanceDataPort();
 
         ComponentPort srcPort = srcComponent.getOutputPort(srcDataPort);
         ComponentPort dstPort = dstComponent.getInputPort(dstDataPort);
@@ -991,7 +999,15 @@ public class WorkspaceTab extends Panel {
             Log.error("Could not retrive the " + msg + " port(s) for the connector: " +
                     connector.getConnector() + " - ignoring");
             Log.error("Source: " + srcDataPort + "  Target: " + dstDataPort);
-
+            
+            final String msgConsole = msg;
+            DeferredCommand.addCommand(new Command() {
+                public void execute() {
+                    _outputPanel.print("Could not retrive the " + msgConsole + " port(s) for the connector: " +
+                            connector.getConnector() + " - ignoring; Source: " + srcDataPort + "  Target: " + dstDataPort);
+                }
+            });
+            
             return null;
         }
 

@@ -13,6 +13,7 @@
    <!--#################### Project Properties #########################-->
     <property name="version" value="1.4.9"/>
     <property name="debug" value="false"/>
+    <property name="target" value="1.5"/>
 
     <property name="src.gwt.dir" value="${basedir}/src"/>
     <property name="src.bootstrap.dir" value="${basedir}/src-bootstrap"/>
@@ -95,11 +96,11 @@
     </target>
 
     <target name="server_compile" depends="prepare" description="-> compiles the server-side code">
-        <javac srcdir="${src.gwt.dir}" destdir="${build.server.dir}" classpathref="gwt_compile.classpath" debug="on" source="1.5" includeantruntime="false"/>
+        <javac srcdir="${src.gwt.dir}" destdir="${build.server.dir}" classpathref="gwt_compile.classpath" debug="on" source="1.5" target="${target}" includeantruntime="false"/>
     </target>
 
     <target name="bootstrap_compile" depends="prepare" description="-> compiles the bootstrapper">
-        <javac srcdir="${src.bootstrap.dir}" destdir="${build.bootstrap.dir}" classpathref="bootstrap.classpath" debug="on" source="1.5" includeantruntime="false"/>
+        <javac srcdir="${src.bootstrap.dir}" destdir="${build.bootstrap.dir}" classpathref="bootstrap.classpath" debug="on" source="1.5" target="${target}" includeantruntime="false"/>
     </target>
 
     <target name="compile" depends="gwt_compile, server_compile, bootstrap_compile" description="-> compiles the entire project"/>
