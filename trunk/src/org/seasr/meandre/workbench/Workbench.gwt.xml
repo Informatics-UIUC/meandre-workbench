@@ -1,0 +1,33 @@
+<module>
+
+      <!-- Specify the app entry point class.                         -->
+      <entry-point class='org.seasr.meandre.workbench.client.Workbench'/>
+
+      <!-- List the servlets used by the application                  -->
+      <servlet path='/Repository' class='org.seasr.meandre.workbench.server.rpc.Repository' />
+      <servlet path='/export_flow' class='org.seasr.meandre.workbench.server.rpc.FileDownloadServlet' />
+
+      <!-- Specify the application specific style sheet.              -->
+      <!--  <stylesheet src='js/ext/resources/css/ext-all.css' /> -->
+      <stylesheet src='Workbench.css' />
+
+      <!-- Import the ExtJS scripts                                   -->
+      <!-- see public/js/ext/INCLUDE_ORDER.txt for script order       -->
+      <!--  <script src='js/ext/adapter/ext/ext-base.js' /> -->
+      <!--  <script src='js/ext/ext-all.js' /> -->
+
+      <!-- Inherit the core Web Toolkit stuff.                        -->
+      <inherits name='com.google.gwt.user.User'/>
+
+      <!-- Other module inherits                                      -->
+      <inherits name='com.allen_sauer.gwt.log.gwt-log' />
+        <extend-property name='log_level' values='DEBUG' />
+        <set-property    name='log_level' value='DEBUG' />
+        <set-property    name='log_DivLogger' value='DISABLED' />
+        <set-property    name='log_FirebugLogger' value='ENABLED' />
+      <inherits name='pl.balon.gwt.diagrams.Diagrams'/>
+      <inherits name='com.gwtext.GwtExt'/>
+      <inherits name='com.gwtextux.GwtExtUx'/>
+      <inherits name='com.gwtextux.GridSearchPlugin'/>
+
+</module>
