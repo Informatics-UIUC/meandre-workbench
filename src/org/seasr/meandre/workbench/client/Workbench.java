@@ -42,7 +42,9 @@
 
 package org.seasr.meandre.workbench.client;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBConnectorDescription;
@@ -363,7 +365,51 @@ public class Workbench extends Application {
                 // clear all info from the details panel
                 resetDetails();
             }
+
+            @Override
+            public void onRemove(final WBExecutableComponentDescription component) {
+            	// Check that the component is not used in any of the flows
+				List<WBFlowDescription> flowsTheCompIsPartOf = new ArrayList<WBFlowDescription>();
+				for (WBFlowDescription wbFlow : _repositoryState.getFlows()) {
+					for (WBExecutableComponentInstanceDescription compInstance : wbFlow.getExecutableComponentInstances())
+						if (compInstance.getExecutableComponent().equals(component.getResourceURI())) {
+							flowsTheCompIsPartOf.add(wbFlow);
+							break;
+						}
+				}
+
+				String message = "Are you sure you want to remove " + component.getName() + "?";
+
+				if (flowsTheCompIsPartOf.size() > 0) {
+					StringBuilder sb = new StringBuilder();
+					sb.append("The component ").append(component.getName()).append(" is used in the following flows:").append("<br>");
+					for (WBFlowDescription wbFlow : flowsTheCompIsPartOf)
+						sb.append(wbFlow.getName()).append("<br>");
+					sb.append("<br>Are you sure you want to remove it and break those flows?");
+					message = sb.toString();
+				}
+
+            	Application.showMessage("Confirmation", message,
+    					MessageBox.WARNING, MessageBox.YESNO, new PromptCallback() {
+							public void execute(String btnID, String text) {
+								if (!btnID.equalsIgnoreCase("yes")) return;
+
+								componentsPanel.setMask("Removing");
+								Repository.removeResource(component.getResourceURI(), new WBCallback<Boolean>() {
+									@Override
+									public void onSuccess(Boolean success) {
+										componentsPanel.clearMask();
+										if (success)
+											_repositoryState.removeComponent(component);
+										else
+											Application.showError("Remove Component", "Could not remove the component!");
+									}
+								});
+							}
+						});
+            }
         });
+
         componentsPanel.addListener(new PanelListenerAdapter() {
             /**
              * Resets the details section state upon components panel collapse
@@ -424,7 +470,38 @@ public class Workbench extends Application {
                 if (!alreadyOpened)
                     addNewTab(flow);
             }
+
+            @Override
+            public void onRemove(final WBFlowDescription flow) {
+    			Application.showMessage("Confirmation", "Are you sure you want to remove " + flow.getName() + "?",
+    					MessageBox.WARNING, MessageBox.YESNO, new PromptCallback() {
+							public void execute(String btnID, String text) {
+								if (!btnID.equalsIgnoreCase("yes")) return;
+
+								for (WorkspaceTab wsTab : workspacePanel.getTabs()) {
+				            		WBFlowDescription wsFlow = wsTab.getFlowDescription();
+				            		if (wsFlow.getFlowURI().equalsIgnoreCase(flow.getFlowURI())) {
+										wsTab.close();
+				            			break;
+				            		}
+				            	}
+
+								flowsPanel.setMask("Removing");
+								Repository.removeResource(flow.getFlowURI(), new WBCallback<Boolean>() {
+									@Override
+									public void onSuccess(Boolean success) {
+										flowsPanel.clearMask();
+										if (success)
+											_repositoryState.removeFlow(flow);
+										else
+											Application.showError("Remove Flow", "Could not remove the flow!");
+									}
+								});
+							}
+						});
+            }
         });
+
         flowsPanel.addListener(new PanelListenerAdapter() {
             /**
              * Resets the details section state when the flows panel is collapsed

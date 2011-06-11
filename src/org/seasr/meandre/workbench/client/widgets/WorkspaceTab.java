@@ -45,8 +45,8 @@ package org.seasr.meandre.workbench.client.widgets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.seasr.meandre.workbench.client.Application;
 import org.seasr.meandre.workbench.client.RepositoryState;
@@ -83,11 +83,11 @@ import com.gwtext.client.dd.DropTarget;
 import com.gwtext.client.dd.DropTargetConfig;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.MessageBox;
+import com.gwtext.client.widgets.MessageBox.PromptCallback;
 import com.gwtext.client.widgets.MessageBoxConfig;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.Toolbar;
 import com.gwtext.client.widgets.ToolbarButton;
-import com.gwtext.client.widgets.MessageBox.PromptCallback;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.grid.GridDragData;
 import com.gwtext.client.widgets.layout.AbsoluteLayout;
@@ -974,12 +974,12 @@ public class WorkspaceTab extends Panel {
             Log.error("Could not retrieve the " + msg + " component(s) for connector: " +
                     connector.getConnector() + " - ignoring");
             Log.error("Source: " + srcCompInstanceURI + "  Target: " + dstCompInstanceURI);
-            
+
             final String msgConsole = msg;
             DeferredCommand.addCommand(new Command() {
                 public void execute() {
                     _outputPanel.print("Could not retrieve the " + msgConsole + " component(s) for connector: " +
-                            connector.getConnector() + " - ignoring; Source: " + srcCompInstanceURI + "  Target: " + dstCompInstanceURI);
+                            connector.getConnector() + " - ignoring; Source: " + srcCompInstanceURI + "  Target: " + dstCompInstanceURI + "\n");
                 }
             });
 
@@ -999,15 +999,15 @@ public class WorkspaceTab extends Panel {
             Log.error("Could not retrive the " + msg + " port(s) for the connector: " +
                     connector.getConnector() + " - ignoring");
             Log.error("Source: " + srcDataPort + "  Target: " + dstDataPort);
-            
+
             final String msgConsole = msg;
             DeferredCommand.addCommand(new Command() {
                 public void execute() {
                     _outputPanel.print("Could not retrive the " + msgConsole + " port(s) for the connector: " +
-                            connector.getConnector() + " - ignoring; Source: " + srcDataPort + "  Target: " + dstDataPort);
+                            connector.getConnector() + " - ignoring; Source: " + srcDataPort + "  Target: " + dstDataPort + "\n");
                 }
             });
-            
+
             return null;
         }
 

@@ -240,6 +240,38 @@ public class RepositoryState {
         return (record != null) ? (WBExecutableComponentDescription) record.getAsObject("wbComponent") : null;
     }
 
+    public boolean removeComponent(WBExecutableComponentDescription component) {
+    	boolean success = false;
+    	Record toRemove = null;
+
+    	for (Record record : _componentsStore.getRecords()) {
+    		if (component.getResourceURI().equals(getComponent(record).getResourceURI())) {
+    			toRemove = record;
+    			break;
+    		}
+    	}
+
+    	if (toRemove != null) {
+    		_componentsStore.remove(toRemove);
+    		success = true;
+    		toRemove = null;
+    	}
+
+    	for (Record record : _componentsStoreFull.getRecords()) {
+    		if (component.getResourceURI().equals(getComponent(record).getResourceURI())) {
+    			toRemove = record;
+    			break;
+    		}
+    	}
+
+    	if (toRemove != null) {
+    		_componentsStoreFull.remove(toRemove);
+    		success = true;
+    	}
+
+    	return success;
+    }
+
     /**
      * Retrieves the flows store
      *
@@ -282,6 +314,38 @@ public class RepositoryState {
      */
     private WBFlowDescription getFlow(Record record) {
         return (record != null) ? (WBFlowDescription) record.getAsObject("wbFlow") : null;
+    }
+
+    public boolean removeFlow(WBFlowDescription flow) {
+    	boolean success = false;
+    	Record toRemove = null;
+
+    	for (Record record : _flowsStore.getRecords()) {
+    		if (flow.getFlowURI().equals(getFlow(record).getFlowURI())) {
+    			toRemove = record;
+    			break;
+    		}
+    	}
+
+    	if (toRemove != null) {
+    		_flowsStore.remove(toRemove);
+    		success = true;
+    		toRemove = null;
+    	}
+
+    	for (Record record : _flowsStoreFull.getRecords()) {
+    		if (flow.getFlowURI().equals(getFlow(record).getFlowURI())) {
+    			toRemove = record;
+    			break;
+    		}
+    	}
+
+    	if (toRemove != null) {
+    		_flowsStoreFull.remove(toRemove);
+    		success = true;
+    	}
+
+    	return success;
     }
 
     /**

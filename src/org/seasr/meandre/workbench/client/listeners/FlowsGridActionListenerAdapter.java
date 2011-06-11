@@ -56,6 +56,9 @@ public class FlowsGridActionListenerAdapter implements FlowsGridActionListener {
     public void onUnselected(WBFlowDescription flow) {
     }
 
+    public void onRemove(WBFlowDescription flow) {
+    }
+
     public void onOpen(WBFlowDescription flow) {
     }
 

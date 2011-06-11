@@ -52,5 +52,6 @@ public interface ComponentsGridActionListener {
 
     public void onSelected(WBExecutableComponentDescription component);
     public void onUnselected(WBExecutableComponentDescription component);
+    public void onRemove(WBExecutableComponentDescription component);
 
 }

@@ -80,6 +80,10 @@ import com.gwtext.client.widgets.grid.RowSelectionModel;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtext.client.widgets.grid.event.RowSelectionListenerAdapter;
 import com.gwtext.client.widgets.layout.AccordionLayout;
+import com.gwtext.client.widgets.menu.BaseItem;
+import com.gwtext.client.widgets.menu.Item;
+import com.gwtext.client.widgets.menu.Menu;
+import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 import com.gwtextux.client.widgets.grid.plugins.GridSearchPlugin;
 
 /**
@@ -214,6 +218,30 @@ public class RepositoryPanel extends Panel {
                 }
             });
 
+            addGridRowListener(new GridRowListenerAdapter() {
+            	@Override
+            	public void onRowContextMenu(GridPanel grid, int rowIndex, EventObject e) {
+            		Record record = grid.getStore().getAt(rowIndex);
+                    final WBExecutableComponentDescription component = (WBExecutableComponentDescription) record.getAsObject("wbComponent");
+
+                	e.stopEvent();
+
+                    Menu componentContextMenu = new Menu();
+                    Item btnRemove = new Item("Remove");
+                    componentContextMenu.addItem(btnRemove);
+
+                    btnRemove.addListener(new BaseItemListenerAdapter() {
+                        @Override
+                        public void onClick(BaseItem item, EventObject e) {
+                        	for (ComponentsGridActionListener listener : _actionListeners)
+                                listener.onRemove(component);
+                        }
+                    });
+
+                	componentContextMenu.showAt(e.getXY());
+            	}
+            });
+
             final Toolbar topToolbar = new Toolbar();
             topToolbar.addFill();
 
@@ -317,7 +345,8 @@ public class RepositoryPanel extends Panel {
 
             RowSelectionModel selectionModel = new RowSelectionModel(true);
             selectionModel.addListener(new RowSelectionListenerAdapter() {
-                public void onRowSelect(RowSelectionModel sm, int rowIndex, Record record) {
+                @Override
+				public void onRowSelect(RowSelectionModel sm, int rowIndex, Record record) {
                     _selectedFlow = (WBFlowDescription) record.getAsObject("wbFlow");
                     for (FlowsGridActionListener listener : _actionListeners)
                         listener.onSelected(_selectedFlow);
@@ -339,6 +368,28 @@ public class RepositoryPanel extends Panel {
 
                     for (FlowsGridActionListener listener : _actionListeners)
                         listener.onOpen(flow);
+                }
+
+                @Override
+                public void onRowContextMenu(GridPanel grid, int rowIndex, EventObject e) {
+                	Record record = grid.getStore().getAt(rowIndex);
+                    final WBFlowDescription flow = (WBFlowDescription) record.getAsObject("wbFlow");
+
+                	e.stopEvent();
+
+                    Menu flowContextMenu = new Menu();
+                    Item btnRemove = new Item("Remove");
+                    flowContextMenu.addItem(btnRemove);
+
+                    btnRemove.addListener(new BaseItemListenerAdapter() {
+                        @Override
+                        public void onClick(BaseItem item, EventObject e) {
+                        	for (FlowsGridActionListener listener : _actionListeners)
+                                listener.onRemove(flow);
+                        }
+                    });
+
+                	flowContextMenu.showAt(e.getXY());
                 }
             });
 

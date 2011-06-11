@@ -62,4 +62,7 @@ public class ComponentsGridActionListenerAdapter implements ComponentsGridAction
     public void onUnselected(WBExecutableComponentDescription component) {
     }
 
+	public void onRemove(WBExecutableComponentDescription component) {
+	}
+
 }
