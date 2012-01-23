@@ -73,6 +73,7 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.gwtext.client.core.Direction;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Function;
 import com.gwtext.client.core.Margins;
@@ -265,9 +266,12 @@ public class WorkspaceTab extends Panel {
             public boolean notifyDrop(DragSource source, EventObject e, DragData data) {
                 int[] xy = e.getXY();
                 int[] pos = getBody().getXY();
+                int[] scroll = getBody().getScroll();
 
                 xy[0] -= pos[0];
                 xy[1] -= pos[1];
+                xy[0] += scroll[0];
+                xy[1] += scroll[1];
 
                 if (data instanceof GridDragData) {
                     GridDragData gridDragData = (GridDragData) data;
@@ -293,6 +297,9 @@ public class WorkspaceTab extends Panel {
                     }
 
                     doLayout();
+
+                    getBody().scroll(Direction.LEFT, scroll[0], false);
+                    getBody().scroll(Direction.DOWN, scroll[1], false);
                 }
 
                 return true;
@@ -859,6 +866,11 @@ public class WorkspaceTab extends Panel {
 
     protected int[] getComponentRelativeLocation(Component component) {
         int[] absPos = component.getPosition();
+        int[] scroll = getBody().getScroll();
+
+        absPos[0] += scroll[0];
+        absPos[1] += scroll[1];
+
         Margins margins = component.getEl().getMargins();
         int left = getRelativeLeft(absPos[0] - margins.getLeft());
         int top = getRelativeTop(absPos[1] - margins.getTop());
@@ -881,12 +893,12 @@ public class WorkspaceTab extends Panel {
     private int[] getComponentXY(Component component) {
         WBExecutableComponentInstanceDescription compInstance = component.getInstanceDescription();
         WBPropertiesDescription compProps = compInstance.getProperties();
-        if (compProps.getKeys().contains(COMP_LEFT_KEY) && compProps.getKeys().contains(COMP_TOP_KEY))
+        if (compProps.getKeys().contains(COMP_LEFT_KEY) && compProps.getKeys().contains(COMP_TOP_KEY)) {
             return new int[] {
                     (int) Double.parseDouble(compProps.getValue(COMP_LEFT_KEY)),
                     (int) Double.parseDouble(compProps.getValue(COMP_TOP_KEY))
             };
-        else {
+        } else {
             int[] xy = getRandomCompPosition();
             compProps.add(COMP_LEFT_KEY, Integer.toString(xy[0]));
             compProps.add(COMP_TOP_KEY, Integer.toString(xy[1]));

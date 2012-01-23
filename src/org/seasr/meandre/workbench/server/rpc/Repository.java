@@ -139,7 +139,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                     if (!remoteAddr.isLoopbackAddress())
                         hostName = remoteAddr.getCanonicalHostName();
                 }
-                
+
                 AbstractMeandreClient client = AbstractMeandreClient.getClientForServer(hostName, port, userName, password);
                 session.setAttribute("version", client.getServerVersion().split("=")[1].trim());
 
@@ -559,16 +559,16 @@ public class Repository extends RemoteServiceServlet implements IRepository {
 
     public WBWebUIInfo runFlow(String flowURL, String token, boolean verbose)
         throws SessionExpiredException, MeandreCommunicationException {
-        
+
         if (getHttpSession().getAttribute("version").toString().startsWith("1.4"))
             return runFlow14(flowURL, token, verbose);
         else
             return runFlow20(flowURL, token, verbose);
     }
-    
+
     private WBWebUIInfo runFlow14(String flowURL, String token, boolean verbose)
         throws SessionExpiredException, MeandreCommunicationException {
-        
+
         int TIMEOUT = 10000; // 10 seconds timeout waiting for flow execution status
         int POLL_FREQ = 500; // poll for execution status every 500ms
 
@@ -604,7 +604,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
             throw new MeandreCommunicationException(e);
         }
     }
-    
+
     private WBWebUIInfo runFlow20(String flowURL, String token, boolean verbose)
         throws SessionExpiredException, MeandreCommunicationException {
 
@@ -614,7 +614,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         try {
             String jobID = clientv2.submitJob(flowURL);
             String status;
-            
+
             // Wait for job to get to "Running" state
             while (!(status = clientv2.retrieveJobStatus(jobID)).equals("Running")) {
                 if (status.equals("Aborted") || status.equals("Failed") || status.equals("Killed"))
@@ -626,7 +626,7 @@ public class Repository extends RemoteServiceServlet implements IRepository {
             // FIXME having a status of Running doesn't actually mean the flow is ready to serve requests;
             //       the execution engine takes time to actually start the flow;  how to reliably detect when
             //       flow is actually running?
-            
+
             return new WBWebUIInfo(clientv2.getHostName(), clientv2.getPort()+1, token, jobID);
         }
         catch (Exception e) {
@@ -650,10 +650,10 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         try {
             MeandreClient clientv2 = (MeandreClient)getClient();
             String status = clientv2.retrieveJobStatus(jobID);
-            
+
             if (status.equals("Aborted") || status.equals("Failed") || status.equals("Killed") || status.equals("Done"))
                 return null;
-            
+
             return "";
         }
         catch (Exception e) {
@@ -749,8 +749,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
 
     public boolean abortFlow(WBWebUIInfo flowInfo)
         throws SessionExpiredException, MeandreCommunicationException {
-        
-        if (getHttpSession().getAttribute("version").toString().startsWith("1.4")) 
+
+        if (getHttpSession().getAttribute("version").toString().startsWith("1.4"))
             return abortFlow14(flowInfo);
         else
             return abortFlow20(flowInfo);
