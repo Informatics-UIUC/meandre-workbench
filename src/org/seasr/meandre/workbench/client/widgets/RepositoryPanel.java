@@ -152,7 +152,7 @@ public class RepositoryPanel extends Panel {
             gridView.setGroupTextTpl("{text} ({[values.rs.length]} {[values.rs.length > 1 ?  \"Items\" : \"Item\"]})");
             gridView.setEmptyText("No components found");
 
-            ColumnConfig ccIcon = new ColumnConfig("Icon", "runnable", 24, false, new Renderer() {
+            ColumnConfig ccIcon = new ColumnConfig("Icon", "runnable", 26, false, new Renderer() {
                 public String render(Object value,
                         CellMetadata cellMetadata, Record record,
                         int rowIndex, int colNum, Store store) {
@@ -302,7 +302,7 @@ public class RepositoryPanel extends Panel {
             gridView.setGroupTextTpl("{text} ({[values.rs.length]} {[values.rs.length > 1 ?  \"Items\" : \"Item\"]})");
             gridView.setEmptyText("No flows found");
 
-            ColumnConfig ccIcon = new ColumnConfig("Icon", "name", 24, false, new Renderer() {
+            ColumnConfig ccIcon = new ColumnConfig("Icon", "name", 26, false, new Renderer() {
                 public String render(Object value,
                         CellMetadata cellMetadata, Record record,
                         int rowIndex, int colNum, Store store) {
