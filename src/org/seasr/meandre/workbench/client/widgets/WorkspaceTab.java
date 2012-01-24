@@ -635,15 +635,15 @@ public class WorkspaceTab extends Panel {
 
             @Override
             public void onClicked(Component component, EventObject e) {
+                for (WorkspaceActionListener listener : _actionListeners)
+                    listener.onComponentClicked(component);
+
                 if (component.isSelected()) {
                     if (e.isCtrlKey())
                         component.unselect();
                 }
                 else
                     component.select();
-
-                for (WorkspaceActionListener listener : _actionListeners)
-                    listener.onComponentClicked(component);
             }
 
             @Override

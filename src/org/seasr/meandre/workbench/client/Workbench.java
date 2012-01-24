@@ -680,6 +680,13 @@ public class Workbench extends Application {
         final WorkspaceTab workspaceTab = new WorkspaceTab(flow);
         _mainPanel.getWorkspacePanel().getOutputPanel().add(workspaceTab.getFlowOutputPanel());
         workspaceTab.addListener(new WorkspaceActionListenerAdapter() {
+
+            @Override
+            public void onComponentClicked(Component component) {
+                // stop any active editing
+                _mainPanel.getDetailsPanel().getPropPanel().stopEditing();
+            }
+
             /**
              * Shows the details for the selected component
              *
