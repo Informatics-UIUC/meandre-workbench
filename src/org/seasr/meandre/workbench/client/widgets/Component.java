@@ -68,7 +68,6 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.gwtext.client.core.EventCallback;
 import com.gwtext.client.core.EventObject;
-import com.gwtext.client.core.Ext;
 import com.gwtext.client.core.Function;
 import com.gwtext.client.core.FxConfig;
 import com.gwtext.client.dd.DD;
@@ -340,6 +339,18 @@ public class Component extends VerticalContainerPanel {
                 setCallback(function);
             }
         });
+    }
+
+    public void setDrag(boolean isBeingDragged) {
+        if (isBeingDragged) {
+            DOM.setIntStyleAttribute(getElement(), "zIndex", 999);
+            this.addClass("component-dragging");
+            _isBeingDragged = true;
+        } else {
+            DOM.setIntStyleAttribute(getElement(), "zIndex", 0);
+            this.removeClass("component-dragging");
+            _isBeingDragged = false;
+        }
     }
 
     public void select() {
@@ -677,25 +688,20 @@ public class Component extends VerticalContainerPanel {
 
         @Override
         public void startDrag(int x, int y) {
-            DOM.setIntStyleAttribute(getEl(), "zIndex", 999);
-            Ext.get(getEl()).addClass("component-dragging");
-            _isBeingDragged = true;
+            for (ComponentActionListener listener : _actionListeners)
+                listener.onStartDrag(Component.this, x, y);
         }
 
         @Override
         public void endDrag(EventObject e) {
-            DOM.setIntStyleAttribute(getEl(), "zIndex", 0);
-            Ext.get(getEl()).removeClass("component-dragging");
-            _isBeingDragged = false;
-
             for (ComponentActionListener listener : _actionListeners)
-                listener.onDragged(Component.this);
+                listener.onDragged(Component.this, e.getXY()[0], e.getXY()[1]);
         }
 
         @Override
         public void onDrag(EventObject e) {
             for (ComponentActionListener listener : _actionListeners)
-                listener.onDragging(Component.this);
+                listener.onDragging(Component.this, e.getXY()[0], e.getXY()[1]);
         }
     }
 }

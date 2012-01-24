@@ -58,8 +58,9 @@ public interface ComponentActionListener {
 
     public void onClicked(Component component, EventObject e);
 
-    public void onDragging(Component component);
-    public void onDragged(Component component);
+    public void onStartDrag(Component component, int x, int y);
+    public void onDragging(Component component, int x, int y);
+    public void onDragged(Component component, int x, int y);
 
     public void onPortSelected(ComponentPort port);
     public void onPortUnselected(ComponentPort port);

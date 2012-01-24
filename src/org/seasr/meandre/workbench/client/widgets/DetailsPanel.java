@@ -44,10 +44,10 @@ package org.seasr.meandre.workbench.client.widgets;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.seasr.meandre.workbench.client.RepositoryState;
 import org.seasr.meandre.workbench.client.beans.repository.WBDataPortDescription;
@@ -183,14 +183,32 @@ public class DetailsPanel extends Panel {
             setSource(editablePropMap);
         }
 
-        public void reset() {
+        public void showMessage(String message) {
+            getView().setEmptyText(message);
             setSource(new NameValuePair[] {});
+        }
+
+        public void reset() {
+            showMessage("No properties to display");
         }
 
     }
 
-    public void view(WorkspaceTab tab, Component component) {
+    public void view(WorkspaceTab tab, Set<Component> components) {
+        if (components.isEmpty()) {
+            reset();
+            return;
+        }
+
         _focusedTab = tab;
+
+        if (components.size() > 1) {
+            _propPanel.showMessage(components.size() + " components selected");
+            _docPanel.setHtml("");
+            return;
+        }
+
+        Component component = components.iterator().next();
 
         WBExecutableComponentDescription compDesc =
             _repositoryState.getComponent(component.getInstanceDescription().getExecutableComponent());

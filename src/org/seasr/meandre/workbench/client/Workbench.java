@@ -45,6 +45,7 @@ package org.seasr.meandre.workbench.client;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBConnectorDescription;
@@ -316,7 +317,7 @@ public class Workbench extends Application {
             @Override
             public boolean doBeforeTabChange(WorkspaceTab oldTab, WorkspaceTab newTab) {
                 // if there's something selected in the old tab, reset state to default
-                if (oldTab != null && oldTab.getSelectedComponent() != null)
+                if (oldTab != null && oldTab.getSelectedComponents().size() > 0)
                     resetDetails();
 
                 return super.doBeforeTabChange(oldTab, newTab);
@@ -332,8 +333,8 @@ public class Workbench extends Application {
                 // bring the output panel associated with this tab into the foreground
                 workspacePanel.getOutputPanel().setActiveItemID(tab.getFlowOutputPanel().getId());
                 // restore any visual selections
-                if (tab.getSelectedComponent() != null)
-                    showDetails(tab, tab.getSelectedComponent());
+                if (tab.getSelectedComponents().size() > 0)
+                    showDetails(tab, tab.getSelectedComponents());
             }
         });
 
@@ -694,7 +695,7 @@ public class Workbench extends Application {
              */
             @Override
             public void onComponentSelected(Component component) {
-                showDetails(workspaceTab, component);
+                showDetails(workspaceTab, workspaceTab.getSelectedComponents());
             }
 
             /**
@@ -704,7 +705,7 @@ public class Workbench extends Application {
              */
             @Override
             public void onComponentUnselected(Component component) {
-                resetDetails();
+                showDetails(workspaceTab, workspaceTab.getSelectedComponents());
             }
 
             @Override
@@ -1081,9 +1082,9 @@ public class Workbench extends Application {
      * @param tab The tab corresponding to the open flow
      * @param component The selected component
      */
-    private void showDetails(WorkspaceTab tab, Component component) {
+    private void showDetails(WorkspaceTab tab, Set<Component> components) {
         clearRepositoryGridSelections();
-        _mainPanel.getDetailsPanel().view(tab, component);
+        _mainPanel.getDetailsPanel().view(tab, components);
     }
 
     /**

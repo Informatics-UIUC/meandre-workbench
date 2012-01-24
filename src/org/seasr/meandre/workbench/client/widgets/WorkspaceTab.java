@@ -76,7 +76,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.Direction;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Function;
-import com.gwtext.client.core.Margins;
 import com.gwtext.client.data.Record;
 import com.gwtext.client.dd.DragData;
 import com.gwtext.client.dd.DragSource;
@@ -115,7 +114,6 @@ public class WorkspaceTab extends Panel {
     private final Map<AbstractConnection, WBConnectorDescription> _connectionMap;
     private final Set<WorkspaceActionListener> _actionListeners = new HashSet<WorkspaceActionListener>();
     private final FlowOutputPanel _outputPanel = new FlowOutputPanel();
-    private Component _selectedComponent = null;
     private ComponentPort _selectedPort = null;
     private WorkspacePanel _parent = null;
     private boolean _dirty = false;
@@ -207,8 +205,8 @@ public class WorkspaceTab extends Panel {
         _btnRemoveComponent.addListener(new ButtonListenerAdapter() {
             @Override
             public void onClick(Button button, EventObject e) {
-                if (_selectedComponent != null)
-                    removeComponent(_selectedComponent);
+                for (Component selectedComponent : getSelectedComponents())
+                    removeComponent(selectedComponent);
             }
         });
 
@@ -560,8 +558,7 @@ public class WorkspaceTab extends Panel {
         if (_isClosing || !isDirty()) {
             // unselect any selected components
             // (causes the details panel to clear if any components were previously selected)
-            if (_selectedComponent != null)
-                _selectedComponent.unselect();
+            clearSelection();
 
             return true;
         }
@@ -631,27 +628,39 @@ public class WorkspaceTab extends Panel {
         _componentMap.put(component.getInstanceDescription(), component);
 
         component.addListener(new ComponentActionListenerAdapter() {
-            private int[] _compPosition = null;
+            private int[] _startDragPosition = null;
+            private int[] _dragPosition = null;
+            private boolean _dragOccurred = false;
 
             @Override
             public void onClicked(Component component, EventObject e) {
+                if (_dragOccurred) {
+                    // disregard the first click event occurring after a drag event
+                    _dragOccurred = false;
+                    return;
+                }
+
+                Log.debug("onClicked: " + component.getName() + "  startDrag=" + _startDragPosition);
+
                 for (WorkspaceActionListener listener : _actionListeners)
                     listener.onComponentClicked(component);
 
-                if (component.isSelected()) {
-                    if (e.isCtrlKey())
+                if (e.isCtrlKey()) {
+                    if (component.isSelected())
                         component.unselect();
-                }
-                else
+                    else
+                        component.select();
+                } else {
+                    clearSelection();
                     component.select();
+                }
             }
 
             @Override
             public void onSelected(Component component) {
                 component.getEl().scrollIntoView(WorkspaceTab.this.getBody().getDOM(), true);
 
-                clearSelection();
-                _selectedComponent = component;
+                _selectedComponents.add(component);
                 _btnRemoveComponent.enable();
 
                 for (WorkspaceActionListener listener : _actionListeners)
@@ -660,32 +669,66 @@ public class WorkspaceTab extends Panel {
 
             @Override
             public void onUnselected(Component component) {
-                _selectedComponent = null;
-                _btnRemoveComponent.disable();
+                _selectedComponents.remove(component);
+
+                if (_selectedComponents.isEmpty())
+                    _btnRemoveComponent.disable();
 
                 for (WorkspaceActionListener listener : _actionListeners)
                     listener.onComponentUnselected(component);
             }
 
             @Override
-            public void onDragging(Component component) {
-                if (_compPosition == null)
-                    _compPosition = getComponentRelativeLocation(component);
+            public void onStartDrag(Component component, int x, int y) {
+                _dragOccurred = true;
 
-                component.updateConnections();
+                if (!component.isSelected()) {
+                    clearSelection();
+                    component.select();
+                }
+
+                for (Component selectedComponent : getSelectedComponents())
+                    selectedComponent.setDrag(true);
+
+                _startDragPosition = component.getPosition(true);
+                _dragPosition = component.getPosition(true);
+
+//                int[] xy = _startDragPosition;
+//                Log.debug("onStartDrag: (" + xy[0] + "," + xy[1] + ")");
+            }
+
+            @Override
+            public void onDragging(Component component, int x, int y) {
+                int xy[] = component.getPosition(true);
+                int[] delta = new int[] { xy[0] - _dragPosition[0], xy[1] - _dragPosition[1] };
+                _dragPosition = xy;
+
+//                Log.debug("onDragging: delta=(" + delta[0] + "," + delta[1] + ")");
+
+                for (Component selectedComponent : getSelectedComponents()) {
+                    if (selectedComponent != component) {
+                        xy = selectedComponent.getPosition(true);
+                        selectedComponent.setPosition(xy[0] + delta[0], xy[1] + delta[1]);
+                    }
+                    selectedComponent.updateConnections();
+                }
 
                 for (WorkspaceActionListener listener : _actionListeners)
                     listener.onComponentDragging(component);
             }
 
             @Override
-            public void onDragged(Component component) {
-                int xy[] = getComponentRelativeLocation(component);
+            public void onDragged(Component component, int x, int y) {
+                int xy[] = component.getPosition(true);
+//                Log.debug("onDragged: (" + xy[0] + "," + xy[1] + ")");
+
+                for (Component selectedComponent : getSelectedComponents())
+                    selectedComponent.setDrag(false);
 
                 for (WorkspaceActionListener listener : _actionListeners)
                     listener.onComponentDragged(component);
 
-                if (_compPosition != null && (_compPosition[0] != xy[0] || _compPosition[1] != xy[1])) {
+                if (_startDragPosition != null && (_startDragPosition[0] != xy[0] || _startDragPosition[1] != xy[1])) {
                     WBExecutableComponentInstanceDescription compInstance = component.getInstanceDescription();
                     compInstance.getProperties().add(COMP_LEFT_KEY, Integer.toString(xy[0]));
                     compInstance.getProperties().add(COMP_TOP_KEY, Integer.toString(xy[1]));
@@ -693,7 +736,8 @@ public class WorkspaceTab extends Panel {
                     setDirty();
                 }
 
-                _compPosition = null;
+                _startDragPosition = null;
+                _dragPosition = null;
             }
 
             @Override
@@ -864,28 +908,6 @@ public class WorkspaceTab extends Panel {
             setDirty();
     }
 
-    protected int[] getComponentRelativeLocation(Component component) {
-        int[] absPos = component.getPosition();
-        int[] scroll = getBody().getScroll();
-
-        absPos[0] += scroll[0];
-        absPos[1] += scroll[1];
-
-        Margins margins = component.getEl().getMargins();
-        int left = getRelativeLeft(absPos[0] - margins.getLeft());
-        int top = getRelativeTop(absPos[1] - margins.getTop());
-
-        return new int[] { left, top };
-    }
-
-    private int getRelativeLeft(int absoluteLeft) {
-        return absoluteLeft - getBody().getLeft();
-    }
-
-    private int getRelativeTop(int absoluteTop) {
-        return absoluteTop - getBody().getTop();
-    }
-
     private int[] getRandomCompPosition() {
         return new int[] { Random.nextInt(500), Random.nextInt(500) };
     }
@@ -1038,8 +1060,8 @@ public class WorkspaceTab extends Panel {
     }
 
     public void removeComponent(final Component component) {
-        if (component == _selectedComponent)
-            _selectedComponent.unselect();
+        if (getSelectedComponents().contains(component))
+            component.unselect();
 
         component.disconnect();
         remove(component);
@@ -1065,13 +1087,15 @@ public class WorkspaceTab extends Panel {
         setDirty();
     }
 
-    public Component getSelectedComponent() {
-        return _selectedComponent;
+    private final Set<Component> _selectedComponents = new HashSet<Component>();
+
+    public Set<Component> getSelectedComponents() {
+        return _selectedComponents;
     }
 
     public void clearSelection() {
-        if (_selectedComponent != null)
-            _selectedComponent.unselect();
+        for (Component selectedComponent : _selectedComponents)
+            selectedComponent.unselect();
     }
 
     public void checkValid() {
