@@ -111,6 +111,14 @@
 	background-image: url(images/gear_delete.png) !important;
 }
 
+.icon-copy {
+    background-image: url(images/copy.png) !important;
+}
+
+.icon-paste {
+    background-image: url(images/paste.png) !important;
+}
+
 .icon-flow-run {
 	background-image: url(images/gears_run.png) !important;
 }

@@ -42,13 +42,16 @@
 
 package org.seasr.meandre.workbench.client.widgets;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.seasr.meandre.workbench.client.Application;
+import org.seasr.meandre.workbench.client.Clipboard;
 import org.seasr.meandre.workbench.client.RepositoryState;
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBConnectorDescription;
@@ -57,6 +60,7 @@ import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponent
 import org.seasr.meandre.workbench.client.beans.repository.WBFlowDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBPropertiesDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBPropertiesDescriptionDefinition;
+import org.seasr.meandre.workbench.client.listeners.ClipboardListener;
 import org.seasr.meandre.workbench.client.listeners.ComponentActionListenerAdapter;
 import org.seasr.meandre.workbench.client.listeners.SaveFlowListener;
 import org.seasr.meandre.workbench.client.listeners.WorkspaceActionListener;
@@ -103,7 +107,7 @@ import com.gwtext.client.widgets.menu.event.MenuListenerAdapter;
  * @author Boris Capitanu
  *
  */
-public class WorkspaceTab extends Panel {
+public class WorkspaceTab extends Panel implements ClipboardListener {
     private final static String COMP_TOP_KEY = "wb_top_pix_pos";
     private final static String COMP_LEFT_KEY = "wb_left_pix_pos";
 
@@ -125,9 +129,11 @@ public class WorkspaceTab extends Panel {
     private final ToolbarButton _btnSave = new ToolbarButton("Save");
     private final ToolbarButton _btnSaveAs = new ToolbarButton("Save As");
     private final ToolbarButton _btnRemoveComponent = new ToolbarButton("Remove");
+    private final ToolbarButton _btnCopy = new ToolbarButton("Copy");
+    private final ToolbarButton _btnPaste = new ToolbarButton("Paste");
 
     private final RepositoryState _repositoryState = RepositoryState.getInstance();
-
+    private final Clipboard _clipboard = Clipboard.getInstance();
 
     public WorkspaceTab(final WBFlowDescription flow) {
         if (flow == null) {
@@ -210,6 +216,107 @@ public class WorkspaceTab extends Panel {
             }
         });
 
+        _btnCopy.setIconCls("icon-copy");
+        _btnCopy.disable();
+        _btnCopy.addListener(new ButtonListenerAdapter() {
+            @Override
+            public void onClick(Button button, EventObject e) {
+                List<WBExecutableComponentInstanceDescription> components = new ArrayList<WBExecutableComponentInstanceDescription>();
+                Set<String> executableComponentInstances = new HashSet<String>();
+
+                for (Component selectedComponent : getSelectedComponents()) {
+                    WBExecutableComponentInstanceDescription instanceDescription = selectedComponent.getInstanceDescription();
+                    components.add(instanceDescription.clone());
+                    executableComponentInstances.add(instanceDescription.getExecutableComponentInstance());
+                }
+
+                List<WBConnectorDescription> connectors = new ArrayList<WBConnectorDescription>();
+                for (WBConnectorDescription connector : _wbFlow.getConnectorDescriptions())
+                    if (executableComponentInstances.contains(connector.getSourceInstance()) &&
+                            executableComponentInstances.contains(connector.getTargetInstance()))
+                        connectors.add(connector.clone());
+
+                _clipboard.put(components, connectors);
+            }
+        });
+
+        _btnPaste.setIconCls("icon-paste");
+        if (_clipboard.isEmpty())
+            _btnPaste.disable();
+        else
+            _btnPaste.enable();
+
+        _btnPaste.addListener(new ButtonListenerAdapter() {
+            @Override
+            public void onClick(Button button, EventObject e) {
+                List<WBExecutableComponentInstanceDescription> components = _clipboard.getComponents();
+                List<WBConnectorDescription> connectors = _clipboard.getConnectors();
+
+                Map<String, String> rewriteMap = new HashMap<String, String>();
+
+                clearSelection();
+
+                for (WBExecutableComponentInstanceDescription compInstance : components) {
+                    WBExecutableComponentDescription compDesc =
+                            _repositoryState.getComponent(compInstance.getExecutableComponent());
+                    if (compDesc == null) {
+                        Log.error("Could not find the component: " + compInstance.getExecutableComponent());
+                        Window.alert("Component: " + compInstance.getExecutableComponent() + " was not found in the repository!");
+                        continue;
+                    }
+
+                    WBExecutableComponentInstanceDescription newCompInstance = createComponentInstance(compDesc);
+                    newCompInstance.setName(compInstance.getName());
+                    newCompInstance.setDescription(compInstance.getDescription());
+                    newCompInstance.setProperties(compInstance.getProperties().clone());
+
+                    rewriteMap.put(compInstance.getExecutableComponentInstance(), newCompInstance.getExecutableComponentInstance());
+
+                    Component newComponent = new Component(newCompInstance, compDesc);
+                    addComponent(newComponent, true);
+
+                    newComponent.select();
+                }
+
+                String baseURI = _wbFlow.getNormalizedFlowURI() + "connector/";
+
+                final List<AbstractConnection> connections = new ArrayList<AbstractConnection>();
+                for (WBConnectorDescription connector : connectors) {
+                    // Create a unique URI
+                    String resURI;
+                    do {
+                        resURI = baseURI + _connectorCount++;
+                    }
+                    while (connectorIsNotUnique(resURI));
+
+                    connector = connector.clone();
+                    connector.setConnector(resURI);
+                    connector.setSourceInstance(rewriteMap.get(connector.getSourceInstance()));
+                    connector.setTargetInstance(rewriteMap.get(connector.getTargetInstance()));
+
+                    _wbFlow.getConnectorDescriptions().add(connector);
+                    connections.add(createConnection(connector));
+                }
+
+                int[] scroll = getBody().getScroll();
+
+                doLayout();
+
+                getBody().scroll(Direction.LEFT, scroll[0], false);
+                getBody().scroll(Direction.DOWN, scroll[1], false);
+
+                // Perform lazy add of connections since they don't get rendered otherwise
+                DeferredCommand.addCommand(new Command() {
+                    public void execute() {
+                        for (AbstractConnection connection : connections)
+                            connection.addTo(WorkspaceTab.this);
+                    }
+                });
+            }
+        });
+
+        _clipboard.addListener(this);
+
         _btnRunFlow.setIconCls("icon-flow-run");
         _btnRunFlow.addListener(new ButtonListenerAdapter() {
             @Override
@@ -235,6 +342,8 @@ public class WorkspaceTab extends Panel {
         toolbar.addButton(_btnSaveAs);
         toolbar.addButton(_btnExport);
         toolbar.addSeparator();
+        toolbar.addButton(_btnCopy);
+        toolbar.addButton(_btnPaste);
         toolbar.addButton(_btnRemoveComponent);
         toolbar.addFill();
         toolbar.addButton(_btnRunFlow);
@@ -496,6 +605,7 @@ public class WorkspaceTab extends Panel {
     protected void beforeDestroy() {
         Log.debug("Destroying tab '" + getTitle() + "'");
         _actionListeners.clear();
+        _clipboard.removeListener(this);
 
         super.beforeDestroy();
     }
@@ -516,6 +626,17 @@ public class WorkspaceTab extends Panel {
         TAB_COUNTER++;
 
         return name;
+    }
+
+    public void onCopyToClipboard() {
+        Log.debug("onCopyToClipboard: " + this.getTitle() + ":  components=" +
+                _clipboard.getComponents().size() + "  connectors=" + _clipboard.getConnectors().size());
+        _btnPaste.enable();
+    }
+
+    public void onClipboardReset() {
+        Log.debug("onCopyToClipboard: " + this.getTitle() + ": Clipboard empty");
+        _btnPaste.disable();
     }
 
     public boolean isDirty() {
@@ -640,7 +761,7 @@ public class WorkspaceTab extends Panel {
                     return;
                 }
 
-                Log.debug("onClicked: " + component.getName() + "  startDrag=" + _startDragPosition);
+//                Log.debug("onClicked: " + component.getName() + "  startDrag=" + _startDragPosition);
 
                 for (WorkspaceActionListener listener : _actionListeners)
                     listener.onComponentClicked(component);
@@ -662,6 +783,7 @@ public class WorkspaceTab extends Panel {
 
                 _selectedComponents.add(component);
                 _btnRemoveComponent.enable();
+                _btnCopy.enable();
 
                 for (WorkspaceActionListener listener : _actionListeners)
                     listener.onComponentSelected(component);
@@ -671,8 +793,10 @@ public class WorkspaceTab extends Panel {
             public void onUnselected(Component component) {
                 _selectedComponents.remove(component);
 
-                if (_selectedComponents.isEmpty())
+                if (_selectedComponents.isEmpty()) {
                     _btnRemoveComponent.disable();
+                    _btnCopy.disable();
+                }
 
                 for (WorkspaceActionListener listener : _actionListeners)
                     listener.onComponentUnselected(component);
@@ -800,14 +924,6 @@ public class WorkspaceTab extends Panel {
                 }
             }
 
-            private boolean connectorIsNotUnique(String resURI) {
-                for (WBConnectorDescription connector : _connectionMap.values())
-                    if (connector.getConnector().equalsIgnoreCase(resURI))
-                        return true;
-
-                return false;
-            }
-
             @Override
             public void onPortUnselected(ComponentPort port) {
                 if (_selectedPort == port)
@@ -906,6 +1022,14 @@ public class WorkspaceTab extends Panel {
 
         if (setDirty)
             setDirty();
+    }
+
+    private boolean connectorIsNotUnique(String resURI) {
+        for (WBConnectorDescription connector : _connectionMap.values())
+            if (connector.getConnector().equalsIgnoreCase(resURI))
+                return true;
+
+        return false;
     }
 
     private int[] getRandomCompPosition() {
