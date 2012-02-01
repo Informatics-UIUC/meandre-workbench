@@ -40,16 +40,15 @@
  * WITH THE SOFTWARE.
  */
 
-package org.seasr.meandre.workbench.client.listeners;
+package org.seasr.meandre.workbench.client.widgets;
 
-/**
- * @author Boris Capitanu
- *
- */
-public interface MainPanelActionListener {
+import com.gwtextux.client.widgets.image.Image;
 
-    public void onLogout();
-    public void onCredits();
-    public void onSettings();
+
+@SuppressWarnings("unchecked")
+public abstract class CompBoxPanel extends ContainerPanel {
+
+    public abstract ContainerPanel getTopBand();
+    public abstract Image getImageIcon();
 
 }

@@ -51,10 +51,13 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.seasr.meandre.workbench.client.Workbench;
+import org.seasr.meandre.workbench.client.beans.ComponentColor;
 import org.seasr.meandre.workbench.client.beans.repository.WBDataPortDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentInstanceDescription;
 import org.seasr.meandre.workbench.client.listeners.ComponentActionListener;
+import org.seasr.meandre.workbench.client.listeners.SettingsListener;
 
 import pl.balon.gwt.diagrams.client.connection.Connection;
 import pl.balon.gwt.diagrams.client.connection.RectilinearTwoEndedConnection;
@@ -65,7 +68,6 @@ import pl.balon.gwt.diagrams.client.connector.UIObjectConnector;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.gwtext.client.core.EventCallback;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Function;
@@ -80,6 +82,7 @@ import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 import com.gwtext.client.widgets.menu.event.MenuListenerAdapter;
+import com.gwtextux.client.widgets.image.Image;
 
 /**
  * @author Boris Capitanu
@@ -99,9 +102,17 @@ public class Component extends VerticalContainerPanel {
     private String _tfComponentNameValue;
     private boolean _isBeingRenamed = false;
     private boolean _isBeingDragged = false;
+    private String _category = null;
+    private final SettingsListener _settingsListener;
 
     public Component(final WBExecutableComponentInstanceDescription compInstance, final WBExecutableComponentDescription compDesc) {
         _compInstance = compInstance;
+
+        for (String tag : compDesc.getTags().getTags())
+            if (tag.startsWith("_") && tag.endsWith("_")) {
+                _category = tag;
+                break;
+            }
 
         setCls("component");
 
@@ -139,26 +150,45 @@ public class Component extends VerticalContainerPanel {
             vpOutputs.add(compOutputPort);
         }
 
-        ContainerPanel compBox = new ContainerPanel() {
+        final CompBoxPanel compBox = new CompBoxPanel() {
+            final ContainerPanel _topBand;
+            final Image _imgIcon;
+
             {
+                Map<String, ComponentColor> componentCategoryColors = Workbench.Settings.getComponentCategoryColors();
+                final ComponentColor componentColor = (_category != null && componentCategoryColors.containsKey(_category)) ?
+                        componentCategoryColors.get(_category) : componentCategoryColors.get("_");
+
                 setCls("component-box");
 
-                ContainerPanel topBand = new ContainerPanel();
-                topBand.setCls("component-box-topband");
-                add(topBand);
+                _topBand = new ContainerPanel();
+                _topBand.setCls("component-box-topband");
+                _topBand.doOnRender(new Function() {
+                    public void execute() {
+                        getTopBand().getEl().setStyle("background-color", componentColor.getTopBandColor());
+                    }
+                });
+                add(_topBand);
 
-                Image imgIcon = new Image("images/gear.png");
-                imgIcon.setStyleName("component-box-icon");
-                add(imgIcon);
+                _imgIcon = new Image("icon", "images/gear.png");
+                _imgIcon.setCls("component-box-icon");
+                _imgIcon.doOnRender(new Function() {
+                    public void execute() {
+                        getImageIcon().getEl().setStyle("border-color", componentColor.getBorderColor());
+                    }
+                });
+                add(_imgIcon);
 
                 if (!compDesc.getProperties().getKeys().isEmpty()) {
-                    Image imgProps = new Image("images/component-props.png");
-                    imgProps.setStyleName("component-box-prop");
+                    Image imgProps = new Image("props", "images/component-props.png");
+                    imgProps.setCls("component-box-prop");
                     add(imgProps);
                 }
 
                 doOnRender(new Function() {
                     public void execute() {
+                        getEl().setStyle("background-color", componentColor.getMainColor());
+                        getEl().setStyle("border-color", componentColor.getBorderColor());
                         getEl().addListener("contextmenu", new EventCallback() {
                             public void execute(EventObject e) {
                                 if (_contextMenu != null) {
@@ -169,8 +199,33 @@ public class Component extends VerticalContainerPanel {
                         });
                     }
                 });
+
+
+            }
+
+            @Override
+            public ContainerPanel getTopBand() {
+                return _topBand;
+            }
+
+            @Override
+            public Image getImageIcon() {
+                return _imgIcon;
             }
         };
+
+        _settingsListener = new SettingsListener() {
+            public void onComponentCategoryColorsChanged(Map<String, ComponentColor> categoryColors) {
+                ComponentColor componentColor = (_category != null && categoryColors.containsKey(_category)) ?
+                        categoryColors.get(_category) : categoryColors.get("_");
+                compBox.getEl().setStyle("background-color", componentColor.getMainColor());
+                compBox.getTopBand().getEl().setStyle("background-color", componentColor.getTopBandColor());
+                compBox.getEl().setStyle("border-color", componentColor.getBorderColor());
+                compBox.getImageIcon().getEl().setStyle("border-color", componentColor.getBorderColor());
+            }
+        };
+
+        Workbench.Settings.addListener(_settingsListener);
 
         HorizontalPanel compPanel = new HorizontalPanel();
         compPanel.setSpacing(1);
@@ -283,6 +338,9 @@ public class Component extends VerticalContainerPanel {
         _actionListeners.clear();
         _inputs.clear();
         _outputs.clear();
+
+        Log.debug("Removing settings listener");
+        Workbench.Settings.removeListener(_settingsListener);
 
         super.beforeDestroy();
     }

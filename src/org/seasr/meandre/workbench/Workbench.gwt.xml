@@ -18,6 +18,7 @@
 
       <!-- Inherit the core Web Toolkit stuff.                        -->
       <inherits name='com.google.gwt.user.User'/>
+      <inherits name="com.google.gwt.json.JSON"/>
 
       <!-- Other module inherits                                      -->
       <inherits name='com.allen_sauer.gwt.log.gwt-log' />
@@ -28,6 +29,6 @@
       <inherits name='pl.balon.gwt.diagrams.Diagrams'/>
       <inherits name='com.gwtext.GwtExt'/>
       <inherits name='com.gwtextux.GwtExtUx'/>
-      <inherits name='com.gwtextux.GridSearchPlugin'/>
-
+      <inherits name="com.gwtextux.GridSearchPlugin"/>
+      <inherits name="com.gwtextux.GridCellActionsPlugin"/>
 </module>

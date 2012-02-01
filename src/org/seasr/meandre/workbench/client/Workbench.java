@@ -47,6 +47,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.seasr.meandre.workbench.client.beans.WBSettings;
 import org.seasr.meandre.workbench.client.beans.execution.WBWebUIInfo;
 import org.seasr.meandre.workbench.client.beans.repository.WBConnectorDescription;
 import org.seasr.meandre.workbench.client.beans.repository.WBExecutableComponentDescription;
@@ -79,11 +80,13 @@ import org.seasr.meandre.workbench.client.widgets.RepositoryPanel;
 import org.seasr.meandre.workbench.client.widgets.RepositoryPanel.ComponentsGrid;
 import org.seasr.meandre.workbench.client.widgets.RepositoryPanel.FlowsGrid;
 import org.seasr.meandre.workbench.client.widgets.RepositoryPanel.LocationsGrid;
+import org.seasr.meandre.workbench.client.widgets.SettingsDialog;
 import org.seasr.meandre.workbench.client.widgets.WorkspacePanel;
 import org.seasr.meandre.workbench.client.widgets.WorkspaceTab;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Location;
@@ -113,9 +116,11 @@ import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 public class Workbench extends Application {
 
     private static int TIMEOUT_RETRIEVE_FLOW_OUTPUT = 1000;  // in milliseconds
+    public static final String WB_SETTINGS_COOKIE_NAME = "wbSettings";
 
     private static Workbench _workbench;
     private static final IRepositoryAsync Repository = IRepository.Util.getInstance();
+    public static WBSettings Settings;
 
     private final RepositoryState _repositoryState = RepositoryState.getInstance();
     private MainPanel _mainPanel;
@@ -219,6 +224,13 @@ public class Workbench extends Application {
      */
     protected void onLoginSuccess(WBSession session) {
         _session = session;
+
+        String strSettings = Cookies.getCookie("wbSettings");
+        if (strSettings == null) {
+            strSettings = WBSettings.DEFAULT_SETTINGS;
+            Cookies.setCookie(WB_SETTINGS_COOKIE_NAME, strSettings);
+        }
+        Workbench.Settings = WBSettings.fromJSON(strSettings);
 
         // remove all visual elements
         RootPanel.get().clear();
@@ -642,6 +654,13 @@ public class Workbench extends Application {
                     _creditsDialog = new CreditsDialog();
 
                 _creditsDialog.show();
+            }
+
+            /**
+             * Presents the application settings screen
+             */
+            public void onSettings() {
+                new SettingsDialog(Settings).show();
             }
         });
 

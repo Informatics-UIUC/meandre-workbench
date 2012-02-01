@@ -42,14 +42,16 @@
 
 package org.seasr.meandre.workbench.client.listeners;
 
+import java.util.Map;
+
+import org.seasr.meandre.workbench.client.beans.ComponentColor;
+
 /**
  * @author Boris Capitanu
- *
  */
-public interface MainPanelActionListener {
 
-    public void onLogout();
-    public void onCredits();
-    public void onSettings();
+public interface SettingsListener {
+
+    public void onComponentCategoryColorsChanged(Map<String, ComponentColor> categoryColors);
 
 }

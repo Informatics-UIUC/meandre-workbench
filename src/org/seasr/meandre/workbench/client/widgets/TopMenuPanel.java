@@ -76,6 +76,14 @@ public class TopMenuPanel extends ContainerPanel {
                 hpMenu.setVerticalAlignment(HorizontalPanel.ALIGN_BOTTOM);
                 hpMenu.setStyleName("top-header-menu");
 
+                Label lblSettings = new Label("settings");
+                lblSettings.setStyleName("top-header-menu-items");
+                lblSettings.addClickListener(new ClickListener() {
+                    public void onClick(Widget sender) {
+                        actionListener.onSettings();
+                    }
+                });
+
                 Label lblCredits = new Label("credits");
                 lblCredits.setStyleName("top-header-menu-items");
                 lblCredits.addClickListener(new ClickListener() {
@@ -88,6 +96,8 @@ public class TopMenuPanel extends ContainerPanel {
                 lblSeparator1.setStyleName("top-header-menu-separator");
                 Label lblSeparator2 = new Label("|");
                 lblSeparator2.setStyleName("top-header-menu-separator");
+                Label lblSeparator3 = new Label("|");
+                lblSeparator3.setStyleName("top-header-menu-separator");
 
                 Label lblLogout = new Label("logout");
                 lblLogout.setStyleName("top-header-menu-items");
@@ -107,8 +117,10 @@ public class TopMenuPanel extends ContainerPanel {
 
                 hpMenu.add(lblCredits);
                 hpMenu.add(lblSeparator1);
-                hpMenu.add(lblLogout);
+                hpMenu.add(lblSettings);
                 hpMenu.add(lblSeparator2);
+                hpMenu.add(lblLogout);
+                hpMenu.add(lblSeparator3);
                 hpMenu.add(lblLoginInfo);
 
                 ContainerPanel imgContainer = new ContainerPanel();

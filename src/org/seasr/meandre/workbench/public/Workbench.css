@@ -139,6 +139,14 @@
 	background-image: url(images/copyright.png) !important;
 }
 
+.icon-settings {
+    background-image: url(images/folder_wrench.png) !important;
+}
+
+.icon-delete {
+    background-image: url(images/cross.gif) !important;
+}
+
 /** END ICONS **/
 
 

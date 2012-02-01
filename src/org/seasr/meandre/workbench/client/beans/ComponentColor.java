@@ -40,16 +40,65 @@
  * WITH THE SOFTWARE.
  */
 
-package org.seasr.meandre.workbench.client.listeners;
+package org.seasr.meandre.workbench.client.beans;
+
+import com.allen_sauer.gwt.log.client.Log;
 
 /**
  * @author Boris Capitanu
- *
  */
-public interface MainPanelActionListener {
 
-    public void onLogout();
-    public void onCredits();
-    public void onSettings();
+public class ComponentColor {
 
+        private final String _mainColor;
+
+        public ComponentColor(String mainColor) {
+            _mainColor = mainColor;
+        }
+
+        public String getMainColor() {
+            return _mainColor;
+        }
+
+        public String getTopBandColor() {
+            String topBandColor = "#";
+
+            for (int i = 1; i < _mainColor.length(); i += 2) {
+                String hex = _mainColor.substring(i, i + 2);
+                int value = Integer.parseInt(hex, 16);
+                if (i == 1 || i == 3)
+                    value += 13;
+                else
+                    value += 17;
+
+                if (value > 255) value = 255;
+                String hexString = Integer.toHexString(value);
+                if (hexString.length() < 2) hexString = "0" + hexString;
+                topBandColor += hexString;
+            }
+
+            Log.debug("mainColor: " + _mainColor + "  topBandColor: " + topBandColor);
+            return topBandColor;
+        }
+
+        public String getBorderColor() {
+            String borderColor = "#";
+
+            for (int i = 1; i < _mainColor.length(); i += 2) {
+                String hex = _mainColor.substring(i, i + 2);
+                int value = Integer.parseInt(hex, 16);
+                if (i == 1 || i == 3)
+                    value -= 18;
+                else
+                    value -= 24;
+
+                if (value < 0) value = 0;
+                String hexString = Integer.toHexString(value);
+                if (hexString.length() < 2) hexString = "0" + hexString;
+                borderColor += hexString;
+            }
+
+            Log.debug("mainColor: " + _mainColor + "  borderColor: " + borderColor);
+            return borderColor;
+        }
 }

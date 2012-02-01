@@ -73,6 +73,11 @@ public class MainPanel extends Panel {
                 if (_actionListener != null)
                     _actionListener.onCredits();
             }
+
+            public void onSettings() {
+                if (_actionListener != null)
+                    _actionListener.onSettings();
+            }
         });
 
         _detailsPanel = new DetailsPanel();
