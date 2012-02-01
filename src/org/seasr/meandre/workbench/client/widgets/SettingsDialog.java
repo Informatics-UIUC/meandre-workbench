@@ -160,7 +160,7 @@ public class SettingsDialog extends Window {
         ToolbarButton button = new ToolbarButton("Add Category", new ButtonListenerAdapter() {
             @Override
             public void onClick(Button button, EventObject e) {
-                Record category = recordDef.createRecord(new Object[] { "New Category", "red", "" });
+                Record category = recordDef.createRecord(new Object[] { "New Category", "#B6B7EE", "" });
                 grid.stopEditing();
                 int pos = store.getRecords().length;
                 store.insert(pos, category);
