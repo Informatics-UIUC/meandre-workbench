@@ -853,9 +853,12 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
                     listener.onComponentDragged(component);
 
                 if (_startDragPosition != null && (_startDragPosition[0] != xy[0] || _startDragPosition[1] != xy[1])) {
-                    WBExecutableComponentInstanceDescription compInstance = component.getInstanceDescription();
-                    compInstance.getProperties().add(COMP_LEFT_KEY, Integer.toString(xy[0]));
-                    compInstance.getProperties().add(COMP_TOP_KEY, Integer.toString(xy[1]));
+                    for (Component selectedComponent : getSelectedComponents()) {
+                        xy = selectedComponent.getPosition(true);
+                        WBExecutableComponentInstanceDescription compInstance = selectedComponent.getInstanceDescription();
+                        compInstance.getProperties().add(COMP_LEFT_KEY, Integer.toString(xy[0]));
+                        compInstance.getProperties().add(COMP_TOP_KEY, Integer.toString(xy[1]));
+                    }
 
                     setDirty();
                 }
