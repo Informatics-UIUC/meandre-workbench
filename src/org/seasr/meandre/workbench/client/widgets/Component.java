@@ -90,6 +90,8 @@ import com.gwtextux.client.widgets.image.Image;
  */
 public class Component extends VerticalContainerPanel {
 
+    public static final String DEFAULT_CATEGORY_TAG = "#default";
+
     private final WBExecutableComponentInstanceDescription _compInstance;
     private final Set<ComponentActionListener> _actionListeners = new HashSet<ComponentActionListener>();
     private final Map<String, ComponentPort> _inputs;
@@ -109,7 +111,7 @@ public class Component extends VerticalContainerPanel {
         _compInstance = compInstance;
 
         for (String tag : compDesc.getTags().getTags())
-            if (tag.startsWith("_") && tag.endsWith("_")) {
+            if (tag.startsWith("#")) {
                 _category = tag;
                 break;
             }
@@ -157,7 +159,7 @@ public class Component extends VerticalContainerPanel {
             {
                 Map<String, ComponentColor> componentCategoryColors = Workbench.Settings.getComponentCategoryColors();
                 final ComponentColor componentColor = (_category != null && componentCategoryColors.containsKey(_category)) ?
-                        componentCategoryColors.get(_category) : componentCategoryColors.get("_");
+                        componentCategoryColors.get(_category) : componentCategoryColors.get(DEFAULT_CATEGORY_TAG);
 
                 setCls("component-box");
 
@@ -217,7 +219,7 @@ public class Component extends VerticalContainerPanel {
         _settingsListener = new SettingsListener() {
             public void onComponentCategoryColorsChanged(Map<String, ComponentColor> categoryColors) {
                 ComponentColor componentColor = (_category != null && categoryColors.containsKey(_category)) ?
-                        categoryColors.get(_category) : categoryColors.get("_");
+                        categoryColors.get(_category) : categoryColors.get(DEFAULT_CATEGORY_TAG);
                 compBox.getEl().setStyle("background-color", componentColor.getMainColor());
                 compBox.getTopBand().getEl().setStyle("background-color", componentColor.getTopBandColor());
                 compBox.getEl().setStyle("border-color", componentColor.getBorderColor());

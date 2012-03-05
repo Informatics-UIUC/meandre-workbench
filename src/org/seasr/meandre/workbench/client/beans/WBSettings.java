@@ -15,7 +15,15 @@ import com.google.gwt.json.client.JSONString;
 
 public class WBSettings {
 
-    public static final String DEFAULT_SETTINGS = "{ 'compCatColors': [ { 'tag': '_', 'color': '#B6B7EE' } ] }";
+    public static final String DEFAULT_SETTINGS = "{ 'compCatColors': [" +
+    		"  { 'tag': '#default',   'color': '#BEBADA' }" +
+            ", { 'tag': '#analytics', 'color': '#8DD3C7' }" +
+            ", { 'tag': '#transform', 'color': '#FFFFB3' }" +
+            ", { 'tag': '#input',     'color': '#FB8072' }" +
+            ", { 'tag': '#vis',       'color': '#80B1D3' }" +
+            ", { 'tag': '#control',   'color': '#FDB462' }" +
+            ", { 'tag': '#output',    'color': '#B3DE69' }" +
+    		" ] }";
 
     private final Set<SettingsListener> _actionListeners = new HashSet<SettingsListener>();
     private Map<String, ComponentColor> _compCatColors;

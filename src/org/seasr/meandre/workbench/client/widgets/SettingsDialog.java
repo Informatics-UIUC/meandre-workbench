@@ -42,6 +42,8 @@
 
 package org.seasr.meandre.workbench.client.widgets;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +51,7 @@ import org.seasr.meandre.workbench.client.Workbench;
 import org.seasr.meandre.workbench.client.beans.ComponentColor;
 import org.seasr.meandre.workbench.client.beans.WBSettings;
 
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.Cookies;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Position;
@@ -128,7 +131,7 @@ public class SettingsDialog extends Window {
         ColumnWithCellActionsConfig actionsColumn = new ColumnWithCellActionsConfig("Action", "action", 60, false);
         actionsColumn.setCellActions(new GridCellAction[] { new GridCellAction("icon-delete", "Delete", new GridCellActionListener() {
             public boolean execute(GridPanel gridPanel, Record record, String action, Object value, String dataIndex, int rowIndex, int colIndex) {
-                if (!record.getAsString("tag").equals("_")) {
+                if (!record.getAsString("tag").equals("#default")) {
                     gridPanel.getStore().remove(record);
                     gridPanel.getStore().commitChanges();
                     return true;
@@ -183,7 +186,12 @@ public class SettingsDialog extends Window {
                 }
 
                 settings.setComponentCategoryColors(compCatColors);
-                Cookies.setCookie(Workbench.WB_SETTINGS_COOKIE_NAME, settings.toJSON());
+
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.YEAR, 10);
+                Log.info("Setting expiration date of cookie '" + Workbench.WB_SETTINGS_COOKIE_NAME + "' to " + sdf.format(cal.getTime()));
+                Cookies.setCookie(Workbench.WB_SETTINGS_COOKIE_NAME, settings.toJSON(), cal.getTime());
                 SettingsDialog.this.close();
             }
         });
