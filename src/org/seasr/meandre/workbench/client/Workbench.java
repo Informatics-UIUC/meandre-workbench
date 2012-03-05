@@ -42,9 +42,7 @@
 
 package org.seasr.meandre.workbench.client;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -230,11 +228,10 @@ public class Workbench extends Application {
         String strSettings = Cookies.getCookie(WB_SETTINGS_COOKIE_NAME);
         if (strSettings == null) {
             strSettings = WBSettings.DEFAULT_SETTINGS;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.YEAR, 10);
-            Log.info("Setting expiration date of cookie '" + WB_SETTINGS_COOKIE_NAME + "' to " + sdf.format(cal.getTime()));
-            Cookies.setCookie(WB_SETTINGS_COOKIE_NAME, strSettings, cal.getTime());
+            Date now = new Date();
+            Date expires = new Date(now.getYear() + 10, now.getMonth(), now.getDay());
+            Log.info("Setting expiration date of cookie '" + WB_SETTINGS_COOKIE_NAME + "' to " + expires);
+            Cookies.setCookie(WB_SETTINGS_COOKIE_NAME, strSettings, expires);
         }
         Workbench.Settings = WBSettings.fromJSON(strSettings);
 

@@ -42,8 +42,7 @@
 
 package org.seasr.meandre.workbench.client.widgets;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -187,11 +186,10 @@ public class SettingsDialog extends Window {
 
                 settings.setComponentCategoryColors(compCatColors);
 
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.YEAR, 10);
-                Log.info("Setting expiration date of cookie '" + Workbench.WB_SETTINGS_COOKIE_NAME + "' to " + sdf.format(cal.getTime()));
-                Cookies.setCookie(Workbench.WB_SETTINGS_COOKIE_NAME, settings.toJSON(), cal.getTime());
+                Date now = new Date();
+                Date expires = new Date(now.getYear() + 10, now.getMonth(), now.getDay());
+                Log.info("Setting expiration date of cookie '" + Workbench.WB_SETTINGS_COOKIE_NAME + "' to " + expires);
+                Cookies.setCookie(Workbench.WB_SETTINGS_COOKIE_NAME, settings.toJSON(), expires);
                 SettingsDialog.this.close();
             }
         });
