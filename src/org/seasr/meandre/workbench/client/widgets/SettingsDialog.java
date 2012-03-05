@@ -91,15 +91,7 @@ public class SettingsDialog extends Window {
 
     public SettingsDialog(final WBSettings settings) {
         Map<String, ComponentColor> compCatColors = settings.getComponentCategoryColors();
-        Object[][] compCatData = new Object[compCatColors.size()][];
-        int i = 0;
-        for (Map.Entry<String, ComponentColor> entry : compCatColors.entrySet()) {
-            Object[] catColor = new Object[3];
-            catColor[0] = entry.getKey();
-            catColor[1] = entry.getValue().getMainColor();
-            catColor[2] = "";
-            compCatData[i++] = catColor;
-        }
+        MemoryProxy proxy = getDataProxy(compCatColors);
 
         final RecordDef recordDef = new RecordDef(new FieldDef[] {
                 new StringFieldDef("tag"),
@@ -107,7 +99,6 @@ public class SettingsDialog extends Window {
                 new StringFieldDef("action")
              });
 
-        MemoryProxy proxy = new MemoryProxy(compCatData);
         ArrayReader reader = new ArrayReader(recordDef);
         final Store store = new Store(proxy, reader);
         store.load();
@@ -159,7 +150,7 @@ public class SettingsDialog extends Window {
         grid.setTitle("Component Category Colors");
 
         Toolbar toolbar = new Toolbar();
-        ToolbarButton button = new ToolbarButton("Add Category", new ButtonListenerAdapter() {
+        ToolbarButton btnAddCategory = new ToolbarButton("Add Category", new ButtonListenerAdapter() {
             @Override
             public void onClick(Button button, EventObject e) {
                 Record category = recordDef.createRecord(new Object[] { "New Category", "#B6B7EE", "" });
@@ -170,7 +161,20 @@ public class SettingsDialog extends Window {
             }
         });
 
-        toolbar.addButton(button);
+        ToolbarButton btnResetToDefaults = new ToolbarButton("Reset To Defaults", new ButtonListenerAdapter() {
+            @Override
+            public void onClick(Button button, EventObject e) {
+                grid.stopEditing();
+                store.removeAll();
+                WBSettings defaultSettings = WBSettings.fromJSON(WBSettings.DEFAULT_SETTINGS);
+                store.setDataProxy(getDataProxy(defaultSettings.getComponentCategoryColors()));
+                store.load();
+            }
+        });
+
+        toolbar.addButton(btnAddCategory);
+        toolbar.addFill();
+        toolbar.addButton(btnResetToDefaults);
         grid.setTopToolbar(toolbar);
 
         Button btnOK = new Button("OK", new ButtonListenerAdapter() {
@@ -219,6 +223,24 @@ public class SettingsDialog extends Window {
         grid.addPlugin(actionsPlugin);
 
         add(grid);
+    }
+
+    private static MemoryProxy getDataProxy(Map<String, ComponentColor> compCatColors) {
+        Object[][] compCatData = getStoreData(compCatColors);
+        return new MemoryProxy(compCatData);
+    }
+
+    private static Object[][] getStoreData(Map<String, ComponentColor> compCatColors) {
+        Object[][] compCatData = new Object[compCatColors.size()][];
+        int i = 0;
+        for (Map.Entry<String, ComponentColor> entry : compCatColors.entrySet()) {
+            Object[] catColor = new Object[3];
+            catColor[0] = entry.getKey();
+            catColor[1] = entry.getValue().getMainColor();
+            catColor[2] = "";
+            compCatData[i++] = catColor;
+        }
+        return compCatData;
     }
 
 }
