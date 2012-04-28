@@ -16,13 +16,13 @@ import com.google.gwt.json.client.JSONString;
 public class WBSettings {
 
     public static final String DEFAULT_SETTINGS = "{ 'compCatColors': [" +
-    		"  { 'tag': '#default',   'color': '#B6B7EE' }" +
-            ", { 'tag': '#analytics', 'color': '#8DD3C7' }" +
-            ", { 'tag': '#transform', 'color': '#FFDD33' }" +
-            ", { 'tag': '#input',     'color': '#FB8072' }" +
-            ", { 'tag': '#vis',       'color': '#80B1D3' }" +
-            ", { 'tag': '#control',   'color': '#FDB462' }" +
-            ", { 'tag': '#output',    'color': '#B3DE69' }" +
+    		"  { 'tag': '#default',   'color': '#CCCCCC' }" +
+            ", { 'tag': '#analytics', 'color': '#859D38' }" +
+            ", { 'tag': '#transform', 'color': '#386CB0' }" +
+            ", { 'tag': '#input',     'color': '#994801' }" +
+            ", { 'tag': '#vis',       'color': '#8B91BC' }" +
+            ", { 'tag': '#control',   'color': '#E6AB02' }" +
+            ", { 'tag': '#output',    'color': '#666666' }" +
     		" ] }";
 
     private final Set<SettingsListener> _actionListeners = new HashSet<SettingsListener>();
