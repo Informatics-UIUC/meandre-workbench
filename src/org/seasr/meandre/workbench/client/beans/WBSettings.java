@@ -11,18 +11,19 @@ import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
+import com.google.gwt.json.client.JSONValue;
 
 
 public class WBSettings {
 
-    public static final String DEFAULT_SETTINGS = "{ 'compCatColors': [" +
-    		"  { 'tag': '#default',   'color': '#CCCCCC' }" +
-            ", { 'tag': '#analytics', 'color': '#859D38' }" +
-            ", { 'tag': '#transform', 'color': '#386CB0' }" +
-            ", { 'tag': '#input',     'color': '#994801' }" +
-            ", { 'tag': '#vis',       'color': '#8B91BC' }" +
-            ", { 'tag': '#control',   'color': '#E6AB02' }" +
-            ", { 'tag': '#output',    'color': '#666666' }" +
+    public static final String DEFAULT_SETTINGS = "{ \"compCatColors\": [" +
+    		"  { \"tag\": \"#default\",   \"color\": \"#CCCCCC\" }" +
+            ", { \"tag\": \"#analytics\", \"color\": \"#859D38\" }" +
+            ", { \"tag\": \"#transform\", \"color\": \"#386CB0\" }" +
+            ", { \"tag\": \"#input\",     \"color\": \"#994801\" }" +
+            ", { \"tag\": \"#vis\",       \"color\": \"#8B91BC\" }" +
+            ", { \"tag\": \"#control\",   \"color\": \"#E6AB02\" }" +
+            ", { \"tag\": \"#output\",    \"color\": \"#666666\" }" +
     		" ] }";
 
     private final Set<SettingsListener> _actionListeners = new HashSet<SettingsListener>();
@@ -30,10 +31,11 @@ public class WBSettings {
 
     private WBSettings() { }
 
-    public static WBSettings fromJSON(String json) {
+    public static WBSettings fromJSON(String jsonStr) {
         WBSettings settings = new WBSettings();
 
-        JSONObject joSettings = JSONParser.parseStrict(json).isObject();
+        JSONValue json = JSONParser.parseStrict(jsonStr);
+		JSONObject joSettings = json.isObject();
         JSONArray jaCompCatColors = joSettings.get("compCatColors").isArray();
         settings._compCatColors = new HashMap<String, ComponentColor>();
         for (int i = 0, iMax = jaCompCatColors.size(); i < iMax; i++) {
