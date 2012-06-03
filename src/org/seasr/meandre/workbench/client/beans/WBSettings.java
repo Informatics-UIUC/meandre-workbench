@@ -33,7 +33,7 @@ public class WBSettings {
     public static WBSettings fromJSON(String json) {
         WBSettings settings = new WBSettings();
 
-        JSONObject joSettings = JSONParser.parse(json).isObject();
+        JSONObject joSettings = JSONParser.parseStrict(json).isObject();
         JSONArray jaCompCatColors = joSettings.get("compCatColors").isArray();
         settings._compCatColors = new HashMap<String, ComponentColor>();
         for (int i = 0, iMax = jaCompCatColors.size(); i < iMax; i++) {

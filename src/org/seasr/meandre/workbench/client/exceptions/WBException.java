@@ -42,7 +42,7 @@
 
 package org.seasr.meandre.workbench.client.exceptions;
 
-import org.seasr.meandre.workbench.client.Application;
+import org.seasr.meandre.workbench.shared.Utils;
 
 /**
  * Wrapper for Workbench-specific exceptions
@@ -70,7 +70,7 @@ public class WBException extends Exception {
      */
     public WBException(String message) {
         super(message);
-        _serverTrace = Application.formatException(this);
+        _serverTrace = Utils.formatException(this);
     }
 
     /**
@@ -78,7 +78,7 @@ public class WBException extends Exception {
      */
     public WBException(Throwable cause) {
         super(cause);
-        _serverTrace = Application.formatException(this);
+        _serverTrace = Utils.formatException(this);
     }
 
     /**
@@ -87,7 +87,7 @@ public class WBException extends Exception {
      */
     public WBException(String message, Throwable cause) {
         super(message, cause);
-        _serverTrace = Application.formatException(this);
+        _serverTrace = Utils.formatException(this);
     }
 
     public String getServerTrace() {

@@ -466,6 +466,17 @@ public interface IRepository extends RemoteService {
         throws SessionExpiredException, MeandreCommunicationException;
 
     /**
+     * Request the forced termination (kill) of a flow execution
+     *
+     * @param jobId The job ID
+     * @return true if success, false otherwise
+     * @throws SessionExpiredException Thrown if the user's session has expired
+     * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
+     */
+    public boolean killFlow(String jobId)
+    	throws SessionExpiredException, MeandreCommunicationException;
+
+    /**
      * Retrieves statistics about a running flow
      *
      * @param runningFlowPort The port where the flow is running

@@ -62,6 +62,7 @@ public class WBSession implements IsSerializable {
     private Date _date;
     private String _hostName;
     private int _port;
+    private String _serverVersion;
     private WBVersion _wbVersion;
 
     /**
@@ -79,7 +80,7 @@ public class WBSession implements IsSerializable {
      * @param hostName The host name
      * @param port The port number
      */
-    public WBSession(String sid, String userName, String password, Set<String> userRoles, String hostName, int port, WBVersion version) {
+    public WBSession(String sid, String userName, String password, Set<String> userRoles, String hostName, int port, WBVersion version, String serverVersion) {
         _sid = sid;
         _userName = userName;
         _password = password;
@@ -88,6 +89,7 @@ public class WBSession implements IsSerializable {
         _port = port;
         _date = new Date();
         _wbVersion = version;
+        _serverVersion = serverVersion;
     }
 
     /**
@@ -161,5 +163,14 @@ public class WBSession implements IsSerializable {
      */
     public WBVersion getWBVersion() {
         return _wbVersion;
+    }
+
+    /**
+     * Returns the server version information
+     *
+     * @return The server version information
+     */
+    public String getServerVersion() {
+        return _serverVersion;
     }
 }

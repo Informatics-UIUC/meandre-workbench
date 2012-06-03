@@ -1,162 +1,222 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="Meandre-Workbench" basedir="." default="dist">
-    <import file="common.xml" />
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="Meandre-Workbench" default="build" basedir=".">
+  <import file="common.xml" />
 
-    <svn failonerror="false">
-        <wcVersion path="${basedir}" prefix="svn.root."/>
-    </svn>
+  <svn refid="svn.settings">
+    <wcVersion path="${basedir}" prefix="svn.root."/>
+  </svn>
 
-    <condition property="svn_revision" value="${svn.root.revision.max-with-flags}" else="custom">
-        <isset property="svn.root.revision.max-with-flags"/>
-    </condition>
+  <condition property="svn_revision" value="${svn.root.revision.max-with-flags}" else="custom">
+    <isset property="svn.root.revision.max-with-flags"/>
+  </condition>
 
-   <!--#################### Project Properties #########################-->
-    <property name="version" value="1.4.10"/>
-    <property name="debug" value="false"/>
-    <property name="target" value="1.5"/>
+  <!--#################### Project Properties #########################-->
+  <property name="version" value="1.4.11"/>
 
-    <property name="src.gwt.dir" value="${basedir}/src"/>
-    <property name="src.bootstrap.dir" value="${basedir}/src-bootstrap"/>
-    <property name="lib.bootstrap.dir" value="${basedir}/lib/bootstrap"/>
-    <property name="lib.deploy.dir" value="${basedir}/lib/deploy"/>
-    <property name="lib.compiler.dir" value="${basedir}/lib/compiler"/>
-    <property name="build.dir" value="${basedir}/build"/>
-    <property name="build.bootstrap.dir" value="${build.dir}/bootstrap"/>
-    <property name="build.server.dir" value="${build.dir}/server"/>
-    <property name="dist.dir" value="${basedir}/dist"/>
-    <property name="gwt.lib.dir" value="${basedir}/lib/build"/>
-    <property name="gwt.output.dir" value="${build.dir}/gwtOutput"/>
-    <property name="gwt.workbench" value="org.seasr.meandre.workbench.Workbench"/>
-    <property name="bootstrap.class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
-    <property name="web.xml" value="${basedir}/www/WEB-INF/web.xml"/>
-    <property name="version.template" value="${basedir}/version.tpl"/>
-    <property name="version.file" value="${src.gwt.dir}/org/seasr/meandre/workbench/server/Version.java"/>
-    <property name="workbench.war.file" value="${dist.dir}/${ant.project.name}-${version}.${svn_revision}.war"/>
-    <property name="workbench.jar.file" value="${dist.dir}/${ant.project.name}-${version}.${svn_revision}.jar"/>
+  <!-- compilation settings -->
+  <property name="source" value="1.5"/>
+  <property name="target" value="1.5"/>
+  <property name="debug" value="true"/>
+  <property name="debuglevel" value="lines,vars,source"/>
 
-    <path id="deploy.classpath">
-        <fileset dir="${lib.deploy.dir}" includes="*.jar"/>
-    </path>
+  <property name="src.dir" value="${basedir}/src"/>
+  <property name="lib.dir" value="${basedir}/lib"/>
+  <property name="war.dir" value="${basedir}/war"/>
+  <property name="dist.dir" value="${basedir}/dist"/>
 
-    <path id="run.classpath">
-        <fileset dir="${dist.dir}/bootstrap/lib" includes="*.jar"/>
-        <pathelement location="${dist.dir}/bootstrap"/>
-    </path>
+  <property name="src.bootstrap.dir" value="${basedir}/src-bootstrap"/>
+  <property name="lib.bootstrap.dir" value="${lib.dir}/bootstrap"/>
+  <property name="build.dir" value="${basedir}/build"/>
+  <property name="build.gwt.dir" value="${build.dir}/gwt"/>
+  <property name="build.bootstrap.dir" value="${build.dir}/bootstrap"/>
+  <property name="bootstrap.class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
 
-    <path id="gwt_compile.classpath">
-        <fileset dir="${lib.compiler.dir}" includes="gwt-compiler.jar"/>
-        <fileset dir="${gwt.lib.dir}" includes="*.jar"/>
-        <pathelement location="${src.gwt.dir}"/>
-        <path refid="deploy.classpath"/>
-    </path>
+  <property name="war.lib.dir" value="${war.dir}/WEB-INF/lib"/>
+  <property name="war.classes.dir" value="${war.dir}/WEB-INF/classes"/>
+  <property name="gwt.sdk.dir" location="${lib.dir}/gwt"/>
+  <property name="gwt.args" value=""/>
 
-    <path id="bootstrap.classpath">
-        <fileset dir="${lib.bootstrap.dir}" includes="*.jar"/>
-    </path>
+  <property name="lib.support.dir" value="${lib.dir}/support"/>
+  <property name="lib.build.dir" value="${lib.dir}/build"/>
 
+  <property name="gwt.workbench" value="org.seasr.meandre.workbench.Workbench"/>
+  <property name="war.workbench" value="${war.dir}/workbench"/>
+  <property name="workbench.homepage" value="Workbench.html"/>
+  <property name="workbench.war.file" value="${dist.dir}/${ant.project.name}-${version}.${svn_revision}.war"/>
+  <property name="workbench.jar.file" value="${dist.dir}/${ant.project.name}-${version}.${svn_revision}.jar"/>
+  <property name="version.template" value="${basedir}/version.tpl"/>
+  <property name="versionfile.dir" value="${src.dir}/org/seasr/meandre/workbench/server"/>
 
-    <!--######################### BUILD TARGETS ###########################-->
+ 
+  <path id="project.classpath">
+    <pathelement location="${build.gwt.dir}"/>
+    <pathelement location="${gwt.sdk.dir}/gwt-user.jar"/>
+    <fileset dir="${gwt.sdk.dir}" includes="gwt-dev*.jar"/>
+    <fileset dir="${lib.build.dir}" includes="**/*.jar"/>
+    <fileset dir="${war.lib.dir}" includes="**/*.jar"/>
+  </path>
 
-    <target name="init">
-        <tstamp>
-            <format property="TIMESTAMP" pattern="MMM d, yyyy h:mm:ssa Z"/>
-        </tstamp>
-    </target>
+  <path id="bootstrap.classpath">
+    <fileset dir="${lib.bootstrap.dir}" includes="**/*.jar"/>
+  </path>
 
-    <target name="prepare" depends="init" description="-> performs necessary preparation tasks for the build">
-        <mkdir dir="${build.bootstrap.dir}"/>
-        <mkdir dir="${build.server.dir}"/>
-        <mkdir dir="${gwt.output.dir}"/>
-        <mkdir dir="${dist.dir}"/>
+  <!--######################### BUILD TARGETS ###########################-->
 
-        <copy file="${version.template}" toFile="${version.file}" overwrite="true">
-            <filterset>
-                <filter token="VERSION" value="${version}"/>
-                <filter token="REVISION" value="${svn_revision}"/>
-            </filterset>
-        </copy>
-    </target>
+  <target name="init">
+    <tstamp>
+        <format property="TIMESTAMP" pattern="MMM d, yyyy h:mm:ssa Z"/>
+    </tstamp>
+  </target>
 
-    <target name="clean" description="-> removes auto-generated files/folders">
-        <delete dir="${build.bootstrap.dir}"/>
-        <delete dir="${build.server.dir}"/>
-        <delete dir="${gwt.output.dir}"/>
-        <delete dir="${dist.dir}"/>
-    </target>
+  <target name="prepare" depends="init" description="-> performs necessary preparation tasks for the build">
+    <mkdir dir="${build.gwt.dir}"/>
+    <mkdir dir="${build.bootstrap.dir}"/>
+    <mkdir dir="${dist.dir}"/>
 
-    <target name="gwt_compile" depends="prepare" description="-> compiles the main GWT source tree">
-        <delete dir="${gwt.output.dir}"/>
-        <java classname="com.google.gwt.dev.GWTCompiler" fork="yes" maxmemory="512m">
-            <classpath refid="gwt_compile.classpath"/>
-            <arg value="-out"/>
-            <arg value="${gwt.output.dir}"/>
-            <arg value="$@"/>
-            <arg value="${gwt.workbench}"/>
-        </java>
-    </target>
+    <copy file="${version.template}" tofile="${build.dir}/Version.java" overwrite="true">
+      <filterset>
+        <filter token="VERSION" value="${version}"/>
+        <filter token="REVISION" value="${svn_revision}"/>
+      </filterset>
+    </copy>
 
-    <target name="server_compile" depends="prepare" description="-> compiles the server-side code">
-        <javac srcdir="${src.gwt.dir}" destdir="${build.server.dir}" classpathref="gwt_compile.classpath" debug="on" source="1.5" target="${target}" includeantruntime="false"/>
-    </target>
+    <copy todir="${versionfile.dir}" overwrite="true">
+      <fileset file="${build.dir}/Version.java">
+        <modified/>
+      </fileset>
+    </copy>
 
-    <target name="bootstrap_compile" depends="prepare" description="-> compiles the bootstrapper">
-        <javac srcdir="${src.bootstrap.dir}" destdir="${build.bootstrap.dir}" classpathref="bootstrap.classpath" debug="on" source="1.5" target="${target}" includeantruntime="false"/>
-    </target>
+    <delete file="${build.dir}/Version.java"/>
+  </target>
 
-    <target name="compile" depends="gwt_compile, server_compile, bootstrap_compile" description="-> compiles the entire project"/>
+  <target name="libs">
+    <mkdir dir="${war.lib.dir}" />
+    <copy todir="${war.lib.dir}" file="${gwt.sdk.dir}/gwt-servlet.jar" />
+  </target>
 
-    <target name="dist" depends="compile" description="-> creates Workbench distribution">
-        <war destfile="${workbench.war.file}" webxml="${web.xml}">
-            <fileset dir="${gwt.output.dir}/${gwt.workbench}"/>
-            <lib dir="${lib.deploy.dir}"/>
-            <classes dir="${build.server.dir}"/>
-        	<manifest>
-                <attribute name="Build-Version" value="${version}.${svn_revision}"/>
-        	    <attribute name="Build-Date" value="${TIMESTAMP}"/>
-        	</manifest>
-        </war>
+  <target name="javac" depends="prepare,libs" description="-> compile Java source to bytecode">
+    <javac srcdir="${src.dir}" encoding="utf-8"
+           destdir="${build.gwt.dir}"
+           classpathref="project.classpath"
+           source="${source}" target="${target}" nowarn="true"
+           debug="${debug}" debuglevel="${debuglevel}"
+           includeantruntime="false"/>
 
-        <jar destfile="${workbench.jar.file}">
-            <fileset dir="${build.bootstrap.dir}"/>
-        	<zipgroupfileset dir="${lib.bootstrap.dir}" includes="*.jar"/>
-        	<fileset file="${src.bootstrap.dir}/workbench-jetty.xml"/>
-        	<zipfileset file="${workbench.war.file}" fullpath="Meandre-Workbench.war"/>
-            <manifest>
-                <attribute name="Build-Version" value="${version}.${svn_revision}"/>
-                <attribute name="Build-Date" value="${TIMESTAMP}"/>
-                <attribute name="Main-Class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
-            </manifest>
-        </jar>
-    </target>
+    <javac srcdir="${src.bootstrap.dir}" encoding="utf-8"
+           destdir="${build.bootstrap.dir}" 
+           classpathref="bootstrap.classpath"
+           source="${source}" target="${target}"
+           debug="${debug}" debuglevel="${debuglevel}" 
+           includeantruntime="false"/>
 
-    <target name="run" depends="dist" description="-> compiles and runs Meandre-Workbench">
-        <antcall target="run-fast"/>
-    </target>
+    <copy todir="${build.gwt.dir}">
+      <fileset dir="${src.dir}" excludes="**/*.java"/>
+    </copy>
+  </target>
 
-    <condition property="can.run-fast">
+  <target name="gwtc" depends="javac" description="-> GWT compile to JavaScript (production mode)">
+    <java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
+      <classpath>
+        <pathelement location="${src.dir}"/>
+        <path refid="project.classpath"/>
+        <fileset dir="${gwt.sdk.dir}" includes="validation-api-*.jar"/>
+      </classpath>
+      <!-- add jvmarg -Xss16M or similar if you see a StackOverflowError -->
+      <jvmarg value="-Xmx256M"/>
+      <arg line="-war"/>
+      <arg value="${war.dir}"/>
+      <!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
+      <arg line="${gwt.args}"/>
+      <arg value="${gwt.workbench}"/>
+    </java>
+  </target>
+
+  <target name="devmode" depends="javac" description="-> run development mode">
+    <java failonerror="true" fork="true" classname="com.google.gwt.dev.DevMode">
+      <classpath>
+        <pathelement location="${src.dir}"/>
+        <path refid="project.classpath"/>
+        <fileset dir="${gwt.sdk.dir}" includes="validation-api-*.jar"/>
+      </classpath>
+      <jvmarg value="-Xmx256M"/>
+      <arg value="-startupUrl"/>
+      <arg value="${workbench.homepage}"/>
+      <arg line="-war"/>
+      <arg value="${war.dir}"/>
+      <!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
+      <arg line="${gwt.args}"/>
+      <arg value="${gwt.workbench}"/>
+    </java>
+  </target>
+
+  <target name="build" depends="gwtc" description="-> build the entire project" />
+
+  <target name="war" depends="build" description="-> create a deployable WAR file">
+    <war destfile="${workbench.war.file}" 
+         basedir="${war.dir}" excludes="META-INF/**/*, WEB-INF/**/*"
+         webxml="${war.dir}/WEB-INF/web.xml">
+      <lib dir="${war.lib.dir}"/>
+      <classes dir="${build.gwt.dir}"/>
+      <manifest>
+        <attribute name="Build-Version" value="${version}.${svn_revision}"/>
+        <attribute name="Build-Date" value="${TIMESTAMP}"/>
+      </manifest>
+    </war>
+  </target>
+
+  <target name="jar" depends="war" description="-> created a runnable JAR file">
+    <jar destfile="${workbench.jar.file}">
+      <fileset dir="${build.bootstrap.dir}"/>
+      <zipgroupfileset dir="${lib.bootstrap.dir}" includes="*.jar"/>
+      <fileset file="${src.bootstrap.dir}/workbench-jetty.xml"/>
+      <zipfileset file="${workbench.war.file}" fullpath="Meandre-Workbench.war"/>
+        <manifest>
+          <attribute name="Build-Version" value="${version}.${svn_revision}"/>
+          <attribute name="Build-Date" value="${TIMESTAMP}"/>
+          <attribute name="Main-Class" value="org.seasr.meandre.workbench.bootstrap.JettyBootstrapper"/>
+        </manifest>
+    </jar>
+  </target>
+
+  <target name="dist" depends="war, jar" description="-> created a complete Workbench distribution"/>
+
+  <target name="run" depends="dist" description="-> compiles and runs Meandre-Workbench">
+    <antcall target="run-fast"/>
+  </target>
+
+  <condition property="can.run-fast">
+    <and>
+      <available file="${workbench.jar.file}"/>
+      <available classname="${bootstrap.class}" classpath="${workbench.jar.file}"/>
+    </and>
+  </condition>
+
+  <target name="run-fast" depends="run-fast.check" if="can.run-fast" description="-> runs an already compiled Meandre-Workbech">
+    <java jar="${workbench.jar.file}" fork="yes" maxmemory="1024m">
+      <sysproperty key="org.seasr.meandre.workbench.debug" value="${debug}" />
+    </java>
+  </target>
+
+  <target name="run-fast.check" unless="can.run-fast">
+      <echo message="Cannot perform run-fast - required files are missing. Performing full build..."/>
+      <antcall target="dist"/>
+
+      <condition property="can.run-fast">
         <and>
-            <available file="${workbench.jar.file}"/>
-            <available classname="${bootstrap.class}" classpath="${workbench.jar.file}"/>
+          <available file="${workbench.jar.file}"/>
+          <available classname="${bootstrap.class}" classpath="${workbench.jar.file}"/>
         </and>
-    </condition>
+      </condition>
+  </target>
 
-    <target name="run-fast" depends="run-fast.check" if="can.run-fast" description="-> runs an already compiled Meandre-Workbech">
-        <java jar="${workbench.jar.file}" fork="yes" maxmemory="1024m">
-            <sysproperty key="org.seasr.meandre.workbench.debug" value="${debug}" />
-        </java>
-    </target>
-
-    <target name="run-fast.check" unless="can.run-fast">
-        <echo message="Cannot perform run-fast - required files are missing. Performing full build..."/>
-        <antcall target="dist"/>
-
-        <condition property="can.run-fast">
-            <and>
-                <available file="${workbench.jar.file}"/>
-                <available classname="${bootstrap.class}" classpath="${workbench.jar.file}"/>
-            </and>
-        </condition>
-    </target>
+  <target name="clean" description="-> removes auto-generated files/folders">
+    <delete dir="${war.dir}/../gwt-unitCache" failonerror="false"/>
+    <delete dir="${war.workbench}" failonerror="false"/>
+    <delete dir="${war.dir}/WEB-INF/deploy" failonerror="false"/>
+    <delete dir="${build.dir}" failonerror="false"/>
+    <delete dir="${dist.dir}" failonerror="false"/>
+    <delete dir="log" failonerror="false"/>
+  </target>
 
 </project>
 

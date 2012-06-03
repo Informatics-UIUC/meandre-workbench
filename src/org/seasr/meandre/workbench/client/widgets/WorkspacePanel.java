@@ -65,6 +65,7 @@ import com.gwtext.client.widgets.layout.BorderLayoutData;
  * @author Boris Capitanu
  *
  */
+@SuppressWarnings("unchecked")
 public class WorkspacePanel extends Panel implements ShowWebUIListener {
     private final TabPanel _tabPanel = new TabPanel();
     private WorkspacePanelActionListener _actionListener = null;
@@ -124,10 +125,12 @@ public class WorkspacePanel extends Panel implements ShowWebUIListener {
         final NewTabButton newTabButton = new NewTabButton();
         _tabPanel.add(newTabButton);
         _tabPanel.doOnRender(new Function() {
-            public void execute() {
+            @Override
+			public void execute() {
                 ExtElement tabEl = Ext.get(_tabPanel.getTabEl(newTabButton));
                 tabEl.addListener("click", new EventCallback() {
-                    public void execute(EventObject e) {
+                    @Override
+					public void execute(EventObject e) {
                         _actionListener.onNewTab(WorkspacePanel.this);
                     }
                 });
@@ -185,7 +188,8 @@ public class WorkspacePanel extends Panel implements ShowWebUIListener {
     }
 
 
-    public void onShowWebUI() {
+    @Override
+	public void onShowWebUI() {
         getActiveTab().openWebUI();
     }
 }

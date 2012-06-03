@@ -44,8 +44,8 @@ package org.seasr.meandre.workbench.client.listeners;
 
 import org.seasr.meandre.workbench.client.beans.repository.WBFlowDescription;
 import org.seasr.meandre.workbench.client.widgets.Component;
-import org.seasr.meandre.workbench.client.widgets.WorkspaceTab;
 import org.seasr.meandre.workbench.client.widgets.Component.ComponentPort;
+import org.seasr.meandre.workbench.client.widgets.WorkspaceTab;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -77,5 +77,5 @@ public interface WorkspaceActionListener {
 
     public void onFlowRun(WorkspaceTab flowTab);
     public void onFlowStop(WBFlowDescription flow);
-
+    public void onFlowKill(WBFlowDescription flow);
 }

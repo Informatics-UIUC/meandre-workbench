@@ -419,5 +419,14 @@ public interface IRepositoryAsync {
      */
     public void retrieveRunningFlowStatistics(int runningFlowPort, AsyncCallback<String> callback);
 
+    /**
+     * Request the forced termination (kill) of a flow execution
+     *
+     * @param jobId The job ID
+     * @return true if success, false otherwise
+     * @throws SessionExpiredException Thrown if the user's session has expired
+     * @throws MeandreCommunicationException Thrown if a problem occurred while communicating with the Meandre server
+     */
+	public void killFlow(String jobId, AsyncCallback<Boolean> callback);
 
 }

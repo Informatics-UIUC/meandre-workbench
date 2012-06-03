@@ -52,6 +52,7 @@ import org.seasr.meandre.workbench.client.beans.WBSettings;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Position;
 import com.gwtext.client.core.TextAlign;
@@ -113,14 +114,16 @@ public class SettingsDialog extends Window {
         colorColumn.setEditor(new GridEditor(colorField));
 
         ColumnConfig sampleColumn = new ColumnConfig("Sample", "color", 62, false, new Renderer() {
-            public String render(Object value, CellMetadata cellMetadata, Record record, int rowIndex, int colNum, Store store) {
+            @Override
+			public String render(Object value, CellMetadata cellMetadata, Record record, int rowIndex, int colNum, Store store) {
                 return "<div style='width: 48; height: 10; background-color: " + value.toString() + "; border: 1px solid black;'/>";
             }
         });
 
         ColumnWithCellActionsConfig actionsColumn = new ColumnWithCellActionsConfig("Action", "action", 60, false);
         actionsColumn.setCellActions(new GridCellAction[] { new GridCellAction("icon-delete", "Delete", new GridCellActionListener() {
-            public boolean execute(GridPanel gridPanel, Record record, String action, Object value, String dataIndex, int rowIndex, int colIndex) {
+            @Override
+			public boolean execute(GridPanel gridPanel, Record record, String action, Object value, String dataIndex, int rowIndex, int colIndex) {
                 if (!record.getAsString("tag").equals("#default")) {
                     gridPanel.getStore().remove(record);
                     gridPanel.getStore().commitChanges();
@@ -190,8 +193,8 @@ public class SettingsDialog extends Window {
 
                 settings.setComponentCategoryColors(compCatColors);
 
-                Date now = new Date();
-                Date expires = new Date(now.getYear() + 10, now.getMonth(), now.getDay());
+                Date expires = new Date();
+                CalendarUtil.addMonthsToDate(expires, 120); // 10 years
                 Log.info("Setting expiration date of cookie '" + Workbench.WB_SETTINGS_COOKIE_NAME + "' to " + expires);
                 Cookies.setCookie(Workbench.WB_SETTINGS_COOKIE_NAME, settings.toJSON(), expires);
                 SettingsDialog.this.close();

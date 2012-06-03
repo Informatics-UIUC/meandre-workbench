@@ -72,8 +72,8 @@ import pl.balon.gwt.diagrams.client.connection.ConnectionActionListener;
 import pl.balon.gwt.diagrams.client.connection.RectilinearTwoEndedConnection;
 
 import com.allen_sauer.gwt.log.client.Log;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -107,6 +107,7 @@ import com.gwtext.client.widgets.menu.event.MenuListenerAdapter;
  * @author Boris Capitanu
  *
  */
+@SuppressWarnings("unchecked")
 public class WorkspaceTab extends Panel implements ClipboardListener {
     private final static String COMP_TOP_KEY = "wb_top_pix_pos";
     private final static String COMP_LEFT_KEY = "wb_left_pix_pos";
@@ -306,12 +307,13 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
                 getBody().scroll(Direction.DOWN, scroll[1], false);
 
                 // Perform lazy add of connections since they don't get rendered otherwise
-                DeferredCommand.addCommand(new Command() {
-                    public void execute() {
-                        for (AbstractConnection connection : connections)
+                Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+					@Override
+					public void execute() {
+						for (AbstractConnection connection : connections)
                             connection.addTo(WorkspaceTab.this);
-                    }
-                });
+					}
+				});
             }
         });
 
@@ -335,7 +337,17 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
             public void onClick(Button button, EventObject e) {
                 for (WorkspaceActionListener listener : _actionListeners)
                     listener.onFlowStop(_wbFlow);
-                }
+            }
+        });
+
+        _btnKillFlow.setIconCls("icon-flow-kill");
+        _btnKillFlow.disable();
+        _btnKillFlow.addListener(new ButtonListenerAdapter() {
+        	@Override
+        	public void onClick(Button button, EventObject e) {
+        		for (WorkspaceActionListener listener : _actionListeners)
+                    listener.onFlowKill(_wbFlow);
+        	}
         });
 
         toolbar.addButton(_btnSave);
@@ -348,6 +360,7 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
         toolbar.addFill();
         toolbar.addButton(_btnRunFlow);
         toolbar.addButton(_btnStopFlow);
+        toolbar.addButton(_btnKillFlow);
 
         setTopToolbar(toolbar);
 
@@ -391,7 +404,8 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
                         WBExecutableComponentInstanceDescription compInstance = createComponentInstance(compDesc);
                         final Component component = new Component(compInstance, compDesc);
                         component.doOnRender(new Function() {
-                            public void execute() {
+                            @Override
+							public void execute() {
                                 component.select();
                             }
                         });
@@ -422,6 +436,18 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
         _btnRunFlow.disable();
     }
 
+    public void enableKillFlow() {
+    	_btnKillFlow.enable();
+    }
+
+    public void disableKillFlow() {
+    	_btnKillFlow.disable();
+    }
+
+    public void setKillFlowVisible(boolean visible) {
+    	_btnKillFlow.setVisible(visible);
+    }
+
     public void loadFlow(final WBFlowDescription flow) {
         int nInstances = flow.getExecutableComponentInstances().size();
         WBExecutableComponentInstanceDescription[] instances = new WBExecutableComponentInstanceDescription[nInstances];
@@ -433,8 +459,9 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
                 _repositoryState.getComponent(compInstance.getExecutableComponent());
 
             if (compDesc == null) {
-                DeferredCommand.addCommand(new Command() {
-                    public void execute() {
+            	Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+    				@Override
+					public void execute() {
                         _outputPanel.print("Missing component: The component '" + compInstance.getName() + "' needed by this flow " +
                                             "has not been found in the repository! Removing it...\n");
                     }
@@ -472,8 +499,9 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
         }
 
         // Perform lazy add of connections since they don't get rendered otherwise
-        DeferredCommand.addCommand(new Command() {
-            public void execute() {
+        Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+			@Override
+			public void execute() {
                 for (AbstractConnection connection : _connectionMap.keySet())
                     connection.addTo(WorkspaceTab.this);
             }
@@ -483,7 +511,8 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
     private void saveFlow(boolean saveAs, final AsyncCallback<WBFlowDescription> callback) {
         if ((_wbFlow.getName().length() == 0 || saveAs)) {
             SaveFlowDialog saveDialog = new SaveFlowDialog(new SaveFlowListener() {
-                public void onSave(final String name, final String description, final String rights, final String baseURI, final String tags) {
+                @Override
+				public void onSave(final String name, final String description, final String rights, final String baseURI, final String tags) {
                     // Check whether the flow exists on the server
                     String flowURI = baseURI + name.toLowerCase().replaceAll(" |\t|/|'", "-") + "/";
                     if (_repositoryState.getFlow(flowURI) != null)
@@ -491,7 +520,8 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
                                 "Overwrite",
                                 "A flow with the name '" + name + "' already exists on the server.<br/><b>Do you want to overwrite it?</b>",
                                 MessageBox.WARNING, MessageBox.YESNO, new PromptCallback() {
-                                    public void execute(String btnID, String text) {
+                                    @Override
+									public void execute(String btnID, String text) {
                                         if (btnID.equalsIgnoreCase("yes"))
                                             saveFlow(name, description, rights, baseURI, tags, callback);
                                     }
@@ -545,14 +575,17 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
                 iconCls = MessageBox.INFO;
                 buttons = MessageBox.YESNO;
                 callback = new PromptCallback() {
-                    public void execute(String btnID, String text) {
+                    @Override
+					public void execute(String btnID, String text) {
                         if (btnID.equalsIgnoreCase("yes")) {
                             saveFlow(false, new AsyncCallback<WBFlowDescription>() {
-                                public void onSuccess(WBFlowDescription result) {
+                                @Override
+								public void onSuccess(WBFlowDescription result) {
                                     doRunFlow();
                                 }
 
-                                public void onFailure(Throwable caught) {
+                                @Override
+								public void onFailure(Throwable caught) {
                                     Log.warn("The flow could not be saved - aborting run request!", caught);
                                 }
                             });
@@ -565,14 +598,17 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
                 iconCls = MessageBox.QUESTION;
                 buttons = MessageBox.YESNOCANCEL;
                 callback = new PromptCallback() {
-                    public void execute(String btnID, String text) {
+                    @Override
+					public void execute(String btnID, String text) {
                         if (btnID.equalsIgnoreCase("yes")) {
                             saveFlow(false, new AsyncCallback<WBFlowDescription>() {
-                                public void onSuccess(WBFlowDescription result) {
+                                @Override
+								public void onSuccess(WBFlowDescription result) {
                                     doRunFlow();
                                 }
 
-                                public void onFailure(Throwable caught) {
+                                @Override
+								public void onFailure(Throwable caught) {
                                     Log.warn("The flow could not be saved - aborting run request!", caught);
                                 }
                             });
@@ -628,13 +664,15 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
         return name;
     }
 
-    public void onCopyToClipboard() {
+    @Override
+	public void onCopyToClipboard() {
         Log.debug("onCopyToClipboard: " + this.getTitle() + ":  components=" +
                 _clipboard.getComponents().size() + "  connectors=" + _clipboard.getConnectors().size());
         _btnPaste.enable();
     }
 
-    public void onClipboardReset() {
+    @Override
+	public void onClipboardReset() {
         Log.debug("onCopyToClipboard: " + this.getTitle() + ": Clipboard empty");
         _btnPaste.disable();
     }
@@ -685,7 +723,8 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
         }
 
         final MessageBox.PromptCallback callback = new MessageBox.PromptCallback() {
-            public void execute(String btnID, String text) {
+            @Override
+			public void execute(String btnID, String text) {
                 if (btnID.equalsIgnoreCase("yes") || btnID.equalsIgnoreCase("no")) {
                     if (btnID.equalsIgnoreCase("yes"))
                         _btnSave.fireEvent("click");
@@ -1098,7 +1137,8 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
             new RectilinearTwoEndedConnection(srcPort.getConnector(), dstPort.getConnector());
 
         connection.addListener(new ConnectionActionListener() {
-            public void connectionRemoved(AbstractConnection connection) {
+            @Override
+			public void connectionRemoved(AbstractConnection connection) {
 
                 WBConnectorDescription connectorDesc = _connectionMap.get(connection);
                 Log.debug("Removing connection " + connectorDesc.getConnector());
@@ -1137,12 +1177,13 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
             Log.error("Source: " + srcCompInstanceURI + "  Target: " + dstCompInstanceURI);
 
             final String msgConsole = msg;
-            DeferredCommand.addCommand(new Command() {
-                public void execute() {
-                    _outputPanel.print("Could not retrieve the " + msgConsole + " component(s) for connector: " +
+            Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+				@Override
+				public void execute() {
+					_outputPanel.print("Could not retrieve the " + msgConsole + " component(s) for connector: " +
                             connector.getConnector() + " - ignoring; Source: " + srcCompInstanceURI + "  Target: " + dstCompInstanceURI + "\n");
-                }
-            });
+				}
+			});
 
             return null;
         }
@@ -1162,8 +1203,9 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
             Log.error("Source: " + srcDataPort + "  Target: " + dstDataPort);
 
             final String msgConsole = msg;
-            DeferredCommand.addCommand(new Command() {
-                public void execute() {
+            Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+				@Override
+				public void execute() {
                     _outputPanel.print("Could not retrive the " + msgConsole + " port(s) for the connector: " +
                             connector.getConnector() + " - ignoring; Source: " + srcDataPort + "  Target: " + dstDataPort + "\n");
                 }
@@ -1243,6 +1285,7 @@ public class WorkspaceTab extends Panel implements ClipboardListener {
     private WBWebUIInfo _webUIInfo = null;
     private final ToolbarButton _btnRunFlow = new ToolbarButton("Run flow");
     private final ToolbarButton _btnStopFlow = new ToolbarButton("Stop flow");
+    private final ToolbarButton _btnKillFlow = new ToolbarButton("Kill flow");
     private final ToolbarButton _btnExport;
 
     public void openWebUI() {

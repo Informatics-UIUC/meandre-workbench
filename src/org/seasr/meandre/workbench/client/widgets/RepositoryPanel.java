@@ -54,9 +54,9 @@ import org.seasr.meandre.workbench.client.listeners.FlowsGridActionListener;
 import org.seasr.meandre.workbench.client.listeners.LocationsGridActionListener;
 import org.seasr.meandre.workbench.client.listeners.RefreshListener;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Function;
 import com.gwtext.client.core.TextAlign;
@@ -105,7 +105,8 @@ public class RepositoryPanel extends Panel {
         setLayout(new AccordionLayout(true));
 
         addTool(new Tool(Tool.REFRESH, new Function() {
-            public void execute() {
+            @Override
+			public void execute() {
                 for (RefreshListener listener : _refreshListeners)
                     listener.onRefresh();
             }
@@ -153,7 +154,8 @@ public class RepositoryPanel extends Panel {
             gridView.setEmptyText("No components found");
 
             ColumnConfig ccIcon = new ColumnConfig("Icon", "runnable", 26, false, new Renderer() {
-                public String render(Object value,
+                @Override
+				public String render(Object value,
                         CellMetadata cellMetadata, Record record,
                         int rowIndex, int colNum, Store store) {
                     return Format.format("<img src='images/{0}.png'/>", value.toString());
@@ -173,7 +175,8 @@ public class RepositoryPanel extends Panel {
             ColumnConfig ccAuthor = new ColumnConfig("Creator", "creator", 80, true);
 
             ColumnConfig ccCreated = new ColumnConfig("Date", "creationDate", 70, true, new Renderer() {
-                public String render(Object value, CellMetadata cellMetadata,
+                @Override
+				public String render(Object value, CellMetadata cellMetadata,
                         Record record, int rowIndex, int colNum, Store store) {
                     Date creationDate = (Date)value;
                     return dateFormatter.format(creationDate);
@@ -303,7 +306,8 @@ public class RepositoryPanel extends Panel {
             gridView.setEmptyText("No flows found");
 
             ColumnConfig ccIcon = new ColumnConfig("Icon", "name", 26, false, new Renderer() {
-                public String render(Object value,
+                @Override
+				public String render(Object value,
                         CellMetadata cellMetadata, Record record,
                         int rowIndex, int colNum, Store store) {
                     return "<img src='images/gears.png'/>";
@@ -323,7 +327,8 @@ public class RepositoryPanel extends Panel {
             ColumnConfig ccAuthor = new ColumnConfig("Creator", "creator", 80, true);
 
             ColumnConfig ccCreated = new ColumnConfig("Date", "creationDate", 70, true, new Renderer() {
-                public String render(Object value, CellMetadata cellMetadata,
+                @Override
+				public String render(Object value, CellMetadata cellMetadata,
                         Record record, int rowIndex, int colNum, Store store) {
                     Date creationDate = (Date)value;
                     return dateFormatter.format(creationDate);
@@ -526,7 +531,8 @@ public class RepositoryPanel extends Panel {
         }
 
         public void setMask(final String message) {
-            DeferredCommand.addCommand(new Command() {
+        	Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+        		@Override
                 public void execute() {
                     LocationsGrid.this.getEl().mask(message);
                 }

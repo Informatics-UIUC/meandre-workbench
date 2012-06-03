@@ -89,10 +89,12 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.ClosingEvent;
+import com.google.gwt.user.client.Window.ClosingHandler;
 import com.google.gwt.user.client.Window.Location;
-import com.google.gwt.user.client.WindowCloseListener;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.MessageBox.ConfirmCallback;
@@ -138,9 +140,10 @@ public class Workbench extends Application {
         _workbench = this;
 
         // hook the close window event to check whether there are unsaved flows
-        Window.addWindowCloseListener(new WindowCloseListener() {
-            public String onWindowClosing() {
-                String closingMsg = null;
+        Window.addWindowClosingHandler(new ClosingHandler() {
+			@Override
+			public void onWindowClosing(ClosingEvent event) {
+				String closingMsg = null;
 
                 // _loggingOut is set when user clicks the "logout" button - an intentional action
                 if (_mainPanel != null && !_skipNavigateAwayPrompt) {
@@ -156,12 +159,8 @@ public class Workbench extends Application {
                 }
 
                 _skipNavigateAwayPrompt = false;
-
-                return closingMsg;
-            }
-
-            public void onWindowClosed() {
-            }
+                event.setMessage(closingMsg);
+			}
         });
 
         // retrieve the user session, if already exists
@@ -208,7 +207,8 @@ public class Workbench extends Application {
      */
     private void doLogin() {
         LoginListener loginListener = new LoginListener() {
-            public void onLogin(String userName, String password, String hostName, int port) {
+            @Override
+			public void onLogin(String userName, String password, String hostName, int port) {
                 login(userName, password, hostName, port);
             }
         };
@@ -228,8 +228,8 @@ public class Workbench extends Application {
         String strSettings = Cookies.getCookie(WB_SETTINGS_COOKIE_NAME);
         if (strSettings == null) {
             strSettings = WBSettings.DEFAULT_SETTINGS;
-            Date now = new Date();
-            Date expires = new Date(now.getYear() + 10, now.getMonth(), now.getDay());
+            Date expires = new Date();
+            CalendarUtil.addMonthsToDate(expires, 120);  // 10 years
             Log.info("Setting expiration date of cookie '" + WB_SETTINGS_COOKIE_NAME + "' to " + expires);
             Cookies.setCookie(WB_SETTINGS_COOKIE_NAME, strSettings, expires);
         }
@@ -247,9 +247,11 @@ public class Workbench extends Application {
         repositoryPanel.getFlowsPanel().setStore(_repositoryState.getFlowsStore());
         repositoryPanel.getLocationsPanel().setStore(_repositoryState.getLocationsStore());
         repositoryPanel.addListener(new RefreshListener() {
-            public void onRefresh() {
+            @Override
+			public void onRefresh() {
                 refreshRepository(new ICommand<Boolean>() {
-                    public void execute(Boolean args) {
+                    @Override
+					public void execute(Boolean args) {
                         repositoryPanel.getComponentsPanel().clearSearch();
                         repositoryPanel.getFlowsPanel().clearSearch();
                     }
@@ -267,7 +269,8 @@ public class Workbench extends Application {
              * @param wsTab The tab where the context menu was invoked
              * @return The context menu
              */
-            public Menu getTabContextMenu(final WorkspacePanel wsPanel, final WorkspaceTab wsTab) {
+            @Override
+			public Menu getTabContextMenu(final WorkspacePanel wsPanel, final WorkspaceTab wsTab) {
                 wsPanel.setActiveTab(wsTab);
 
                 // create the "New Tab" menu option
@@ -303,7 +306,8 @@ public class Workbench extends Application {
              * @param wsPanel The panel to which the tab belongs
              * @param wsTab The tab that was closed
              */
-            public void onTabClosed(WorkspacePanel wsPanel, WorkspaceTab wsTab) {
+            @Override
+			public void onTabClosed(WorkspacePanel wsPanel, WorkspaceTab wsTab) {
                 Log.info("Tab " + wsTab.getTitle() + " closed");
 
                 // remove the output panel
@@ -318,7 +322,8 @@ public class Workbench extends Application {
              *
              * @param wsPanel The panel where the new tab will be created
              */
-            public void onNewTab(WorkspacePanel wsPanel) {
+            @Override
+			public void onNewTab(WorkspacePanel wsPanel) {
                 addNewTab(null);
             }
 
@@ -407,6 +412,7 @@ public class Workbench extends Application {
 
             	Application.showMessage("Confirmation", message,
     					MessageBox.WARNING, MessageBox.YESNO, new PromptCallback() {
+							@Override
 							public void execute(String btnID, String text) {
 								if (!btnID.equalsIgnoreCase("yes")) return;
 
@@ -491,6 +497,7 @@ public class Workbench extends Application {
             public void onRemove(final WBFlowDescription flow) {
     			Application.showMessage("Confirmation", "Are you sure you want to remove " + flow.getName() + "?",
     					MessageBox.WARNING, MessageBox.YESNO, new PromptCallback() {
+							@Override
 							public void execute(String btnID, String text) {
 								if (!btnID.equalsIgnoreCase("yes")) return;
 
@@ -549,9 +556,11 @@ public class Workbench extends Application {
             /**
              * Adds a new Meandre components location via the wizard
              */
-            public void onAdd() {
+            @Override
+			public void onAdd() {
                 AddLocationDialog addLocationDialog = new AddLocationDialog(new AddLocationListener() {
-                    public void onAdd(final String description, final String url) {
+                    @Override
+					public void onAdd(final String description, final String url) {
                         locationsPanel.setMask("Adding");
                         Repository.addLocation(url, description, new WBCallback<Boolean>() {
                             @Override
@@ -574,10 +583,12 @@ public class Workbench extends Application {
              *
              * @param location The location to be removed
              */
-            public void onRemove(final WBLocation location) {
+            @Override
+			public void onRemove(final WBLocation location) {
                 MessageBox.confirm("Remove Location", "Are you sure you want to remove this location?",
                         new ConfirmCallback() {
-                            public void execute(String btnID) {
+                            @Override
+							public void execute(String btnID) {
                                 if (btnID.equalsIgnoreCase("yes"))
                                     Repository.removeLocation(location.getLocation(), new WBCallback<Boolean>() {
                                         @Override
@@ -595,7 +606,8 @@ public class Workbench extends Application {
             /**
              * Warns user about regenerating repository, and invokes regenerate if user approved
              */
-            public void onRegenerate() {
+            @Override
+			public void onRegenerate() {
                 Application.showMessage("Regenerate",
                         "<b>Regenerating the repository will delete all components and " +
                         "flows not contained in your location sources!</b> " +
@@ -603,7 +615,8 @@ public class Workbench extends Application {
                         MessageBox.WARNING,
                         MessageBox.YESNO,
                         new PromptCallback() {
-                            public void execute(String btnID, String text) {
+                            @Override
+							public void execute(String btnID, String text) {
                                 if (btnID.equalsIgnoreCase("yes"))
                                     Repository.regenerate(new WBCallback<Boolean>() {
                                         @Override
@@ -624,7 +637,8 @@ public class Workbench extends Application {
             /**
              * Warns user about logging out while having unsaved changes, and performs logout if user approves
              */
-            public void onLogout() {
+            @Override
+			public void onLogout() {
                 boolean dirty = false;
                 for (WorkspaceTab tab : workspacePanel.getTabs())
                     if (tab.isDirty()) {
@@ -642,7 +656,8 @@ public class Workbench extends Application {
                 }
 
                 Application.showMessage("Logout", logoutMsg, icon, MessageBox.YESNO, new PromptCallback() {
-                    public void execute(String btnID, String text) {
+                    @Override
+					public void execute(String btnID, String text) {
                         if (btnID.equalsIgnoreCase("yes"))
                             logout();
                     }
@@ -652,7 +667,8 @@ public class Workbench extends Application {
             /**
              * Presents application credits information
              */
-            public void onCredits() {
+            @Override
+			public void onCredits() {
                 if (_creditsDialog == null)
                     _creditsDialog = new CreditsDialog();
 
@@ -662,7 +678,8 @@ public class Workbench extends Application {
             /**
              * Presents the application settings screen
              */
-            public void onSettings() {
+            @Override
+			public void onSettings() {
                 new SettingsDialog(Settings).show();
             }
         });
@@ -673,7 +690,8 @@ public class Workbench extends Application {
         new Viewport(_mainPanel);
 
         refreshRepository(new ICommand<Boolean>() {
-            public void execute(Boolean args) {
+            @Override
+			public void execute(Boolean args) {
                 // expand the flows section
                 _mainPanel.getRepositoryPanel().getFlowsPanel().expand();
             }
@@ -701,6 +719,8 @@ public class Workbench extends Application {
      */
     private WorkspaceTab createTab(WBFlowDescription flow) {
         final WorkspaceTab workspaceTab = new WorkspaceTab(flow);
+        workspaceTab.setKillFlowVisible(_session.getServerVersion().startsWith("2.0"));
+
         _mainPanel.getWorkspacePanel().getOutputPanel().add(workspaceTab.getFlowOutputPanel());
         workspaceTab.addListener(new WorkspaceActionListenerAdapter() {
 
@@ -837,7 +857,8 @@ public class Workbench extends Application {
                         if (caught instanceof CorruptedFlowException)
                             Application.showError("Save Flow", null, caught,
                                     new ConfirmCallback() {
-                                        public void execute(String btnID) {
+                                        @Override
+										public void execute(String btnID) {
                                             if (callback != null)
                                                 callback.onFailure(caught);
                                         }
@@ -875,6 +896,7 @@ public class Workbench extends Application {
                             outputPanel.clearMask();
                             outputPanel.print("Flow execution failed");
                             flowTab.enableRunFlow();
+                            flowTab.disableKillFlow();
 
                             return;
                         } else
@@ -882,6 +904,7 @@ public class Workbench extends Application {
                             		"( id: " + result.getURI() + " webUI: " +
                             		result.getWebUIUrl() + " )");
 
+                        flowTab.enableKillFlow();
                         flowTab.setWebUIInfo(result);
                         Log.debug("Checking whether the flow contains any WebUI components...");
                         boolean showWebUi = flowHasWebUI(flow);
@@ -902,6 +925,7 @@ public class Workbench extends Application {
                                             // Flow execution finished
                                             flowTab.setWebUIInfo(null);
                                             flowTab.enableRunFlow();
+                                            flowTab.disableKillFlow();
                                             return;
                                         }
 
@@ -914,6 +938,7 @@ public class Workbench extends Application {
                                         super.onFailure(caught);
                                         flowTab.setWebUIInfo(null);
                                         flowTab.enableRunFlow();
+                                        flowTab.disableKillFlow();
                                     }
                                 });
                             }
@@ -926,6 +951,7 @@ public class Workbench extends Application {
                     public void onFailure(Throwable caught) {
                         super.onFailure(caught);
                         flowTab.enableRunFlow();
+                        flowTab.disableKillFlow();
                         outputPanel.clearMask();
                     }
 
@@ -945,12 +971,16 @@ public class Workbench extends Application {
                     return;
                 }
 
+                Log.info("Requesting abort flow for " + webUI.getURI());
+
                 // attempts to abort the flow (via RPC)
                 Repository.abortFlow(webUI, new WBCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
-                        workspaceTab.setWebUIInfo(null);
-                        workspaceTab.enableRunFlow();
+                    	if (_session.getServerVersion().startsWith("1.4")) {
+	                        workspaceTab.setWebUIInfo(null);
+	                        workspaceTab.enableRunFlow();
+                    	}
                         Application.showMessage("Abort Flow", "Request successfully dispatched", MessageBox.INFO);
                     }
 
@@ -960,6 +990,41 @@ public class Workbench extends Application {
                         workspaceTab.setWebUIInfo(null);
                     }
                 });
+            }
+
+            /**
+             * Kill a flow (only possible on Meandre 2.0)
+             *
+             * @param flow The flow to kill
+             */
+            @Override
+            public void onFlowKill(WBFlowDescription flow) {
+                WBWebUIInfo webUI = workspaceTab.getWebUIInfo();
+                if (webUI == null) {
+                    Application.showMessage("Kill Flow", "This flow is not currently running", MessageBox.INFO);
+                    return;
+                }
+
+                Log.info("Requesting kill flow for " + webUI.getURI());
+
+            	Repository.killFlow(webUI.getURI(), new WBCallback<Boolean>() {
+					@Override
+					public void onSuccess(Boolean result) {
+		                FlowOutputPanel outputPanel = workspaceTab.getFlowOutputPanel();
+		                outputPanel.print("*** Flow execution terminated by user request ***");
+
+						workspaceTab.setWebUIInfo(null);
+                        workspaceTab.enableRunFlow();
+                        workspaceTab.disableKillFlow();
+                        Application.showMessage("Kill Flow", "Request successfully dispatched", MessageBox.INFO);
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						super.onFailure(caught);
+						workspaceTab.setWebUIInfo(null);
+					}
+				});
             }
 
         });
@@ -977,7 +1042,8 @@ public class Workbench extends Application {
 
         repositoryPanel.setMask("Loading");
         _repositoryState.refresh(new ICommand<Object>() {
-            public void execute(Object args) {
+            @Override
+			public void execute(Object args) {
                 repositoryPanel.clearMask();
 
                 for (WorkspaceTab tab : _mainPanel.getWorkspacePanel().getTabs())  //FIXME: temporary, remove when the event-driven

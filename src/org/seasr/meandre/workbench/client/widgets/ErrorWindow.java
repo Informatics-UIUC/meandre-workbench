@@ -42,8 +42,8 @@
 
 package org.seasr.meandre.workbench.client.widgets;
 
-import org.seasr.meandre.workbench.client.Application;
 import org.seasr.meandre.workbench.client.exceptions.WBException;
+import org.seasr.meandre.workbench.shared.Utils;
 
 import com.google.gwt.user.client.ui.Image;
 import com.gwtext.client.core.EventObject;
@@ -103,7 +103,7 @@ public class ErrorWindow extends Window {
         lblMessage.setCls("msg-error");
         hPanel.add(lblMessage);
 
-        String details = Application.formatException(throwable);
+        String details = Utils.formatException(throwable);
 
         if (throwable instanceof WBException) {
             String serverTrace = ((WBException)throwable).getServerTrace();

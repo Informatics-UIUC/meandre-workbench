@@ -103,7 +103,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
 
     private static final IBeanConverter<URI, String> UriStringConverter =
         new IBeanConverter<URI, String>() {
-            public String convert(URI url) {
+            @Override
+			public String convert(URI url) {
                 return url.toString();
             }
         };
@@ -115,13 +116,15 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     // Workbench //
     ///////////////
 
-    public WBSession getSession()
+    @Override
+	public WBSession getSession()
         throws SessionExpiredException {
 
         return (WBSession) checkSession().getAttribute("session");
     }
 
-    public WBSession login(String userName, String password, String hostName, int port)
+    @Override
+	public WBSession login(String userName, String password, String hostName, int port)
         throws LoginFailedException, MeandreCommunicationException {
 
         HttpSession session = getHttpSession();
@@ -141,7 +144,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                 }
 
                 AbstractMeandreClient client = AbstractMeandreClient.getClientForServer(hostName, port, userName, password);
-                session.setAttribute("version", client.getServerVersion().split("=")[1].trim());
+                String serverVersion = client.getServerVersion().getString("version");
+				session.setAttribute("version", serverVersion);
 
                 Set<String> userRoles = client.retrieveUserRoles();
 
@@ -151,17 +155,13 @@ public class Repository extends RemoteServiceServlet implements IRepository {
                 WBVersion wbVersion = new WBVersion(Version.getVersion(), Version.getRevision(), Version.getBuildDate());
 
                 WBSession wbSession =
-                    new WBSession(session.getId(), userName, password, userRoles, hostName, port, wbVersion);
+                    new WBSession(session.getId(), userName, password, userRoles, hostName, port, wbVersion, serverVersion);
 
                 session.setAttribute("client", client);
                 session.setAttribute("session", wbSession);
 
                 return wbSession;
             }
-            catch (LoginFailedException e) {
-                throw e;
-            }
-
             catch (Exception e) {
                 throw new MeandreCommunicationException(e);
             }
@@ -170,7 +170,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
             return (WBSession) session.getAttribute("session");
     }
 
-    public Boolean logout()
+    @Override
+	public Boolean logout()
         throws SessionExpiredException {
 
         checkSession().invalidate();
@@ -178,7 +179,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         return true;
     }
 
-    public Boolean clearCache()
+    @Override
+	public Boolean clearCache()
         throws SessionExpiredException {
 
         HttpSession session = checkSession();
@@ -193,7 +195,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     // Locations //
     ///////////////
 
-    public Set<WBLocation> retrieveLocations()
+    @Override
+	public Set<WBLocation> retrieveLocations()
         throws SessionExpiredException, MeandreCommunicationException {
 
         AbstractMeandreClient client = getClient();
@@ -207,7 +210,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public boolean addLocation(String locationURL, String description)
+    @Override
+	public boolean addLocation(String locationURL, String description)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -218,7 +222,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public boolean removeLocation(String url)
+    @Override
+	public boolean removeLocation(String url)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -233,7 +238,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     // Repository //
     ////////////////
 
-    public boolean regenerate()
+    @Override
+	public boolean regenerate()
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -244,7 +250,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public Set<String> retrieveComponentUrls()
+    @Override
+	public Set<String> retrieveComponentUrls()
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -256,7 +263,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public WBExecutableComponentDescription retrieveComponentDescriptor(String componentURL)
+    @Override
+	public WBExecutableComponentDescription retrieveComponentDescriptor(String componentURL)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -268,7 +276,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public Set<WBExecutableComponentDescription> retrieveComponentDescriptors()
+    @Override
+	public Set<WBExecutableComponentDescription> retrieveComponentDescriptors()
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -282,7 +291,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public Set<String> retrieveFlowUrls()
+    @Override
+	public Set<String> retrieveFlowUrls()
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -293,7 +303,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public WBFlowDescription retrieveFlowDescriptor(String flowURL)
+    @Override
+	public WBFlowDescription retrieveFlowDescriptor(String flowURL)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -305,7 +316,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public Set<WBFlowDescription> retrieveFlowDescriptors()
+    @Override
+	public Set<WBFlowDescription> retrieveFlowDescriptors()
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -319,7 +331,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public Set<String> retrieveAllTags()
+    @Override
+	public Set<String> retrieveAllTags()
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -330,7 +343,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public Set<String> retrieveComponentTags()
+    @Override
+	public Set<String> retrieveComponentTags()
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -341,7 +355,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public Set<String> retrieveFlowTags()
+    @Override
+	public Set<String> retrieveFlowTags()
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -352,7 +367,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public Set<String> retrieveComponentsByTag(String tag)
+    @Override
+	public Set<String> retrieveComponentsByTag(String tag)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -364,7 +380,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public Set<String> retrieveFlowsByTag(String tag)
+    @Override
+	public Set<String> retrieveFlowsByTag(String tag)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -376,7 +393,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public Set<String> retrieveComponentUrlsByQuery(String query)
+    @Override
+	public Set<String> retrieveComponentUrlsByQuery(String query)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -388,7 +406,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public Set<String> retrieveFlowUrlsByQuery(String query)
+    @Override
+	public Set<String> retrieveFlowUrlsByQuery(String query)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -400,7 +419,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public boolean uploadFlow(WBFlowDescription wbFlow, boolean overwrite)
+    @Override
+	public boolean uploadFlow(WBFlowDescription wbFlow, boolean overwrite)
         throws SessionExpiredException, MeandreCommunicationException, CorruptedFlowException {
 
         FlowDescription flow = MeandreConverter.WBFlowDescriptionConverter.convert(wbFlow);
@@ -455,13 +475,15 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public boolean uploadFlowBatch(Set<WBFlowDescription> flows, boolean overwrite)
+    @Override
+	public boolean uploadFlowBatch(Set<WBFlowDescription> flows, boolean overwrite)
         throws SessionExpiredException, MeandreCommunicationException {
 
         throw new RuntimeException("Not yet implemented");
     }
 
-    public boolean exportFlow(String flowURI, String format)
+    @Override
+	public boolean exportFlow(String flowURI, String format)
         throws SessionExpiredException, MeandreCommunicationException {
 
         QueryableRepository repository = null;
@@ -516,7 +538,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         throw new RuntimeException("Export format " + format + " unknown!");
     }
 
-    public boolean removeResource(String resourceURL)
+    @Override
+	public boolean removeResource(String resourceURL)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -531,7 +554,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     // Publish //
     /////////////
 
-    public boolean publish(String resourceURL)
+    @Override
+	public boolean publish(String resourceURL)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -542,7 +566,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public boolean unpublish(String resourceURL)
+    @Override
+	public boolean unpublish(String resourceURL)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -557,7 +582,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     // Execution //
     ///////////////
 
-    public WBWebUIInfo runFlow(String flowURL, String token, boolean verbose)
+    @Override
+	public WBWebUIInfo runFlow(String flowURL, String token, boolean verbose)
         throws SessionExpiredException, MeandreCommunicationException {
 
         if (getHttpSession().getAttribute("version").toString().startsWith("1.4"))
@@ -613,21 +639,29 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         MeandreClient clientv2 = (MeandreClient)getClient();
         try {
             String jobID = clientv2.submitJob(flowURL);
-            String status;
+            JSONObject status;
 
             // Wait for job to get to "Running" state
-            while (!(status = clientv2.retrieveJobStatus(jobID)).equals("Running")) {
-                if (status.equals("Aborted") || status.equals("Failed") || status.equals("Killed"))
+            while (!(status = clientv2.retrieveJobStatus(jobID)).getString("status").equals("Running")) {
+            	String state = status.getString("status");
+                if (state.equals("Aborted") || state.equals("Failed") || state.equals("Killed"))
                     return null;
                 else
                     Thread.sleep(POLL_FREQ);
             }
 
+            InputStream flowInputStream = clientv2.retrieveJobOutput(jobID);
+            _flowConsoles.put(jobID, flowInputStream);
+
             // FIXME having a status of Running doesn't actually mean the flow is ready to serve requests;
             //       the execution engine takes time to actually start the flow;  how to reliably detect when
             //       flow is actually running?
 
-            return new WBWebUIInfo(clientv2.getHostName(), clientv2.getPort()+1, token, jobID);
+            JSONObject execMeta = status.getJSONObject("wrapper_meta");
+            String webuiHost = execMeta.getString("webui_host");
+            int webuiPort = execMeta.getInt("webui_port");
+
+            return new WBWebUIInfo(webuiHost, webuiPort, token, jobID);
         }
         catch (Exception e) {
             throw new MeandreCommunicationException(e);
@@ -637,7 +671,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     //TODO may need to start separate thread that retrieves the console output and uses
     //     the producer-consumer scenario to feed the results to the client
 
-    public String retrieveFlowOutput(String flowExecutionInstanceId)
+    @Override
+	public String retrieveFlowOutput(String flowExecutionInstanceId)
         throws MeandreCommunicationException {
 
         if (getHttpSession().getAttribute("version").toString().startsWith("1.4"))
@@ -648,13 +683,34 @@ public class Repository extends RemoteServiceServlet implements IRepository {
 
     private String retrieveFlowOutput20(String jobID) throws MeandreCommunicationException {
         try {
-            MeandreClient clientv2 = (MeandreClient)getClient();
-            String status = clientv2.retrieveJobStatus(jobID);
+            InputStream flowOutputStream = _flowConsoles.get(jobID);
+            if (flowOutputStream == null)
+            	throw new MeandreCommunicationException(jobID + " has not been executed");
 
-            if (status.equals("Aborted") || status.equals("Failed") || status.equals("Killed") || status.equals("Done"))
-                return null;
+            try {
+                int bufferSize = 1024*1024;
 
-            return "";
+                byte[] data = new byte[bufferSize];
+                int nRead = flowOutputStream.read(data);
+
+                if (nRead < 0) {
+                    // EOF detected
+                    _flowConsoles.remove(jobID);
+                    return null;
+                }
+
+                try {
+                    return new String(data, 0, nRead);
+                }
+                catch (Exception ex) {
+                    throw new MeandreCommunicationException("Cannot create string from stream", ex);
+                }
+            }
+            catch (IOException e) {
+                _flowConsoles.remove(jobID);
+
+                throw new MeandreCommunicationException(e);
+            }
         }
         catch (Exception e) {
             throw new MeandreCommunicationException(e);
@@ -692,7 +748,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public WBWebUIInfo retrieveWebUIInfo(String token)
+    @Override
+	public WBWebUIInfo retrieveWebUIInfo(String token)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -714,11 +771,28 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
+	@Override
+	public boolean killFlow(String jobID)
+		throws SessionExpiredException, MeandreCommunicationException {
+
+		if (getHttpSession().getAttribute("version").toString().startsWith("1.4"))
+            return false;  // can't kill flows in meandre 1.4.x
+
+		MeandreClient clientv2 = (MeandreClient)getClient();
+        try {
+            return clientv2.killJob(jobID);
+        }
+        catch (TransmissionException e) {
+			throw new MeandreCommunicationException(e);
+		}
+	}
+
     ////////////
     // Public //
     ////////////
 
-    public Set<WBExecutableComponentDescription> retrievePublicComponents()
+    @Override
+	public Set<WBExecutableComponentDescription> retrievePublicComponents()
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -731,7 +805,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public Set<WBFlowDescription> retrievePublicFlows()
+    @Override
+	public Set<WBFlowDescription> retrievePublicFlows()
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {
@@ -747,26 +822,10 @@ public class Repository extends RemoteServiceServlet implements IRepository {
     // Admin of Running Flows //
     ////////////////////////////
 
-    public boolean abortFlow(WBWebUIInfo flowInfo)
+    @Override
+	public boolean abortFlow(WBWebUIInfo flowInfo)
         throws SessionExpiredException, MeandreCommunicationException {
 
-        if (getHttpSession().getAttribute("version").toString().startsWith("1.4"))
-            return abortFlow14(flowInfo);
-        else
-            return abortFlow20(flowInfo);
-    }
-
-    private boolean abortFlow20(WBWebUIInfo flowInfo) throws SessionExpiredException, MeandreCommunicationException {
-        MeandreClient clientv2 = (MeandreClient)getClient();
-        try {
-            return clientv2.killJob(flowInfo.getURI());
-        }
-        catch (TransmissionException e) {
-            throw new MeandreCommunicationException(e);
-        }
-    }
-
-    private boolean abortFlow14(WBWebUIInfo flowInfo) throws SessionExpiredException, MeandreCommunicationException {
         try {
             return getClient().abortFlow(flowInfo.getPort());
         }
@@ -775,7 +834,8 @@ public class Repository extends RemoteServiceServlet implements IRepository {
         }
     }
 
-    public String retrieveRunningFlowStatistics(int runningFlowPort)
+    @Override
+	public String retrieveRunningFlowStatistics(int runningFlowPort)
         throws SessionExpiredException, MeandreCommunicationException {
 
         try {

@@ -46,11 +46,11 @@ import org.seasr.meandre.workbench.client.widgets.ErrorWindow;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.gwtext.client.widgets.MessageBox;
-import com.gwtext.client.widgets.MessageBoxConfig;
 import com.gwtext.client.widgets.MessageBox.PromptCallback;
+import com.gwtext.client.widgets.MessageBoxConfig;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -59,47 +59,26 @@ import com.gwtext.client.widgets.MessageBox.PromptCallback;
  */
 public abstract class Application implements EntryPoint {
 
-    private final static String NEW_LINE = "\n";
-
     /* (non-Javadoc)
      * @see com.google.gwt.core.client.EntryPoint#onModuleLoad()
      */
-    public void onModuleLoad() {
+    @Override
+	public void onModuleLoad() {
         // Register an UncaughtExceptionHandler
         GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
-            public void onUncaughtException(final Throwable throwable) {
+            @Override
+			public void onUncaughtException(final Throwable throwable) {
                 showError("Uncaught exception", throwable);
             }
         });
 
         // Use a deferred command so that the handler catches onLoad() exceptions
-        DeferredCommand.addCommand(new Command() {
-            public void execute() {
-                onLoad();
-            }
-        });
-    }
-
-    /**
-     * Returns a pretty-print version of an exception
-     *
-     * @param throwable The exception
-     * @return A formatted string containing the exception and its stack trace
-     */
-    public static String formatException(Throwable throwable) {
-        String text = "";
-
-        while (throwable != null) {
-            text += new String(throwable.toString() + NEW_LINE);
-            for (StackTraceElement stackTraceElement : throwable.getStackTrace())
-                text += "    at " + stackTraceElement + NEW_LINE;
-
-            throwable = throwable.getCause();
-            if (throwable != null)
-                text += NEW_LINE + "Caused by: ";
-        }
-
-        return text;
+        Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+			@Override
+			public void execute() {
+				onLoad();
+			}
+		});
     }
 
     /**

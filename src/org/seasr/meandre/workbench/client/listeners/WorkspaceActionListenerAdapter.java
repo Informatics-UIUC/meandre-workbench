@@ -44,8 +44,8 @@ package org.seasr.meandre.workbench.client.listeners;
 
 import org.seasr.meandre.workbench.client.beans.repository.WBFlowDescription;
 import org.seasr.meandre.workbench.client.widgets.Component;
-import org.seasr.meandre.workbench.client.widgets.WorkspaceTab;
 import org.seasr.meandre.workbench.client.widgets.Component.ComponentPort;
+import org.seasr.meandre.workbench.client.widgets.WorkspaceTab;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -55,49 +55,67 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class WorkspaceActionListenerAdapter implements WorkspaceActionListener {
 
-    public void onComponentAdded(Component component, int x, int y) {
+    @Override
+	public void onComponentAdded(Component component, int x, int y) {
     }
 
-    public void onComponentClicked(Component component) {
+    @Override
+	public void onComponentClicked(Component component) {
     }
 
-    public void onComponentDragged(Component component) {
+    @Override
+	public void onComponentDragged(Component component) {
     }
 
-    public void onComponentDragging(Component component) {
+    @Override
+	public void onComponentDragging(Component component) {
     }
 
-    public void onComponentRemoved(Component component) {
+    @Override
+	public void onComponentRemoved(Component component) {
     }
 
-    public void onComponentSelected(Component component) {
+    @Override
+	public void onComponentSelected(Component component) {
     }
 
-    public void onComponentUnselected(Component component) {
+    @Override
+	public void onComponentUnselected(Component component) {
     }
 
-    public void onComponentRenamed(Component component, String oldName, String newName) {
+    @Override
+	public void onComponentRenamed(Component component, String oldName, String newName) {
     }
 
-    public void onConnectionAdded(ComponentPort source, ComponentPort target) {
+    @Override
+	public void onConnectionAdded(ComponentPort source, ComponentPort target) {
     }
 
-    public void onConnectionRemoved(ComponentPort source, ComponentPort target) {
+    @Override
+	public void onConnectionRemoved(ComponentPort source, ComponentPort target) {
     }
 
-    public void onFlowModified() {
+    @Override
+	public void onFlowModified() {
     }
 
-    public void onFlowSave(WBFlowDescription flow, AsyncCallback<WBFlowDescription> callback) {
+    @Override
+	public void onFlowSave(WBFlowDescription flow, AsyncCallback<WBFlowDescription> callback) {
     }
 
-    public void onFlowExport(WBFlowDescription flow, String format) {
+    @Override
+	public void onFlowExport(WBFlowDescription flow, String format) {
     }
 
-    public void onFlowRun(WorkspaceTab flowTab) {
+    @Override
+	public void onFlowRun(WorkspaceTab flowTab) {
     }
 
-    public void onFlowStop(WBFlowDescription flow) {
+    @Override
+	public void onFlowStop(WBFlowDescription flow) {
     }
 
+    @Override
+	public void onFlowKill(WBFlowDescription flow) {
+    }
 }

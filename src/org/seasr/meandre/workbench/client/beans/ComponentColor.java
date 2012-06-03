@@ -42,7 +42,6 @@
 
 package org.seasr.meandre.workbench.client.beans;
 
-import com.allen_sauer.gwt.log.client.Log;
 
 /**
  * @author Boris Capitanu
@@ -77,7 +76,6 @@ public class ComponentColor {
                 topBandColor += hexString;
             }
 
-            Log.debug("mainColor: " + _mainColor + "  topBandColor: " + topBandColor);
             return topBandColor;
         }
 
@@ -98,7 +96,6 @@ public class ComponentColor {
                 borderColor += hexString;
             }
 
-            Log.debug("mainColor: " + _mainColor + "  borderColor: " + borderColor);
             return borderColor;
         }
 }

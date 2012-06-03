@@ -107,7 +107,8 @@ public class Component extends VerticalContainerPanel {
     private String _category = null;
     private final SettingsListener _settingsListener;
 
-    public Component(final WBExecutableComponentInstanceDescription compInstance, final WBExecutableComponentDescription compDesc) {
+    @SuppressWarnings("unchecked")
+	public Component(final WBExecutableComponentInstanceDescription compInstance, final WBExecutableComponentDescription compDesc) {
         _compInstance = compInstance;
 
         for (String tag : compDesc.getTags().getTags())
@@ -122,7 +123,8 @@ public class Component extends VerticalContainerPanel {
         vpInputs.setCls("component-vp-ports");
 
         final Comparator<WBDataPortDescription> comparator = new Comparator<WBDataPortDescription>() {
-            public int compare(WBDataPortDescription p1, WBDataPortDescription p2) {
+            @Override
+			public int compare(WBDataPortDescription p1, WBDataPortDescription p2) {
                 return p1.getName().compareToIgnoreCase(p2.getName());
             }
         };
@@ -166,7 +168,8 @@ public class Component extends VerticalContainerPanel {
                 _topBand = new ContainerPanel();
                 _topBand.setCls("component-box-topband");
                 _topBand.doOnRender(new Function() {
-                    public void execute() {
+                    @Override
+					public void execute() {
                         getTopBand().getEl().setStyle("background-color", componentColor.getTopBandColor());
                     }
                 });
@@ -175,7 +178,8 @@ public class Component extends VerticalContainerPanel {
                 _imgIcon = new Image("icon", "images/gear.png");
                 _imgIcon.setCls("component-box-icon");
                 _imgIcon.doOnRender(new Function() {
-                    public void execute() {
+                    @Override
+					public void execute() {
                         getImageIcon().getEl().setStyle("border-color", componentColor.getBorderColor());
                     }
                 });
@@ -188,11 +192,13 @@ public class Component extends VerticalContainerPanel {
                 }
 
                 doOnRender(new Function() {
-                    public void execute() {
+                    @Override
+					public void execute() {
                         getEl().setStyle("background-color", componentColor.getMainColor());
                         getEl().setStyle("border-color", componentColor.getBorderColor());
                         getEl().addListener("contextmenu", new EventCallback() {
-                            public void execute(EventObject e) {
+                            @Override
+							public void execute(EventObject e) {
                                 if (_contextMenu != null) {
                                     e.stopEvent();
                                     _contextMenu.showAt(e.getXY());
@@ -217,7 +223,8 @@ public class Component extends VerticalContainerPanel {
         };
 
         _settingsListener = new SettingsListener() {
-            public void onComponentCategoryColorsChanged(Map<String, ComponentColor> categoryColors) {
+            @Override
+			public void onComponentCategoryColorsChanged(Map<String, ComponentColor> categoryColors) {
                 ComponentColor componentColor = (_category != null && categoryColors.containsKey(_category)) ?
                         categoryColors.get(_category) : categoryColors.get(DEFAULT_CATEGORY_TAG);
                 compBox.getEl().setStyle("background-color", componentColor.getMainColor());
@@ -258,7 +265,8 @@ public class Component extends VerticalContainerPanel {
 //            }
 //        });
         _tfComponentName.addKeyPressListener(new EventCallback() {
-            public void execute(EventObject e) {
+            @Override
+			public void execute(EventObject e) {
                 if (e.getKey() == EventObject.ENTER)
                     _tfComponentName.getEl().blur();
                 else
@@ -297,11 +305,13 @@ public class Component extends VerticalContainerPanel {
             }
         });
         _tfComponentName.doOnRender(new Function() {
-            public void execute() {
+            @Override
+			public void execute() {
                 _tfComponentName.removeClass("x-form-text");
 
                 _tfComponentName.getEl().addListener("click", new EventCallback() {
-                    public void execute(EventObject e) {
+                    @Override
+					public void execute(EventObject e) {
                         if (!isSelected() || _isBeingRenamed) return;
                         e.stopPropagation();
 
@@ -322,9 +332,11 @@ public class Component extends VerticalContainerPanel {
         add(hpLabel);
 
         doOnRender(new Function() {
-            public void execute() {
+            @Override
+			public void execute() {
                 getEl().addListener("click", new EventCallback() {
-                    public void execute(EventObject e) {
+                    @Override
+					public void execute(EventObject e) {
                         raiseClick(e);
                     }
                 });
@@ -571,9 +583,11 @@ public class Component extends VerticalContainerPanel {
             setCls("component-port");
 
             doOnRender(new Function() {
-                public void execute() {
+                @Override
+				public void execute() {
                     getEl().addListener("click", new EventCallback() {
-                        public void execute(EventObject e) {
+                        @Override
+						public void execute(EventObject e) {
                             e.stopPropagation();
                             removeHighlight();
                             portClicked(ComponentPort.this);
@@ -581,7 +595,8 @@ public class Component extends VerticalContainerPanel {
                     });
 
                     getEl().addListener("mouseover", new EventCallback() {
-                        public void execute(EventObject e) {
+                        @Override
+						public void execute(EventObject e) {
                             if (_isBeingDragged) return;
 
                             _dragDrop.lock();
@@ -603,7 +618,8 @@ public class Component extends VerticalContainerPanel {
                     });
 
                     getEl().addListener("mouseout", new EventCallback() {
-                        public void execute(EventObject e) {
+                        @Override
+						public void execute(EventObject e) {
                             if (_isBeingDragged) return;
 
                             _dragDrop.unlock();
@@ -624,7 +640,8 @@ public class Component extends VerticalContainerPanel {
                      });
 
                     getEl().addListener("contextmenu", new EventCallback() {
-                        public void execute(EventObject e) {
+                        @Override
+						public void execute(EventObject e) {
                             e.stopEvent();
                             _contextMenu.showAt(e.getXY());
                         }

@@ -43,6 +43,7 @@
 package org.seasr.meandre.workbench.server;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -92,14 +93,19 @@ public class Version {
        }
 
        try {
-            Manifest manifest = new Manifest(new URL(baseDir + "META-INF" + File.separator + "MANIFEST.MF").openStream());
+            InputStream is = new URL(baseDir + "META-INF" + File.separator + "MANIFEST.MF").openStream();
+            if (is == null) return null;
+
+            Manifest manifest = new Manifest();
             String buildDate = manifest.getMainAttributes().getValue("Build-Date");
+            if (buildDate == null) return null;
+
             _buildDate = new SimpleDateFormat("MMM d, yyyy h:mm:ssa Z").parse(buildDate);
             
             return _buildDate;
         }
         catch (Exception e) {
-            System.err.println("version: thrown exception: " + e);
+            System.err.println("version.tpl: thrown exception: " + e);
             return null;
         }
     }
