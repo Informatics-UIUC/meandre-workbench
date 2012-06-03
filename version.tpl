@@ -56,7 +56,7 @@ public class Version {
     // these macros will be replaced by ANT
     private static final String VERSION = "@VERSION@";
     private static final String REVISION = "@REVISION@";
-    
+
     private static Date _buildDate = null;
 
     public static String getVersion() {
@@ -77,10 +77,10 @@ public class Version {
 
     public static Date getBuildDate() {
        if (_buildDate != null) return _buildDate;
-       
+
        String classContainer = Version.class.getProtectionDomain().getCodeSource().getLocation().toString();
        String baseDir = null;
-       
+
        try {
            Pattern regex = Pattern.compile("^(.*)WEB-INF[/\\\\]classes.*$");
            Matcher regexMatcher = regex.matcher(classContainer);
@@ -96,12 +96,12 @@ public class Version {
             InputStream is = new URL(baseDir + "META-INF" + File.separator + "MANIFEST.MF").openStream();
             if (is == null) return null;
 
-            Manifest manifest = new Manifest();
+            Manifest manifest = new Manifest(is);
             String buildDate = manifest.getMainAttributes().getValue("Build-Date");
             if (buildDate == null) return null;
 
             _buildDate = new SimpleDateFormat("MMM d, yyyy h:mm:ssa Z").parse(buildDate);
-            
+
             return _buildDate;
         }
         catch (Exception e) {
