@@ -216,6 +216,7 @@
     <delete dir="${build.dir}" failonerror="false"/>
     <delete dir="${dist.dir}" failonerror="false"/>
     <delete dir="log" failonerror="false"/>
+    <delete dir="${war.dir}/log" failonerror="false"/>
   </target>
 
 </project>
